@@ -318,6 +318,80 @@
     if (reduce) { size(); draw(); } else { requestAnimationFrame(frame); onView(cv, v => run = v); }
   })();
 
+  /* 4b) AI Tutor card: the golem walks to a whiteboard and writes formulas */
+  (() => {
+    const cv = $('#tutorBoard'); if (!cv) return;
+    const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
+    let W = 0, H = 0, run = true;
+    const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    size(); addEventListener('resize', size);
+    const formulas = [
+      { t: 'a² + b² = c²', col: '#1f6f4f' },
+      { t: 'P(A|B) = P(B|A) P(A) / P(B)', col: '#2456c8' },
+      { t: 'ŷ = w·x + b', col: '#b0431f' },
+      { t: '∫₀¹ x dx = ½', col: '#1f6f4f' },
+    ];
+    let idx = 0, phase = 'walk', t = 0, prog = 0, gx = -42, hov = false;
+    const host = cv.closest('.paper') || cv.parentElement;
+    host.addEventListener('mouseenter', () => { hov = true; });
+    host.addEventListener('mouseleave', () => { hov = false; });
+    cv.addEventListener('click', () => { if (phase === 'write' || phase === 'hold') { phase = 'erase'; prog = 0; } });
+    const rr = (x, y, w, h, r) => { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); };
+    const drawGolem = (fx, fy, walk, point) => {
+      c.save(); c.translate(fx, fy); c.lineJoin = 'round';
+      const out = '#08321E', sw = walk ? Math.sin(t * 0.45) * 2.6 : 0;
+      c.fillStyle = '#1E6B45'; c.strokeStyle = out; c.lineWidth = 2.4;
+      [[-6, sw], [6, -sw]].forEach(([lx, dy]) => { rr(lx - 3, -12 + dy, 6, 12, 1); c.fill(); c.stroke(); });
+      c.fillStyle = '#2E8C5E'; c.lineWidth = 2.6; rr(-15, -36, 30, 25, 4); c.fill(); c.stroke();
+      const ay = -30, ex = 22 + (point ? 4 : 0), ey = -38 - (point ? 5 : 0);   // raised writing arm
+      c.strokeStyle = out; c.lineWidth = 4; c.lineCap = 'round'; c.beginPath(); c.moveTo(13, ay); c.lineTo(ex, ey); c.stroke();
+      c.strokeStyle = '#2456c8'; c.lineWidth = 3; c.beginPath(); c.moveTo(ex, ey); c.lineTo(ex + 5, ey - 4); c.stroke();
+      c.strokeStyle = out; c.lineCap = 'butt';
+      c.fillStyle = '#2E8C5E'; c.lineWidth = 2.6; rr(-13, -52, 26, 16, 3); c.fill(); c.stroke();
+      c.lineWidth = 2; c.beginPath(); c.moveTo(0, -52); c.lineTo(0, -58); c.stroke();
+      c.fillStyle = '#5FD89B'; rr(-3, -62, 6, 5, 1.5); c.fill(); c.stroke();
+      c.fillStyle = '#FFD24D'; c.lineWidth = 1; rr(-9, -48, 7, 7, 1.5); c.fill(); c.stroke(); rr(2, -48, 7, 7, 1.5); c.fill(); c.stroke();
+      c.restore();
+    };
+    const draw = () => {
+      if (run) {
+        t++; c.clearRect(0, 0, W, H);
+        const groundY = H - 20, bx = Math.max(W * 0.30, 118), by = 20, bw = W - bx - 16, bh = groundY - by - 14;
+        c.strokeStyle = 'rgba(255,255,255,.08)'; c.lineWidth = 1; c.beginPath(); c.moveTo(0, groundY + 2); c.lineTo(W, groundY + 2); c.stroke();
+        c.fillStyle = '#fbfdfc'; c.strokeStyle = '#cfd8d3'; c.lineWidth = 2; rr(bx, by, bw, bh, 8); c.fill(); c.stroke();
+        c.fillStyle = '#aeb9b3'; c.fillRect(bx + 14, by + bh, bw - 28, 5);
+        c.fillStyle = '#1f6f4f'; c.fillRect(bx + bw - 54, by + bh + 1, 14, 3); c.fillStyle = '#2456c8'; c.fillRect(bx + bw - 36, by + bh + 1, 14, 3);
+        const sp = hov ? 1.8 : 1, targetX = bx - 20;
+        if (phase === 'walk') { gx += (targetX - gx) * 0.06 * sp; if (Math.abs(gx - targetX) < 1.2) { gx = targetX; phase = 'write'; prog = 0; } }
+        else if (phase === 'write') { prog += 0.006 * sp; if (prog >= 1) { prog = 1; phase = 'hold'; t = 0; } }
+        else if (phase === 'hold') { if (t > (hov ? 50 : 110)) { phase = 'erase'; prog = 0; } }
+        else if (phase === 'erase') { prog += 0.02 * sp; if (prog >= 1) { idx = (idx + 1) % formulas.length; phase = 'write'; prog = 0; } }
+        const f = formulas[idx];
+        let fs = 19; c.font = `600 ${fs}px Georgia, "Times New Roman", serif`;
+        while (c.measureText(f.t).width > bw - 34 && fs > 11) { fs--; c.font = `600 ${fs}px Georgia, "Times New Roman", serif`; }
+        c.textBaseline = 'middle'; c.textAlign = 'left';
+        const tw = c.measureText(f.t).width, txX = bx + 17, txY = by + bh * 0.45;
+        if (phase === 'write') {                                    // typewriter: glyphs appear left→right
+          const sub = f.t.slice(0, Math.max(0, Math.round(prog * f.t.length)));
+          c.fillStyle = f.col; c.fillText(sub, txX, txY);
+          const sw = c.measureText(sub).width; c.beginPath(); c.arc(txX + sw + 2, txY, 2.4, 0, 7); c.fill();
+        } else if (phase !== 'walk') {
+          c.fillStyle = f.col; c.fillText(f.t, txX, txY);
+          if (phase === 'erase') {                                  // whiteboard eraser wipes it away
+            const ex = txX + prog * (tw + 10);
+            c.fillStyle = '#fbfdfc'; c.fillRect(txX - 4, txY - 18, ex - (txX - 4), 36);
+            c.fillStyle = '#dfe6e2'; c.strokeStyle = '#b3bdb8'; c.lineWidth = 1; rr(ex - 9, txY - 13, 15, 26, 2); c.fill(); c.stroke();
+          }
+        }
+        if (phase !== 'walk') { c.fillStyle = 'rgba(110,120,115,.3)'; c.font = '12px Georgia, serif'; c.fillText('— worked example', txX + 2, txY + 28); }
+        drawGolem(gx, groundY, phase === 'walk', phase === 'write' || phase === 'hold');
+      }
+      requestAnimationFrame(draw);
+    };
+    if (reduce) { size(); phase = 'hold'; gx = Math.max(W * 0.30, 118) - 20; prog = 1; draw(); run = false; }
+    else { requestAnimationFrame(draw); onView(cv, v => run = v); }
+  })();
+
   /* 5) RAIN card: diagonal droplets + occasional lightning */
   (() => {
     const cv = $('#rainCanvas'); if (!cv) return;

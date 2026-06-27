@@ -163,7 +163,7 @@
   <div class="container">
     <div class="s-head reveal">
       <div><span class="eyebrow">Research</span><h2>What I'm researching</h2></div>
-      <p>Three problems I haven't been able to put down. Each one is interactive below, go ahead and poke at it.</p>
+      <p>Four problems I haven't been able to put down. Each one is interactive below, go ahead and poke at it.</p>
     </div>
     <div class="papers">
       <div class="paper reveal">
@@ -185,15 +185,27 @@
         <canvas id="agenticFlow" class="agentic-flow"></canvas>
         <div class="pno">02</div>
         <div>
-          <h3>Agentic systems and a deployed AI tutor</h3>
+          <h3>Agentic systems for the whole university</h3>
           <div class="venue">Lab for Emerging Intelligence &middot; Teradata-funded</div>
-          <p>The agentic platform behind the work at LEI: MCP servers over the university's APIs and a workflow engine built to degrade gracefully when something breaks, because 7,000+ people feel it when it does. The AI tutor that came out of it runs for 8,000 students and cut TA hours by 64% in an A/B test, using LoRA/SFT/RLHF fine-tuning and Bayesian knowledge tracing.</p>
-          <div class="chips"><span class="chip">MCP servers</span><span class="chip">Workflow engine</span><span class="chip">LoRA / SFT / RLHF</span><span class="chip">FastAPI</span></div>
+          <p>I lead the Agentic Systems project at LEI (under Dr. Ramamohan Paturi, Matthew Clegg, and Dr. Elizabeth Lyons): enterprise, workflow-driven agentic AI for 7,000+ UCSD staff, faculty, and students. Custom MCP servers over the university's APIs, research into automated skill-generation and optimization, and a novel workflow executor I built to stay intelligent, deterministic, and graceful when a task goes sideways.</p>
+          <div class="chips"><span class="chip">MCP servers</span><span class="chip">Workflow executor</span><span class="chip">Skill optimization</span><span class="chip">FastAPI</span></div>
+        </div>
+      </div>
+      <div class="paper reveal" id="tutorCard">
+        <div class="pno">03</div>
+        <div>
+          <h3>Smart Learning Hub &amp; a deployed AI tutor</h3>
+          <div class="venue">Lab for Emerging Intelligence &middot; LLM reasoning &amp; fine-tuning</div>
+          <p>I lead development and testing for the Python AI Tutor and the Smart Learning Hub: educational virtual agents built on LLM reasoning, fine-tuned with LoRA/SFT/RLHF and reinforcement-learning frameworks, with Bayesian knowledge tracing to model what each student actually knows. It runs for <b>8,000 students</b> across UCSD, SDSU, and Cal Poly Pomona; in an A/B test it cut TA hours <b>64%</b> and lifted engagement <b>87%</b>.</p>
+          <div class="whiteboard" aria-hidden="true">
+            <canvas id="tutorBoard" aria-label="An AI tutor writing on a whiteboard"></canvas>
+          </div>
+          <div class="chips"><span class="chip">LLM reasoning</span><span class="chip">LoRA / SFT / RLHF</span><span class="chip">Bayesian knowledge tracing</span><span class="chip">Python</span></div>
         </div>
       </div>
       <div class="paper reveal" id="lifeCard">
         <div class="life-grid">
-          <div class="pno">03</div>
+          <div class="pno">04</div>
           <div>
             <h3>AILA: an AI living assistant for emergency &amp; rural care</h3>
             <div class="venue">LifeSaver &middot; Qualcomm Institute / Calit2 &middot; HXI Lab</div>
