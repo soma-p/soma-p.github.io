@@ -435,7 +435,7 @@
     ].map(s => ({ ...s, el: $(s.sel) })).filter(s => s.el);
     if (!sections.length) { buddy.style.display = 'none'; return; }
     let tx = innerWidth * 0.8, ty = innerHeight * 0.3, cx = tx, cy = ty, curMsg = '', scrolling = false, stopT = 0, emoteT = 0, lastY = -1;
-    let steps = [], distAcc = 0, stepSide = 1, lastFX = null, lastFY = null, pcx = cx, pcy = cy, scl = 1;
+    let path = [], pcx = cx, pcy = cy, scl = 1;
     const cur = () => { const mid = scrollY + innerHeight * 0.5; let b = sections[0]; for (const s of sections) if (s.el.getBoundingClientRect().top + scrollY <= mid) b = s; return b; };
     const setMsg = (m) => { if (m !== curMsg) { curMsg = m; bubble.textContent = m; } };
     const playEmote = (cls, ms) => { buddy.classList.add(cls); setTimeout(() => buddy.classList.remove(cls), ms); };
@@ -466,19 +466,40 @@
     addEventListener('resize', () => { sizeT(); onScroll(); });
     onScroll(); cx = tx; cy = ty; bubble.classList.add('show'); onStop();
 
-    const footprint = (x, y, ang, alpha) => {                       // a single blocky footprint pressed into the ground
-      g.save(); g.translate(x, y); g.rotate(ang);
-      g.fillStyle = `rgba(150,92,52,${alpha})`; g.fillRect(-5, -3.2, 10, 6.4);
-      g.strokeStyle = `rgba(10,10,11,${alpha * 0.6})`; g.lineWidth = 1; g.strokeRect(-5, -3.2, 10, 6.4);
-      g.fillStyle = `rgba(10,10,11,${alpha * 0.45})`; g.fillRect(2.4, -3.2, 2.6, 6.4);   // toe end
-      g.restore();
+    const HW = 9;                                                   // half-width of the bridge deck
+    const edges = () => {                                            // left/right rail points along the path
+      const n = path.length, L = [], R = [];
+      for (let i = 0; i < n; i++) {
+        const a = path[Math.max(0, i - 1)], b = path[Math.min(n - 1, i + 1)];
+        let dx = b.x - a.x, dy = b.y - a.y; const m = Math.hypot(dx, dy) || 1; dx /= m; dy /= m;
+        const nx = -dy, ny = dx;
+        L.push({ x: path[i].x + nx * HW, y: path[i].y + ny * HW });
+        R.push({ x: path[i].x - nx * HW, y: path[i].y - ny * HW });
+      }
+      return { L, R };
     };
-    const drawTrail = () => {
+    const drawTrail = () => {                                       // render the path as a little plank bridge
       g.clearRect(0, 0, innerWidth, innerHeight);
-      for (const s of steps) footprint(s.x, s.y, s.ang, s.life * 0.5);   // footpath left behind
-      if (steps.length && lastFX !== null) {                        // a couple faint prints ahead of the feet
-        const a = steps[steps.length - 1], ux = Math.cos(a.ang), uy = Math.sin(a.ang), nx = -Math.sin(a.ang), ny = Math.cos(a.ang);
-        for (let k = 1; k <= 2; k++) footprint(lastFX + ux * 16 * k - nx * 7 * stepSide * (k % 2 ? 1 : -1), lastFY + uy * 16 * k - ny * 7 * stepSide * (k % 2 ? 1 : -1), a.ang, (0.22 - k * 0.07));
+      const n = path.length; if (n < 2) return;
+      const { L, R } = edges();
+      for (let i = 1; i < n; i++) {
+        const f = i / n;
+        g.fillStyle = `rgba(206,134,80,${f * 0.34})`;                // wooden deck
+        g.beginPath(); g.moveTo(L[i - 1].x, L[i - 1].y); g.lineTo(L[i].x, L[i].y); g.lineTo(R[i].x, R[i].y); g.lineTo(R[i - 1].x, R[i - 1].y); g.closePath(); g.fill();
+        g.strokeStyle = `rgba(110,58,32,${f * 0.65})`; g.lineWidth = 2.4; g.lineCap = 'round';   // rails
+        g.beginPath(); g.moveTo(L[i - 1].x, L[i - 1].y); g.lineTo(L[i].x, L[i].y); g.stroke();
+        g.beginPath(); g.moveTo(R[i - 1].x, R[i - 1].y); g.lineTo(R[i].x, R[i].y); g.stroke();
+      }
+      for (let i = 0; i < n; i += 3) {                              // cross planks
+        const f = i / n; g.strokeStyle = `rgba(122,66,38,${f * 0.6})`; g.lineWidth = 2.8;
+        g.beginPath(); g.moveTo(L[i].x, L[i].y); g.lineTo(R[i].x, R[i].y); g.stroke();
+      }
+      const last = path[n - 1], prev = path[Math.max(0, n - 6)], vx = last.x - prev.x, vy = last.y - prev.y, mm = Math.hypot(vx, vy) || 1;
+      const ux = vx / mm, uy = vy / mm, nx = -uy, ny = ux;          // a few planks projected ahead
+      for (let k = 1; k <= 3; k++) {
+        const cxp = last.x + ux * 9 * k, cyp = last.y + uy * 9 * k, a = 0.3 - k * 0.08;
+        g.strokeStyle = `rgba(122,66,38,${a})`; g.lineWidth = 2.6;
+        g.beginPath(); g.moveTo(cxp + nx * HW, cyp + ny * HW); g.lineTo(cxp - nx * HW, cyp - ny * HW); g.stroke();
       }
     };
     const loop = () => {
@@ -488,28 +509,24 @@
         const r = base.getBoundingClientRect();
         targetScale = HERO_SCALE;
         tx = r.left + r.width / 2 - BW / 2;
-        ty = r.top + r.height * 0.52 - 48.5 - 41.5 * targetScale;   // feet on the base surface
+        ty = r.top + r.height * 0.52 - 51.5 - 48 * targetScale;     // feet on the base surface
       } else {
         targetScale = 0.86 + 0.3 * clamp((cy / innerHeight - 0.22) / 0.34, 0, 1);
       }
       cx += (tx - cx) * (scrolling ? 0.07 : 0.1); cy += (ty - cy) * 0.09; scl += (targetScale - scl) * 0.08;
       buddy.style.transform = `translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px) scale(${scl.toFixed(3)})`;
+      const ccx = cx + BW / 2;                                       // keep its bubble inside the viewport at the edges
+      buddy.classList.toggle('bub-r', ccx > innerWidth - 132);
+      buddy.classList.toggle('bub-l', ccx < 132);
       const vel = Math.hypot(cx - pcx, cy - pcy); pcx = cx; pcy = cy;
       buddy.classList.toggle('walking', !hero && vel > 0.5);        // step the legs while moving
       if (!hero) {
-        const fx = cx + BW / 2, fy = cy + 92 * scl;                 // ground point at its feet
-        if (lastFX !== null) {
-          const d = Math.hypot(fx - lastFX, fy - lastFY); distAcc += d;
-          if (distAcc >= 17 && d > 0.01) {                          // drop a footprint each stride, alternating sides
-            distAcc = 0; const ang = Math.atan2(fy - lastFY, fx - lastFX);
-            steps.push({ x: fx - Math.sin(ang) * 7 * stepSide, y: fy + Math.cos(ang) * 7 * stepSide, ang, life: 1 });
-            stepSide *= -1; if (steps.length > 26) steps.shift();
-          }
-        }
-        lastFX = fx; lastFY = fy;
-      } else { lastFX = null; }                                     // no footprints while perched
-      for (const s of steps) s.life -= 0.01;
-      steps = steps.filter(s => s.life > 0);
+        const fx = cx + BW / 2, fy = cy + 98 * scl;                 // ground point at its feet
+        const lp = path[path.length - 1];
+        if (!lp || Math.hypot(fx - lp.x, fy - lp.y) > 4) path.push({ x: fx, y: fy });
+        if (path.length > 46) path.shift();
+      } else if (path.length) { path = []; }                        // pull the bridge in while perched
+      if (!scrolling && path.length > 1 && Math.random() < 0.28) path.shift();   // bridge recedes once it stops
       drawTrail();
       requestAnimationFrame(loop);
     };

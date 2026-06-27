@@ -59,7 +59,7 @@ a{color:inherit;text-decoration:none}
 .hero::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(120% 90% at 12% 0%,rgba(255,255,255,.92) 28%,rgba(255,255,255,0) 72%)}
 /* perch for the companion at the top of the page */
-.hero-base{position:absolute;right:5.5%;top:150px;z-index:0;pointer-events:none}
+.hero-base{position:absolute;right:10%;top:182px;z-index:0;pointer-events:none}
 .hero-base svg{display:block;filter:drop-shadow(0 10px 16px rgba(8,40,26,.18))}
 
 .hero-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 26px}
@@ -304,8 +304,9 @@ a{color:inherit;text-decoration:none}
 /* ===== agentic node-graph workflow — orbits the text ===== */
 .flow-around{position:relative;overflow:hidden;min-height:300px;align-items:center}
 .flow-around>.pno,.flow-around>div{position:relative;z-index:2}
+.flow-around>.pno{align-self:flex-start}
 .flow-around>div{padding:6px 30px}
-.agentic-flow{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;pointer-events:none}
+.agentic-flow{position:absolute;top:0;right:0;bottom:0;left:17%;height:100%;z-index:1;display:block;pointer-events:none}
 
 /* ===== AILA / Baymax ===== */
 #lifeCard{display:block}
@@ -416,21 +417,21 @@ a{color:inherit;text-decoration:none}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 /* legs step while it walks */
 .buddy-leg-l,.buddy-leg-r{transform-box:view-box}
-.buddy-leg-l{transform-origin:36px 85px}
-.buddy-leg-r{transform-origin:54px 85px}
+.buddy-leg-l{transform-origin:34px 93px}
+.buddy-leg-r{transform-origin:58px 93px}
 .buddy.walking .buddy-leg-l{animation:bstep .46s ease-in-out infinite}
 .buddy.walking .buddy-leg-r{animation:bstep .46s ease-in-out infinite;animation-delay:-.23s}
 @keyframes bstep{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(8deg)}}
 .buddy-arm-l,.buddy-arm-r{transform-box:view-box}
-.buddy-arm-l{transform-origin:14px 61px;animation:bxwave 2.6s ease-in-out infinite}
-.buddy-arm-r{transform-origin:76px 61px}
+.buddy-arm-l{transform-origin:12px 34px;animation:bxwave 2.6s ease-in-out infinite}
+.buddy-arm-r{transform-origin:80px 34px}
 .buddy-eye{transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 0 4px rgba(255,201,74,.92));animation:blink 4.2s steps(1,end) infinite}
 @keyframes blink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.12)}}
 /* arms-out "presenting" pose when it settles on a section */
 .buddy.present .buddy-arm-l{animation:armout-l .5s cubic-bezier(.2,1.5,.4,1) forwards}
 .buddy.present .buddy-arm-r{animation:armout-r .5s cubic-bezier(.2,1.5,.4,1) forwards}
-@keyframes armout-l{to{transform:rotate(124deg)}}
-@keyframes armout-r{to{transform:rotate(-124deg)}}
+@keyframes armout-l{to{transform:rotate(112deg)}}
+@keyframes armout-r{to{transform:rotate(-112deg)}}
 /* personality emotes */
 .buddy.em-jump .buddy-bot{animation:em-jump .8s ease}
 .buddy.em-spin .buddy-bot{animation:em-spin .85s ease-in-out}
@@ -445,6 +446,11 @@ a{color:inherit;text-decoration:none}
 .buddy-bubble{position:absolute;bottom:100%;left:50%;transform:translateX(-50%) translateY(-10px);white-space:nowrap;background:var(--ink);color:#fff;font-size:.72rem;font-weight:600;font-family:var(--ff-d);padding:7px 13px;border-radius:100px;opacity:0;transition:opacity .35s,transform .35s}
 .buddy-bubble.show{opacity:1;transform:translateX(-50%) translateY(-14px)}
 .buddy-bubble::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--ink)}
+/* keep the bubble on-screen when docked at an edge */
+.buddy.bub-r .buddy-bubble{left:auto;right:-2px;transform:translateY(-14px)}
+.buddy.bub-l .buddy-bubble{left:-2px;right:auto;transform:translateY(-14px)}
+.buddy.bub-r .buddy-bubble::after{left:auto;right:28px;transform:none}
+.buddy.bub-l .buddy-bubble::after{left:32px;transform:none}
 @media(max-width:900px){.buddy{display:none}}
 
 /* ---------- reveal ---------- */
