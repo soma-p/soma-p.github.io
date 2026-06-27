@@ -61,8 +61,9 @@ a{color:inherit;text-decoration:none}
 /* perch for the companion at the top of the page */
 .hero-base{position:absolute;right:11%;top:226px;z-index:0;pointer-events:none}
 .hero-base svg{display:block;filter:drop-shadow(0 10px 16px rgba(8,40,26,.18))}
-/* about-section finale: the past iterations walk in as you scroll */
+/* the robot family gathers in the contact green and walks in as you scroll */
 .robot-fleet{display:flex;align-items:flex-end;justify-content:center;gap:clamp(14px,3.4vw,40px);margin-top:clamp(56px,9vh,108px);min-height:108px}
+.contact-fleet{margin-top:clamp(104px,15vh,150px)}      /* room above for the golem on the podium, clear of the text */
 .mb-wrap{display:block;opacity:0;will-change:transform,opacity}
 .mini-bot{display:block;filter:drop-shadow(0 7px 9px rgba(8,40,26,.16))}
 .mini-bot .leg{transform-box:fill-box;transform-origin:50% 8%}
@@ -72,11 +73,11 @@ a{color:inherit;text-decoration:none}
 @keyframes fleetBob{0%,100%{transform:translateY(0) rotate(-1.4deg)}50%{transform:translateY(-2.6px) rotate(1.4deg)}}
 @keyframes legA{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(9deg)}}
 @keyframes legB{0%,100%{transform:rotate(9deg)}50%{transform:rotate(-9deg)}}
-/* the golem's resting podium, sitting in the green of the contact block */
-.contact-base{margin:46px auto 4px;width:max-content;opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+/* the golem's resting podium, now a member of the contact lineup */
+.contact-base{align-self:flex-end;opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
 .contact-base svg{display:block;filter:drop-shadow(0 10px 16px rgba(2,18,10,.35))}
 .contact-base.in{opacity:1;transform:none}
-@media(max-width:900px){.contact-base{display:none}.robot-fleet{flex-wrap:wrap;gap:22px 30px}}
+@media(max-width:900px){.contact-base{display:none}.robot-fleet{flex-wrap:wrap;gap:22px 30px}.contact-fleet{margin-top:clamp(48px,8vh,80px)}}
 @media(prefers-reduced-motion:reduce){.mb-wrap{opacity:1!important;transform:none!important}}
 
 .hero-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 26px}

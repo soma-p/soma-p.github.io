@@ -581,7 +581,7 @@
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
     const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.32;    // big, perched on its base at the top
     const heroActive = () => scrollY < HERO_TH && base && base.getBoundingClientRect().width > 0;
-    const aboutBase = $('#contactBase'), ABOUT_SCALE = 1.2;          // settles onto its podium in the contact green
+    const aboutBase = $('#contactBase'), ABOUT_SCALE = 1.05;         // settles onto its podium in the contact green, among the lineup
     const aboutActive = () => { if (!aboutBase) return false; const r = aboutBase.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight * 0.84 && r.bottom > innerHeight * 0.18; };
     if (aboutBase) new IntersectionObserver(es => aboutBase.classList.toggle('in', es[0].isIntersecting), { threshold: 0 }).observe(aboutBase);
     const sections = [
