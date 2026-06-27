@@ -1,2 +1,6 @@
 node_modules/
 .DS_Store
+# original (unoptimized) photos — only imgs/web/* is served
+imgs/*.jpg
+imgs/*.jpeg
+imgs/*.png
