@@ -449,9 +449,10 @@
       setMsg(cur().msg);
       clearTimeout(stopT); stopT = setTimeout(onStop, 260);
     };
-    const onStop = () => {                                          // dock to a side so it never blocks the text
+    const onStop = () => {                                          // dock to whichever side is closer (keeps off the text)
       scrolling = false; const s = cur();
-      tx = s.side === 'L' ? 16 : innerWidth - BW - 16;
+      const side = (cx + BW / 2) < innerWidth / 2 ? 'L' : 'R';
+      tx = side === 'L' ? 16 : innerWidth - BW - 16;
       ty = clamp(s.y * innerHeight, 84, innerHeight - 150);
       setMsg(s.msg);
       setTimeout(() => { if (!scrolling) { buddy.classList.add('present'); scheduleEmote(); } }, 440);
