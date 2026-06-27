@@ -32,7 +32,7 @@
     es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
   }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
   $$('.reveal').forEach(el => io.observe(el));
-  setTimeout(() => $$('.reveal:not(.in)').forEach(el => el.classList.add('in')), 2400);
+  setTimeout(() => $$('.reveal:not(.in), .reveal-img:not(.in)').forEach(el => el.classList.add('in')), 2000);
 
   /* interlude word reveal (staggered) */
   const iio = new IntersectionObserver((es) => {
@@ -71,6 +71,56 @@
     es.forEach(e => { if (e.isIntersecting) { run(e.target); cio.unobserve(e.target); } });
   }, { threshold: 0.6 });
   $$('.n[data-count]').forEach(el => cio.observe(el));
+
+  /* text scramble on the name */
+  const scramble = (el) => {
+    const text = el.dataset.text || el.textContent;
+    const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&*/';
+    const ends = [...text].map((_, i) => 8 + i * 3 + Math.floor(Math.random() * 6));
+    const max = Math.max(...ends) + 1;
+    let f = 0;
+    const up = () => {
+      let out = '';
+      for (let i = 0; i < text.length; i++) {
+        out += f >= ends[i] ? text[i] : glyphs[Math.floor(Math.random() * glyphs.length)];
+      }
+      el.textContent = out;
+      if (f++ <= max) requestAnimationFrame(up); else el.textContent = text;
+    };
+    up();
+  };
+  if (!reduce) $$('.scramble').forEach((el, i) => setTimeout(() => scramble(el), 120 + i * 130));
+
+  /* magnetic buttons */
+  if (!reduce && matchMedia('(pointer:fine)').matches) {
+    $$('.btn, .nav-cta').forEach(el => {
+      el.addEventListener('mousemove', (e) => {
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - (r.left + r.width / 2)) * 0.35;
+        const y = (e.clientY - (r.top + r.height / 2)) * 0.45;
+        el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+      });
+      el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+    });
+  }
+
+  /* image mask-wipe reveals */
+  $$('.hero-photo img, .card.feature .fmedia img, .gal img').forEach(im => {
+    im.classList.add('reveal-img'); io.observe(im);
+  });
+
+  /* smooth scroll (Lenis), with anchor handling */
+  const shot = document.documentElement.classList.contains('shotmode');
+  if (!reduce && !shot && window.Lenis) {
+    const lenis = new window.Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true });
+    const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); };
+    requestAnimationFrame(raf);
+    document.documentElement.style.scrollBehavior = 'auto';
+    $$('a[href^="#"]').forEach(a => a.addEventListener('click', (e) => {
+      const id = a.getAttribute('href');
+      if (id.length > 1) { const t = $(id); if (t) { e.preventDefault(); lenis.scrollTo(t, { offset: -68 }); } }
+    }));
+  }
 
   /* click-to-copy email */
   const el = $('#emailLink');
