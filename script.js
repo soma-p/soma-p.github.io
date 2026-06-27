@@ -195,21 +195,23 @@
   (() => {
     const cv = $('#orcaWave'); if (!cv) return;
     const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
-    let W = 0, H = 0, run = true, hover = 0, amp = 0.55; const N = 60;
+    let W = 0, H = 0, run = true, hover = 0, amp = 0.55, mx = -1; const N = 60;
     const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
     size(); addEventListener('resize', size);
     const host = cv.closest('.card');
-    host?.addEventListener('mouseenter', () => hover = 1); host?.addEventListener('mouseleave', () => hover = 0);
+    host?.addEventListener('mouseenter', () => hover = 1); host?.addEventListener('mouseleave', () => { hover = 0; mx = -1; });
+    host?.addEventListener('mousemove', e => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; });
     const roundBar = (x, y, w, h, r) => { r = Math.min(r, w / 2, h / 2); c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); c.fill(); };
     const draw = (t) => {
       c.clearRect(0, 0, W, H); const mid = H / 2, bw = W / N;
       for (let i = 0; i < N; i++) {
         const env = Math.sin((i / (N - 1)) * Math.PI);
         const s = (Math.sin(t * 0.0035 + i * 0.45) * 0.5 + 0.5) * (Math.sin(t * 0.0019 + i * 0.23) * 0.5 + 0.5);
-        const h = Math.max(3, (0.08 + amp * (0.2 + 0.8 * s)) * (H * 0.46) * (0.45 + 0.55 * env));
+        const cx = i * bw + bw / 2, bump = mx >= 0 ? Math.max(0, 1 - Math.abs(cx - mx) / 95) ** 2 : 0;   // bars peak toward the cursor
+        const h = Math.max(3, (0.08 + amp * (0.2 + 0.8 * s)) * (H * 0.46) * (0.45 + 0.55 * env)) * (1 + bump * 1.8);
         const w = bw * 0.5, x = i * bw + (bw - w) / 2;
         const g = c.createLinearGradient(0, mid - h, 0, mid + h);
-        g.addColorStop(0, '#34D399'); g.addColorStop(0.5, '#10B981'); g.addColorStop(1, '#0E7A53');
+        g.addColorStop(0, bump > 0.15 ? '#9DF9D2' : '#34D399'); g.addColorStop(0.5, '#10B981'); g.addColorStop(1, '#0E7A53');
         c.fillStyle = g; roundBar(x, mid - h, w, h * 2, w / 2);
       }
     };
@@ -320,11 +322,20 @@
   (() => {
     const cv = $('#rainCanvas'); if (!cv) return;
     const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
-    let W = 0, H = 0, run = true, drops = [], flash = 0, bolt = null, cool = 80;
+    let W = 0, H = 0, run = true, drops = [], flash = 0, bolt = null, cool = 80, hov = false, cloudOp = 0, t = 0;
     const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
-    const init = () => { size(); drops = Array.from({ length: Math.max(18, Math.round(W * H / 2400)) }, () => ({ x: Math.random() * W, y: Math.random() * H, l: 7 + Math.random() * 11, v: 2.2 + Math.random() * 2.6 })); };
+    const init = () => { size(); drops = Array.from({ length: Math.max(40, Math.round(W * H / 1150)) }, () => ({ x: Math.random() * W, y: Math.random() * H, l: 8 + Math.random() * 13, v: 2.8 + Math.random() * 3.2 })); };
     init(); addEventListener('resize', init);
     const dx = 0.5;
+    const drawClouds = (op) => {                               // overcast layer rolls in from the top
+      if (op < 0.02) return;
+      const baseY = H * 0.22, drift = (t * 0.4) % 60;
+      const grad = c.createLinearGradient(0, -8, 0, baseY + 16);
+      grad.addColorStop(0, `rgba(66,78,90,${op * 0.72})`); grad.addColorStop(1, `rgba(110,124,138,${op * 0.55})`);
+      c.fillStyle = grad; c.fillRect(0, 0, W, baseY);
+      for (let x = -60 + drift; x < W + 60; x += 30) { const r = 15 + (Math.sin(x * 0.21) + 1) * 7; c.beginPath(); c.arc(x, baseY, r, 0, 7); c.fill(); }
+      for (let x = -60 + drift * 0.6; x < W + 60; x += 46) { const r = 11 + (Math.cos(x * 0.17) + 1) * 5; c.beginPath(); c.arc(x + 14, baseY - 7, r, 0, 7); c.fill(); }
+    };
     const makeBolt = () => {                                  // jagged fork from the top
       const segs = 7 + Math.floor(Math.random() * 4), main = []; let x = W * (0.25 + Math.random() * 0.5), y = 0;
       main.push({ x, y });
@@ -336,11 +347,14 @@
     const strokeBolt = (pts, w, style) => { if (!pts || pts.length < 2) return; c.strokeStyle = style; c.lineWidth = w; c.lineJoin = 'round'; c.beginPath(); c.moveTo(pts[0].x, pts[0].y); for (let i = 1; i < pts.length; i++) c.lineTo(pts[i].x, pts[i].y); c.stroke(); };
     const strike = () => { bolt = makeBolt(); flash = 1; cool = 110 + Math.floor(Math.random() * 160); };
     const host = cv.closest('.lead') || cv.parentElement;
-    host?.addEventListener('mouseenter', strike);                 // a bolt every time you hover the panel
+    host?.addEventListener('mouseenter', () => { hov = true; strike(); });   // clouds roll in + a bolt on hover
+    host?.addEventListener('mouseleave', () => { hov = false; });
     const draw = () => {
       if (run) {
+        t++; cloudOp += ((hov ? 1 : 0) - cloudOp) * 0.06;
         c.clearRect(0, 0, W, H); c.lineWidth = 1.6; c.lineCap = 'round';
-        drops.forEach(d => { const g = c.createLinearGradient(d.x, d.y, d.x - d.l * dx, d.y + d.l); g.addColorStop(0, 'rgba(96,165,250,0)'); g.addColorStop(1, 'rgba(59,130,246,.75)'); c.strokeStyle = g; c.beginPath(); c.moveTo(d.x, d.y); c.lineTo(d.x + d.l * dx, d.y + d.l); c.stroke(); d.y += d.v; d.x += d.v * dx; if (d.y > H + 12) { d.y = -12; d.x = Math.random() * (W + 60); } });
+        const boost = 1 + cloudOp * 0.6;                          // heavier downpour while overcast
+        drops.forEach(d => { const g = c.createLinearGradient(d.x, d.y, d.x - d.l * dx, d.y + d.l); g.addColorStop(0, 'rgba(96,165,250,0)'); g.addColorStop(1, 'rgba(59,130,246,.75)'); c.strokeStyle = g; c.beginPath(); c.moveTo(d.x, d.y); c.lineTo(d.x + d.l * dx, d.y + d.l); c.stroke(); d.y += d.v * boost; d.x += d.v * dx * boost; if (d.y > H + 12) { d.y = -12; d.x = Math.random() * (W + 60); } });
         if (cool > 0) cool--;
         if (flash <= 0.02 && cool <= 0 && Math.random() < 0.02) { bolt = makeBolt(); flash = 1; cool = 110 + Math.floor(Math.random() * 160); }
         if (flash > 0.02 && bolt) {
@@ -351,6 +365,7 @@
           strokeBolt(bolt.main, 1.6, `rgba(191,219,254,${Math.min(1, flash + 0.3)})`);        // bright hot core
           c.shadowBlur = 0; flash *= 0.82;
         }
+        drawClouds(cloudOp);
       }
       requestAnimationFrame(draw);
     };
