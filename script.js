@@ -327,14 +327,19 @@
     const init = () => { size(); drops = Array.from({ length: Math.max(40, Math.round(W * H / 1150)) }, () => ({ x: Math.random() * W, y: Math.random() * H, l: 8 + Math.random() * 13, v: 2.8 + Math.random() * 3.2 })); };
     init(); addEventListener('resize', init);
     const dx = 0.5;
-    const drawClouds = (op) => {                               // overcast layer rolls in from the top
+    const wave = (x, off, a1, f1, a2, f2, base) => base + Math.sin((x + off) * f1) * a1 + Math.sin((x + off) * f2 + 1.3) * a2;
+    const cloudLayer = (style, off, a1, f1, a2, f2, base) => {  // smooth, undulating cloud underside (no circles)
+      c.fillStyle = style; c.beginPath(); c.moveTo(-24, -24); c.lineTo(W + 24, -24);
+      for (let x = W + 24; x >= -24; x -= 5) c.lineTo(x, wave(x, off, a1, f1, a2, f2, base));
+      c.closePath(); c.fill();
+    };
+    const drawClouds = (op) => {                               // overcast cover rolls in from the top
       if (op < 0.02) return;
-      const baseY = H * 0.22, drift = (t * 0.4) % 60;
-      const grad = c.createLinearGradient(0, -8, 0, baseY + 16);
-      grad.addColorStop(0, `rgba(66,78,90,${op * 0.72})`); grad.addColorStop(1, `rgba(110,124,138,${op * 0.55})`);
-      c.fillStyle = grad; c.fillRect(0, 0, W, baseY);
-      for (let x = -60 + drift; x < W + 60; x += 30) { const r = 15 + (Math.sin(x * 0.21) + 1) * 7; c.beginPath(); c.arc(x, baseY, r, 0, 7); c.fill(); }
-      for (let x = -60 + drift * 0.6; x < W + 60; x += 46) { const r = 11 + (Math.cos(x * 0.17) + 1) * 5; c.beginPath(); c.arc(x + 14, baseY - 7, r, 0, 7); c.fill(); }
+      const baseY = H * 0.16, drift = t * 0.5;
+      cloudLayer(`rgba(122,136,150,${op * 0.42})`, drift * 0.55, 6, 0.05, 11, 0.017, baseY * 0.74);   // back haze
+      const grad = c.createLinearGradient(0, -8, 0, baseY + 30);
+      grad.addColorStop(0, `rgba(62,74,86,${op * 0.85})`); grad.addColorStop(1, `rgba(98,112,126,${op * 0.62})`);
+      cloudLayer(grad, drift, 9, 0.043, 15, 0.013, baseY + 4);                                        // main overcast band
     };
     const makeBolt = () => {                                  // jagged fork from the top
       const segs = 7 + Math.floor(Math.random() * 4), main = []; let x = W * (0.25 + Math.random() * 0.5), y = 0;

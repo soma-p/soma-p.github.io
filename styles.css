@@ -339,8 +339,25 @@ a{color:inherit;text-decoration:none}
 .ear-cl{transform-origin:18px 24px}
 .ear-cr{transform-origin:40px 22px;animation-delay:.35s}
 @keyframes eartwitch{0%,88%,100%{transform:rotate(0)}94%{transform:rotate(-9deg)}}
-.pet .eye{transform-box:view-box;transform-origin:center;animation:petblink 4.5s steps(1,end) infinite}
+.pet .eye,.pet-up .eye{transform-box:view-box;transform-origin:center;animation:petblink 4.5s steps(1,end) infinite}
 @keyframes petblink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
+/* the pets sit upright on hover */
+.pet-pair{position:relative;display:flex;align-items:flex-end}
+.pet-lounge{transition:opacity .35s ease}
+.pet-up{position:absolute;bottom:0;opacity:0;transition:opacity .35s ease;pointer-events:none}
+.pet-up.dog{left:calc(50% - 42px)}
+.pet-up.cat{left:calc(50% - 39px)}
+.pet-card:hover .pet-lounge{opacity:0}
+.pet-card:hover .pet-up{opacity:1}
+.tail-dog-u{transform-box:view-box;transform-origin:58px 76px;animation:tailwag 1s ease-in-out infinite}
+.tail-cat-u{transform-box:view-box;transform-origin:53px 84px;animation:tailswish 2.4s ease-in-out infinite}
+.head-dog-u{transform-box:view-box;transform-origin:42px 47px;animation:headtilt 3s ease-in-out infinite}
+.head-cat-u{transform-box:view-box;transform-origin:40px 46px;animation:headtilt 3.4s ease-in-out infinite .5s}
+.ear-l-u,.ear-r-u,.ear-cl-u,.ear-cr-u{transform-box:view-box;animation:eartwitch 2.6s ease-in-out infinite}
+.ear-l-u{transform-origin:28px 30px}
+.ear-r-u{transform-origin:56px 30px;animation-delay:.35s}
+.ear-cl-u{transform-origin:27px 26px}
+.ear-cr-u{transform-origin:53px 26px;animation-delay:.35s}
 
 /* ===== per-card effects (BioVeritas / Union / Skin / VTR) ===== */
 .fx-card{position:relative;overflow:hidden}
