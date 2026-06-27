@@ -261,8 +261,12 @@
     let W = 0, H = 0, run = true, pulse = 0, cx = 0, cy = 0, hw = 0, hh = 0, rad = 0, path = [], topMid = 0;
     const labels = ['Request', 'Plan', 'Tools · MCP', 'Execute', 'Verify', 'Respond'];
     const N = labels.length;
+    const content = (cv.closest('.flow-around') || cv.parentElement).querySelector(':scope > div:not(.pno)');
     const layout = () => {
-      cx = W / 2; cy = H / 2; hw = Math.max(80, W / 2 - 50); hh = Math.max(46, H / 2 - 26); rad = Math.min(38, hh, hw);
+      const cr = cv.getBoundingClientRect(), dr = content ? content.getBoundingClientRect() : cr;   // wrap the text box with padding
+      const PAD = 22, bx = dr.left - cr.left, by = dr.top - cr.top, bw = dr.width, bh = dr.height;
+      cx = bx + bw / 2; cy = by + bh / 2;
+      hw = Math.max(80, bw / 2 + PAD); hh = Math.max(46, bh / 2 + PAD); rad = Math.min(40, hh, hw);
       // sample the rounded-rect perimeter into equal-ish steps (clockwise from left end of top edge)
       path = []; const step = 3;
       const seg = (x1, y1, x2, y2) => { const d = Math.hypot(x2 - x1, y2 - y1), n = Math.max(1, Math.round(d / step)); for (let i = 0; i < n; i++) path.push({ x: x1 + (x2 - x1) * i / n, y: y1 + (y2 - y1) * i / n }); };
@@ -426,14 +430,8 @@
     if (reduce || innerWidth < 900) { buddy.style.display = 'none'; return; }
     const bubble = $('#buddyBubble');
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-    const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.5;     // big, perched on its base at the top
+    const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.32;    // big, perched on its base at the top
     const heroActive = () => scrollY < HERO_TH && base && base.getBoundingClientRect().width > 0;
-    // motion-trail canvas, just behind the buddy
-    const tc = document.createElement('canvas'); tc.className = 'buddy-trail'; tc.setAttribute('aria-hidden', 'true');
-    buddy.parentNode.insertBefore(tc, buddy);
-    const g = tc.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
-    const sizeT = () => { tc.width = innerWidth * dpr; tc.height = innerHeight * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0); };
-    sizeT();
     const sections = [
       { sel: '#top', side: 'R', y: 0.28, msg: "hey, I'll show you around!" },
       { sel: '#work', side: 'L', y: 0.44, msg: "here's where I've worked!" },
@@ -447,7 +445,7 @@
     ].map(s => ({ ...s, el: $(s.sel) })).filter(s => s.el);
     if (!sections.length) { buddy.style.display = 'none'; return; }
     let tx = innerWidth * 0.8, ty = innerHeight * 0.3, cx = tx, cy = ty, curMsg = '', scrolling = false, stopT = 0, emoteT = 0, lastY = -1;
-    let pcx = cx, pcy = cy, scl = 1, dirx = 1, diry = 0, bridgeOp = 0;
+    let pcx = cx, pcy = cy, scl = 1;
     const cur = () => { const mid = scrollY + innerHeight * 0.5; let b = sections[0]; for (const s of sections) if (s.el.getBoundingClientRect().top + scrollY <= mid) b = s; return b; };
     const setMsg = (m) => { if (m !== curMsg) { curMsg = m; bubble.textContent = m; } };
     const playEmote = (cls, ms) => { buddy.classList.add(cls); setTimeout(() => buddy.classList.remove(cls), ms); };
@@ -476,37 +474,9 @@
       setTimeout(() => { if (!scrolling) { buddy.classList.add('present'); scheduleEmote(); } }, 440);
     };
     addEventListener('scroll', onScroll, { passive: true });
-    addEventListener('resize', () => { sizeT(); onScroll(); });
+    addEventListener('resize', onScroll);
     onScroll(); cx = tx; cy = ty; bubble.classList.add('show'); onStop();
 
-    const drawBridge = () => {                                      // a wide plank bridge that spans ahead and dissolves behind
-      g.clearRect(0, 0, innerWidth, innerHeight);
-      if (bridgeOp < 0.02) return;
-      const fx = cx + BW / 2, fy = cy + 96 * scl;                   // ground point at its feet
-      const ux = dirx, uy = diry, nx = -uy, ny = ux, HW = 19;
-      const planks = [];
-      for (let t = -26; t <= 134; t += 9) {
-        let a = 1;
-        if (t < 0) a = (t + 26) / 26;                              // already-walked end fades away
-        else if (t > 92) a = Math.max(0, (134 - t) / 42);          // far end builds in ahead
-        a *= bridgeOp;
-        const px = fx + ux * t, py = fy + uy * t;
-        planks.push({ a, l: { x: px + nx * HW, y: py + ny * HW }, r: { x: px - nx * HW, y: py - ny * HW } });
-      }
-      for (let i = 1; i < planks.length; i++) {                    // deck + side rails
-        const A = planks[i - 1], B = planks[i], a = Math.min(A.a, B.a); if (a <= 0.01) continue;
-        g.fillStyle = `rgba(202,132,78,${a * 0.34})`;
-        g.beginPath(); g.moveTo(A.l.x, A.l.y); g.lineTo(B.l.x, B.l.y); g.lineTo(B.r.x, B.r.y); g.lineTo(A.r.x, A.r.y); g.closePath(); g.fill();
-        g.strokeStyle = `rgba(108,57,32,${a * 0.7})`; g.lineWidth = 2.6; g.lineCap = 'round';
-        g.beginPath(); g.moveTo(A.l.x, A.l.y); g.lineTo(B.l.x, B.l.y); g.stroke();
-        g.beginPath(); g.moveTo(A.r.x, A.r.y); g.lineTo(B.r.x, B.r.y); g.stroke();
-      }
-      for (const P of planks) {                                    // cross planks
-        if (P.a <= 0.01) continue;
-        g.strokeStyle = `rgba(120,65,38,${P.a * 0.62})`; g.lineWidth = 3;
-        g.beginPath(); g.moveTo(P.l.x, P.l.y); g.lineTo(P.r.x, P.r.y); g.stroke();
-      }
-    };
     const loop = () => {
       const hero = heroActive();
       let targetScale;
@@ -523,16 +493,8 @@
       const ccx = cx + BW / 2;                                       // keep its bubble inside the viewport at the edges
       buddy.classList.toggle('bub-r', ccx > innerWidth - 132);
       buddy.classList.toggle('bub-l', ccx < 132);
-      const vx = cx - pcx, vy = cy - pcy, vel = Math.hypot(vx, vy); pcx = cx; pcy = cy;
+      const vel = Math.hypot(cx - pcx, cy - pcy); pcx = cx; pcy = cy;
       buddy.classList.toggle('walking', !hero && vel > 0.5);        // step the legs while moving
-      if (!hero && vel > 0.35) {                                    // bridge spans ahead in the travel direction
-        dirx += (vx / vel - dirx) * 0.12; diry += (vy / vel - diry) * 0.12;
-        const dl = Math.hypot(dirx, diry) || 1; dirx /= dl; diry /= dl;
-        bridgeOp += (1 - bridgeOp) * 0.08;
-      } else {
-        bridgeOp += (0 - bridgeOp) * 0.06;                          // dissolves when it stops / is perched
-      }
-      drawBridge();
       requestAnimationFrame(loop);
     };
     loop();

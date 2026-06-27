@@ -59,7 +59,7 @@ a{color:inherit;text-decoration:none}
 .hero::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(120% 90% at 12% 0%,rgba(255,255,255,.92) 28%,rgba(255,255,255,0) 72%)}
 /* perch for the companion at the top of the page */
-.hero-base{position:absolute;right:10%;top:182px;z-index:0;pointer-events:none}
+.hero-base{position:absolute;right:11%;top:226px;z-index:0;pointer-events:none}
 .hero-base svg{display:block;filter:drop-shadow(0 10px 16px rgba(8,40,26,.18))}
 
 .hero-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 26px}
@@ -302,11 +302,10 @@ a{color:inherit;text-decoration:none}
 .orca-badge{position:absolute;left:18px;top:16px;z-index:2;font-family:var(--ff-d);font-size:.78rem;font-weight:600;letter-spacing:.03em;color:#9ff0c8;background:rgba(0,0,0,.3);padding:6px 13px;border-radius:100px}
 
 /* ===== agentic node-graph workflow — orbits the text ===== */
-.flow-around{position:relative;overflow:hidden;min-height:300px;align-items:center}
+.flow-around{position:relative;overflow:hidden;padding:38px 56px 38px 0}
 .flow-around>.pno,.flow-around>div{position:relative;z-index:2}
-.flow-around>.pno{align-self:flex-start}
-.flow-around>div{padding:6px 30px}
-.agentic-flow{position:absolute;top:0;right:0;bottom:0;left:17%;height:100%;z-index:1;display:block;pointer-events:none}
+.flow-around>div{padding:6px 12px}
+.agentic-flow{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;pointer-events:none}
 
 /* ===== AILA / Baymax ===== */
 #lifeCard{display:block}
@@ -424,8 +423,8 @@ a{color:inherit;text-decoration:none}
 .buddy.walking .buddy-leg-r{animation:bstep .46s ease-in-out infinite;animation-delay:-.23s}
 @keyframes bstep{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(8deg)}}
 .buddy-arm-l,.buddy-arm-r{transform-box:view-box}
-.buddy-arm-l{transform-origin:12px 38px;animation:bxwave 2.6s ease-in-out infinite}
-.buddy-arm-r{transform-origin:80px 38px}
+.buddy-arm-l{transform-origin:14px 40px;animation:bxwave 2.6s ease-in-out infinite}
+.buddy-arm-r{transform-origin:78px 40px}
 /* head moves on its neck */
 .buddy-head{transform-box:view-box;transform-origin:46px 20px;animation:headsway 4.6s ease-in-out infinite}
 @keyframes headsway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
