@@ -414,6 +414,8 @@
     if (reduce || innerWidth < 900) { buddy.style.display = 'none'; return; }
     const bubble = $('#buddyBubble');
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+    const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.5;     // big, perched on its base at the top
+    const heroActive = () => scrollY < HERO_TH && base && base.getBoundingClientRect().width > 0;
     // motion-trail canvas, just behind the buddy
     const tc = document.createElement('canvas'); tc.className = 'buddy-trail'; tc.setAttribute('aria-hidden', 'true');
     buddy.parentNode.insertBefore(tc, buddy);
@@ -432,7 +434,8 @@
       { sel: '#contact', side: 'R', y: 0.5, msg: "let's talk!" },
     ].map(s => ({ ...s, el: $(s.sel) })).filter(s => s.el);
     if (!sections.length) { buddy.style.display = 'none'; return; }
-    let tx = innerWidth * 0.8, ty = innerHeight * 0.3, cx = tx, cy = ty, curMsg = '', scrolling = false, stopT = 0, emoteT = 0, trail = [], lastY = -1;
+    let tx = innerWidth * 0.8, ty = innerHeight * 0.3, cx = tx, cy = ty, curMsg = '', scrolling = false, stopT = 0, emoteT = 0, lastY = -1;
+    let steps = [], distAcc = 0, stepSide = 1, lastFX = null, lastFY = null, pcx = cx, pcy = cy, scl = 1;
     const cur = () => { const mid = scrollY + innerHeight * 0.5; let b = sections[0]; for (const s of sections) if (s.el.getBoundingClientRect().top + scrollY <= mid) b = s; return b; };
     const setMsg = (m) => { if (m !== curMsg) { curMsg = m; bubble.textContent = m; } };
     const playEmote = (cls, ms) => { buddy.classList.add(cls); setTimeout(() => buddy.classList.remove(cls), ms); };
@@ -442,6 +445,7 @@
     const onScroll = () => {
       if (scrollY === lastY) return;                               // ignore spurious same-position events (Lenis rAF)
       lastY = scrollY;
+      if (heroActive()) { scrolling = false; buddy.classList.remove('present', 'walking'); clearTimeout(stopT); setMsg(sections[0].msg); return; }
       scrolling = true; buddy.classList.remove('present'); clearTimeout(emoteT);
       const max = (document.documentElement.scrollHeight - innerHeight) || 1, p = clamp(scrollY / max, 0, 1);
       tx = 16 + (0.5 + 0.4 * Math.sin(p * Math.PI * 4 + 1.05)) * (innerWidth - BW - 32);   // travels across while scrolling
@@ -450,6 +454,7 @@
       clearTimeout(stopT); stopT = setTimeout(onStop, 260);
     };
     const onStop = () => {                                          // dock to whichever side is closer (keeps off the text)
+      if (heroActive()) return;
       scrolling = false; const s = cur();
       const side = (cx + BW / 2) < innerWidth / 2 ? 'L' : 'R';
       tx = side === 'L' ? 16 : innerWidth - BW - 16;
@@ -461,32 +466,50 @@
     addEventListener('resize', () => { sizeT(); onScroll(); });
     onScroll(); cx = tx; cy = ty; bubble.classList.add('show'); onStop();
 
+    const footprint = (x, y, ang, alpha) => {                       // a single blocky footprint pressed into the ground
+      g.save(); g.translate(x, y); g.rotate(ang);
+      g.fillStyle = `rgba(150,92,52,${alpha})`; g.fillRect(-5, -3.2, 10, 6.4);
+      g.strokeStyle = `rgba(10,10,11,${alpha * 0.6})`; g.lineWidth = 1; g.strokeRect(-5, -3.2, 10, 6.4);
+      g.fillStyle = `rgba(10,10,11,${alpha * 0.45})`; g.fillRect(2.4, -3.2, 2.6, 6.4);   // toe end
+      g.restore();
+    };
     const drawTrail = () => {
       g.clearRect(0, 0, innerWidth, innerHeight);
-      const n = trail.length; if (n < 2) return;
-      for (let i = 1; i < n; i++) {                                 // fading copper line behind
-        const a = trail[i - 1], b = trail[i], f = i / n;
-        g.strokeStyle = `rgba(232,153,95,${f * 0.5})`; g.lineWidth = 1 + 3 * f; g.lineCap = 'round';
-        g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
-      }
-      for (let i = 0; i < n; i += 4) {                              // patina footprint dots
-        g.fillStyle = `rgba(116,168,146,${(i / n) * 0.45})`;
-        g.beginPath(); g.arc(trail[i].x, trail[i].y, 2.2, 0, 7); g.fill();
-      }
-      const last = trail[n - 1], prev = trail[Math.max(0, n - 6)], vx = last.x - prev.x, vy = last.y - prev.y;
-      for (let k = 1; k <= 3; k++) {                                // faint projection ahead
-        g.fillStyle = `rgba(232,153,95,${0.3 - k * 0.08})`;
-        g.beginPath(); g.arc(last.x + vx * k * 0.5, last.y + vy * k * 0.5, 2.6, 0, 7); g.fill();
+      for (const s of steps) footprint(s.x, s.y, s.ang, s.life * 0.5);   // footpath left behind
+      if (steps.length && lastFX !== null) {                        // a couple faint prints ahead of the feet
+        const a = steps[steps.length - 1], ux = Math.cos(a.ang), uy = Math.sin(a.ang), nx = -Math.sin(a.ang), ny = Math.cos(a.ang);
+        for (let k = 1; k <= 2; k++) footprint(lastFX + ux * 16 * k - nx * 7 * stepSide * (k % 2 ? 1 : -1), lastFY + uy * 16 * k - ny * 7 * stepSide * (k % 2 ? 1 : -1), a.ang, (0.22 - k * 0.07));
       }
     };
     const loop = () => {
-      cx += (tx - cx) * (scrolling ? 0.07 : 0.09); cy += (ty - cy) * 0.08;
-      const sc = 0.86 + 0.3 * clamp((cy / innerHeight - 0.22) / 0.34, 0, 1);
-      buddy.style.transform = `translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px) scale(${sc.toFixed(3)})`;
-      const px = cx + BW / 2, py = cy + 66 * sc, lp = trail[trail.length - 1];
-      if (!lp || Math.hypot(px - lp.x, py - lp.y) > 3) trail.push({ x: px, y: py });
-      if (trail.length > 44) trail.shift();
-      if (!scrolling && trail.length > 1 && Math.random() < 0.3) trail.shift();   // trail melts away when idle
+      const hero = heroActive();
+      let targetScale;
+      if (hero) {                                                   // sit big on the base at the top of the page
+        const r = base.getBoundingClientRect();
+        targetScale = HERO_SCALE;
+        tx = r.left + r.width / 2 - BW / 2;
+        ty = r.top + r.height * 0.52 - 48.5 - 41.5 * targetScale;   // feet on the base surface
+      } else {
+        targetScale = 0.86 + 0.3 * clamp((cy / innerHeight - 0.22) / 0.34, 0, 1);
+      }
+      cx += (tx - cx) * (scrolling ? 0.07 : 0.1); cy += (ty - cy) * 0.09; scl += (targetScale - scl) * 0.08;
+      buddy.style.transform = `translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px) scale(${scl.toFixed(3)})`;
+      const vel = Math.hypot(cx - pcx, cy - pcy); pcx = cx; pcy = cy;
+      buddy.classList.toggle('walking', !hero && vel > 0.5);        // step the legs while moving
+      if (!hero) {
+        const fx = cx + BW / 2, fy = cy + 92 * scl;                 // ground point at its feet
+        if (lastFX !== null) {
+          const d = Math.hypot(fx - lastFX, fy - lastFY); distAcc += d;
+          if (distAcc >= 17 && d > 0.01) {                          // drop a footprint each stride, alternating sides
+            distAcc = 0; const ang = Math.atan2(fy - lastFY, fx - lastFX);
+            steps.push({ x: fx - Math.sin(ang) * 7 * stepSide, y: fy + Math.cos(ang) * 7 * stepSide, ang, life: 1 });
+            stepSide *= -1; if (steps.length > 26) steps.shift();
+          }
+        }
+        lastFX = fx; lastFY = fy;
+      } else { lastFX = null; }                                     // no footprints while perched
+      for (const s of steps) s.life -= 0.01;
+      steps = steps.filter(s => s.life > 0);
       drawTrail();
       requestAnimationFrame(loop);
     };
