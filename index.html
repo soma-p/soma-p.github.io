@@ -196,11 +196,11 @@
         <div>
           <h3>Smart Learning Hub &amp; a deployed AI tutor</h3>
           <div class="venue">Lab for Emerging Intelligence &middot; LLM reasoning &amp; fine-tuning</div>
-          <p>I lead development and testing for the Python AI Tutor and the Smart Learning Hub: educational virtual agents built on LLM reasoning, fine-tuned with LoRA/SFT/RLHF and reinforcement-learning frameworks, with Bayesian knowledge tracing to model what each student actually knows. It runs for <b>8,000 students</b> across UCSD, SDSU, and Cal Poly Pomona; in an A/B test it cut TA hours <b>64%</b> and lifted engagement <b>87%</b>.</p>
+          <p>I lead development and testing for the Python AI Tutor and the Smart Learning Hub: educational virtual agents built on LLM reasoning, fine-tuned with LoRA/SFT/RLHF and reinforcement-learning frameworks, with Bayesian knowledge tracing to model what each student actually knows. To keep it trustworthy at scale I built a <b>two-layer evaluation pipeline</b>: a lower layer that monitors tutor outputs live, and a long-running eval layer above it that runs an <b>LLM panel of judges</b>, composing and storing each student's learning and personality metrics so the teaching keeps adapting to them. It runs for <b>8,000 students</b> across UCSD, SDSU, and Cal Poly Pomona; in an A/B test it cut TA hours <b>64%</b> and lifted engagement <b>87%</b>.</p>
           <div class="whiteboard" aria-hidden="true">
             <canvas id="tutorBoard" aria-label="An AI tutor writing on a whiteboard"></canvas>
           </div>
-          <div class="chips"><span class="chip">LLM reasoning</span><span class="chip">LoRA / SFT / RLHF</span><span class="chip">Bayesian knowledge tracing</span><span class="chip">Python</span></div>
+          <div class="chips"><span class="chip">LLM reasoning</span><span class="chip">LoRA / SFT / RLHF</span><span class="chip">LLM panel-of-judges evals</span><span class="chip">Live output monitoring</span><span class="chip">Bayesian knowledge tracing</span><span class="chip">Learner &amp; personality modeling</span><span class="chip">Python</span></div>
         </div>
       </div>
       <div class="paper reveal" id="lifeCard">
