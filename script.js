@@ -366,18 +366,30 @@
       pulses = []; rings = [];
     };
     init(); addEventListener('resize', init);
+    let hov = false, mx = -1e4, my = -1e4;
+    const host = cv.closest('.lead') || cv.parentElement;
+    host.addEventListener('mousemove', e => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+    host.addEventListener('mouseenter', () => { hov = true; });
+    host.addEventListener('mouseleave', () => { hov = false; mx = -1e4; my = -1e4; });
     const spawn = () => {
-      if (pulses.length > 5) return; const a = Math.floor(Math.random() * pts.length); let b = -1, best = D;
+      if (pulses.length > 8) return; const a = Math.floor(Math.random() * pts.length); let b = -1, best = D;
       for (let j = 0; j < pts.length; j++) { if (j === a) continue; const d = Math.hypot(pts[a].x - pts[j].x, pts[a].y - pts[j].y); if (d < best) { best = d; b = j; } }
       if (b >= 0) pulses.push({ a, b, p: 0, sp: 0.02 + Math.random() * 0.02 });
     };
     const draw = () => {
       if (run) {
         c.clearRect(0, 0, W, H);
-        pts.forEach(p => { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1; });
-        for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y); if (d < D) { c.strokeStyle = `rgba(14,122,83,${(1 - d / D) * 0.5})`; c.lineWidth = 1; c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke(); } }
-        if (Math.random() < 0.06) spawn();
-        if (Math.random() < 0.014) { const h = pts.find(p => p.hub) || pts[0]; if (h) rings.push({ x: h.x, y: h.y, r: 3, a: 0.7 }); }
+        pts.forEach(p => {
+          if (hov && mx > -1e3) { const dx = mx - p.x, dy = my - p.y, d = Math.hypot(dx, dy); if (d < 120 && d > 1) { p.vx += dx / d * 0.04; p.vy += dy / d * 0.04; } }   // drawn toward the cursor
+          p.vx *= 0.99; p.vy *= 0.99; p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1;
+        });
+        for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y); if (d < D) { c.strokeStyle = `rgba(14,122,83,${(1 - d / D) * (hov ? 0.75 : 0.5)})`; c.lineWidth = 1; c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke(); } }
+        if (hov && mx > -1e3) {                                     // wire the cursor into the network
+          pts.forEach(p => { const d = Math.hypot(p.x - mx, p.y - my); if (d < 110) { c.strokeStyle = `rgba(94,234,212,${(1 - d / 110) * 0.7})`; c.lineWidth = 1.2; c.beginPath(); c.moveTo(mx, my); c.lineTo(p.x, p.y); c.stroke(); } });
+          c.fillStyle = '#5EEAD4'; c.shadowColor = '#34D399'; c.shadowBlur = 10; c.beginPath(); c.arc(mx, my, 3.2, 0, 7); c.fill(); c.shadowBlur = 0;
+        }
+        if (Math.random() < (hov ? 0.2 : 0.06)) spawn();
+        if (Math.random() < (hov ? 0.06 : 0.014)) { const h = pts.find(p => p.hub) || pts[0]; if (h) rings.push({ x: h.x, y: h.y, r: 3, a: 0.7 }); }
         pulses.forEach(pu => { const a = pts[pu.a], b = pts[pu.b]; pu.p += pu.sp; const x = a.x + (b.x - a.x) * pu.p, y = a.y + (b.y - a.y) * pu.p; c.fillStyle = '#5EEAD4'; c.shadowColor = '#34D399'; c.shadowBlur = 8; c.beginPath(); c.arc(x, y, 2.3, 0, 7); c.fill(); c.shadowBlur = 0; });
         pulses = pulses.filter(pu => pu.p < 1);
         rings.forEach(rg => { rg.r += 0.7; rg.a *= 0.96; c.strokeStyle = `rgba(52,211,153,${rg.a})`; c.lineWidth = 1.2; c.beginPath(); c.arc(rg.x, rg.y, rg.r, 0, 7); c.stroke(); });
@@ -435,18 +447,18 @@
     ].map(s => ({ ...s, el: $(s.sel) })).filter(s => s.el);
     if (!sections.length) { buddy.style.display = 'none'; return; }
     let tx = innerWidth * 0.8, ty = innerHeight * 0.3, cx = tx, cy = ty, curMsg = '', scrolling = false, stopT = 0, emoteT = 0, lastY = -1;
-    let path = [], pcx = cx, pcy = cy, scl = 1;
+    let pcx = cx, pcy = cy, scl = 1, dirx = 1, diry = 0, bridgeOp = 0;
     const cur = () => { const mid = scrollY + innerHeight * 0.5; let b = sections[0]; for (const s of sections) if (s.el.getBoundingClientRect().top + scrollY <= mid) b = s; return b; };
     const setMsg = (m) => { if (m !== curMsg) { curMsg = m; bubble.textContent = m; } };
     const playEmote = (cls, ms) => { buddy.classList.add(cls); setTimeout(() => buddy.classList.remove(cls), ms); };
-    const emotes = ['em-jump', 'em-nod', 'em-wiggle', 'em-spin'];
+    const emotes = ['em-jump', 'em-nod', 'em-wiggle', 'em-spin', 'em-look', 'em-look'];
     const scheduleEmote = () => { clearTimeout(emoteT); emoteT = setTimeout(() => { if (!scrolling) { playEmote(emotes[Math.floor(Math.random() * emotes.length)], 850); scheduleEmote(); } }, 2600 + Math.random() * 2600); };
 
     const onScroll = () => {
       if (scrollY === lastY) return;                               // ignore spurious same-position events (Lenis rAF)
       lastY = scrollY;
-      if (heroActive()) { scrolling = false; buddy.classList.remove('present', 'walking'); clearTimeout(stopT); setMsg(sections[0].msg); return; }
-      scrolling = true; buddy.classList.remove('present'); clearTimeout(emoteT);
+      if (heroActive()) { scrolling = false; buddy.classList.remove('present', 'walking', 'dock-r', 'dock-l'); clearTimeout(stopT); setMsg(sections[0].msg); return; }
+      scrolling = true; buddy.classList.remove('present', 'dock-r', 'dock-l'); clearTimeout(emoteT);
       const max = (document.documentElement.scrollHeight - innerHeight) || 1, p = clamp(scrollY / max, 0, 1);
       tx = 16 + (0.5 + 0.4 * Math.sin(p * Math.PI * 4 + 1.05)) * (innerWidth - BW - 32);   // travels across while scrolling
       ty = (0.4 - 0.16 * Math.cos(p * Math.PI * 5)) * innerHeight;
@@ -457,6 +469,7 @@
       if (heroActive()) return;
       scrolling = false; const s = cur();
       const side = (cx + BW / 2) < innerWidth / 2 ? 'L' : 'R';
+      buddy.classList.toggle('dock-r', side === 'R'); buddy.classList.toggle('dock-l', side === 'L');
       tx = side === 'L' ? 16 : innerWidth - BW - 16;
       ty = clamp(s.y * innerHeight, 84, innerHeight - 150);
       setMsg(s.msg);
@@ -466,40 +479,32 @@
     addEventListener('resize', () => { sizeT(); onScroll(); });
     onScroll(); cx = tx; cy = ty; bubble.classList.add('show'); onStop();
 
-    const HW = 9;                                                   // half-width of the bridge deck
-    const edges = () => {                                            // left/right rail points along the path
-      const n = path.length, L = [], R = [];
-      for (let i = 0; i < n; i++) {
-        const a = path[Math.max(0, i - 1)], b = path[Math.min(n - 1, i + 1)];
-        let dx = b.x - a.x, dy = b.y - a.y; const m = Math.hypot(dx, dy) || 1; dx /= m; dy /= m;
-        const nx = -dy, ny = dx;
-        L.push({ x: path[i].x + nx * HW, y: path[i].y + ny * HW });
-        R.push({ x: path[i].x - nx * HW, y: path[i].y - ny * HW });
-      }
-      return { L, R };
-    };
-    const drawTrail = () => {                                       // render the path as a little plank bridge
+    const drawBridge = () => {                                      // a wide plank bridge that spans ahead and dissolves behind
       g.clearRect(0, 0, innerWidth, innerHeight);
-      const n = path.length; if (n < 2) return;
-      const { L, R } = edges();
-      for (let i = 1; i < n; i++) {
-        const f = i / n;
-        g.fillStyle = `rgba(206,134,80,${f * 0.34})`;                // wooden deck
-        g.beginPath(); g.moveTo(L[i - 1].x, L[i - 1].y); g.lineTo(L[i].x, L[i].y); g.lineTo(R[i].x, R[i].y); g.lineTo(R[i - 1].x, R[i - 1].y); g.closePath(); g.fill();
-        g.strokeStyle = `rgba(110,58,32,${f * 0.65})`; g.lineWidth = 2.4; g.lineCap = 'round';   // rails
-        g.beginPath(); g.moveTo(L[i - 1].x, L[i - 1].y); g.lineTo(L[i].x, L[i].y); g.stroke();
-        g.beginPath(); g.moveTo(R[i - 1].x, R[i - 1].y); g.lineTo(R[i].x, R[i].y); g.stroke();
+      if (bridgeOp < 0.02) return;
+      const fx = cx + BW / 2, fy = cy + 96 * scl;                   // ground point at its feet
+      const ux = dirx, uy = diry, nx = -uy, ny = ux, HW = 19;
+      const planks = [];
+      for (let t = -26; t <= 134; t += 9) {
+        let a = 1;
+        if (t < 0) a = (t + 26) / 26;                              // already-walked end fades away
+        else if (t > 92) a = Math.max(0, (134 - t) / 42);          // far end builds in ahead
+        a *= bridgeOp;
+        const px = fx + ux * t, py = fy + uy * t;
+        planks.push({ a, l: { x: px + nx * HW, y: py + ny * HW }, r: { x: px - nx * HW, y: py - ny * HW } });
       }
-      for (let i = 0; i < n; i += 3) {                              // cross planks
-        const f = i / n; g.strokeStyle = `rgba(122,66,38,${f * 0.6})`; g.lineWidth = 2.8;
-        g.beginPath(); g.moveTo(L[i].x, L[i].y); g.lineTo(R[i].x, R[i].y); g.stroke();
+      for (let i = 1; i < planks.length; i++) {                    // deck + side rails
+        const A = planks[i - 1], B = planks[i], a = Math.min(A.a, B.a); if (a <= 0.01) continue;
+        g.fillStyle = `rgba(202,132,78,${a * 0.34})`;
+        g.beginPath(); g.moveTo(A.l.x, A.l.y); g.lineTo(B.l.x, B.l.y); g.lineTo(B.r.x, B.r.y); g.lineTo(A.r.x, A.r.y); g.closePath(); g.fill();
+        g.strokeStyle = `rgba(108,57,32,${a * 0.7})`; g.lineWidth = 2.6; g.lineCap = 'round';
+        g.beginPath(); g.moveTo(A.l.x, A.l.y); g.lineTo(B.l.x, B.l.y); g.stroke();
+        g.beginPath(); g.moveTo(A.r.x, A.r.y); g.lineTo(B.r.x, B.r.y); g.stroke();
       }
-      const last = path[n - 1], prev = path[Math.max(0, n - 6)], vx = last.x - prev.x, vy = last.y - prev.y, mm = Math.hypot(vx, vy) || 1;
-      const ux = vx / mm, uy = vy / mm, nx = -uy, ny = ux;          // a few planks projected ahead
-      for (let k = 1; k <= 3; k++) {
-        const cxp = last.x + ux * 9 * k, cyp = last.y + uy * 9 * k, a = 0.3 - k * 0.08;
-        g.strokeStyle = `rgba(122,66,38,${a})`; g.lineWidth = 2.6;
-        g.beginPath(); g.moveTo(cxp + nx * HW, cyp + ny * HW); g.lineTo(cxp - nx * HW, cyp - ny * HW); g.stroke();
+      for (const P of planks) {                                    // cross planks
+        if (P.a <= 0.01) continue;
+        g.strokeStyle = `rgba(120,65,38,${P.a * 0.62})`; g.lineWidth = 3;
+        g.beginPath(); g.moveTo(P.l.x, P.l.y); g.lineTo(P.r.x, P.r.y); g.stroke();
       }
     };
     const loop = () => {
@@ -509,7 +514,7 @@
         const r = base.getBoundingClientRect();
         targetScale = HERO_SCALE;
         tx = r.left + r.width / 2 - BW / 2;
-        ty = r.top + r.height * 0.52 - 51.5 - 48 * targetScale;     // feet on the base surface
+        ty = r.top + r.height * 0.52 - 51.5 - 45.6 * targetScale;   // feet on the base surface
       } else {
         targetScale = 0.86 + 0.3 * clamp((cy / innerHeight - 0.22) / 0.34, 0, 1);
       }
@@ -518,16 +523,16 @@
       const ccx = cx + BW / 2;                                       // keep its bubble inside the viewport at the edges
       buddy.classList.toggle('bub-r', ccx > innerWidth - 132);
       buddy.classList.toggle('bub-l', ccx < 132);
-      const vel = Math.hypot(cx - pcx, cy - pcy); pcx = cx; pcy = cy;
+      const vx = cx - pcx, vy = cy - pcy, vel = Math.hypot(vx, vy); pcx = cx; pcy = cy;
       buddy.classList.toggle('walking', !hero && vel > 0.5);        // step the legs while moving
-      if (!hero) {
-        const fx = cx + BW / 2, fy = cy + 98 * scl;                 // ground point at its feet
-        const lp = path[path.length - 1];
-        if (!lp || Math.hypot(fx - lp.x, fy - lp.y) > 4) path.push({ x: fx, y: fy });
-        if (path.length > 46) path.shift();
-      } else if (path.length) { path = []; }                        // pull the bridge in while perched
-      if (!scrolling && path.length > 1 && Math.random() < 0.28) path.shift();   // bridge recedes once it stops
-      drawTrail();
+      if (!hero && vel > 0.35) {                                    // bridge spans ahead in the travel direction
+        dirx += (vx / vel - dirx) * 0.12; diry += (vy / vel - diry) * 0.12;
+        const dl = Math.hypot(dirx, diry) || 1; dirx /= dl; diry /= dl;
+        bridgeOp += (1 - bridgeOp) * 0.08;
+      } else {
+        bridgeOp += (0 - bridgeOp) * 0.06;                          // dissolves when it stops / is perched
+      }
+      drawBridge();
       requestAnimationFrame(loop);
     };
     loop();
@@ -573,7 +578,7 @@
     const card = $('#lifeCard'); if (!card) return;
     const wrap = card.querySelector('.baymax'); const rise = card.querySelector('.bm-rise');
     if (!wrap || !rise) return;
-    const RISE_IN = 106, RISE_OUT = 11; let cur = RISE_IN, tgt = RISE_IN;   // feet stay tucked behind the case
+    const RISE_IN = 106, RISE_OUT = 19; let cur = RISE_IN, tgt = RISE_IN;   // feet stay tucked behind the case
     const onScroll = () => {
       const r = card.getBoundingClientRect();
       const p = Math.min(1, Math.max(0, (innerHeight * 0.86 - r.top) / (innerHeight * 0.5)));

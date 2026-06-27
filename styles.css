@@ -389,7 +389,8 @@ a{color:inherit;text-decoration:none}
 .pixgrid .px{transform:scale(0) rotate(60deg);transition:transform .55s cubic-bezier(.2,.85,.25,1)}
 .lead-pix:hover .pixgrid .px{transform:scale(1) rotate(0)}
 .accel-lines{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;opacity:.72}
-.lead-accel:hover .accel-lines{opacity:.98}
+.lead-accel:hover .accel-lines{opacity:1}
+.lead-accel:hover .accel-lines span{animation-duration:.66s!important;height:3.5px;background:linear-gradient(90deg,transparent,#A294FF 58%,#E4DEFF);box-shadow:0 0 18px rgba(160,148,255,.95),0 0 6px rgba(210,204,255,.9)}
 .accel-lines span{position:absolute;height:2px;border-radius:3px;background:linear-gradient(90deg,transparent,#8B7DF2 68%,#C3BBFF);box-shadow:0 0 9px rgba(139,125,242,.75);animation:accel 1.3s cubic-bezier(.45,0,.8,1) infinite}
 .accel-lines span:nth-child(1){top:9%;width:42%;animation-delay:0s;animation-duration:1.05s}
 .accel-lines span:nth-child(2){top:19%;width:60%;height:3px;animation-delay:.5s;animation-duration:1.4s}
@@ -417,14 +418,19 @@ a{color:inherit;text-decoration:none}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 /* legs step while it walks */
 .buddy-leg-l,.buddy-leg-r{transform-box:view-box}
-.buddy-leg-l{transform-origin:34px 93px}
-.buddy-leg-r{transform-origin:58px 93px}
+.buddy-leg-l{transform-origin:34px 90px}
+.buddy-leg-r{transform-origin:58px 90px}
 .buddy.walking .buddy-leg-l{animation:bstep .46s ease-in-out infinite}
 .buddy.walking .buddy-leg-r{animation:bstep .46s ease-in-out infinite;animation-delay:-.23s}
 @keyframes bstep{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(8deg)}}
 .buddy-arm-l,.buddy-arm-r{transform-box:view-box}
-.buddy-arm-l{transform-origin:12px 34px;animation:bxwave 2.6s ease-in-out infinite}
-.buddy-arm-r{transform-origin:80px 34px}
+.buddy-arm-l{transform-origin:12px 38px;animation:bxwave 2.6s ease-in-out infinite}
+.buddy-arm-r{transform-origin:80px 38px}
+/* head moves on its neck */
+.buddy-head{transform-box:view-box;transform-origin:46px 20px;animation:headsway 4.6s ease-in-out infinite}
+@keyframes headsway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.buddy.em-look .buddy-head{animation:emlook 1.3s ease-in-out}
+@keyframes emlook{0%,100%{transform:rotate(0)}25%{transform:rotate(-17deg)}65%{transform:rotate(15deg)}}
 .buddy-eye{transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 0 4px rgba(255,201,74,.92));animation:blink 4.2s steps(1,end) infinite}
 @keyframes blink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.12)}}
 /* arms-out "presenting" pose when it settles on a section */
@@ -432,6 +438,9 @@ a{color:inherit;text-decoration:none}
 .buddy.present .buddy-arm-r{animation:armout-r .5s cubic-bezier(.2,1.5,.4,1) forwards}
 @keyframes armout-l{to{transform:rotate(112deg)}}
 @keyframes armout-r{to{transform:rotate(-112deg)}}
+/* at an edge, only raise the inner arm so the outer one doesn't go off-screen */
+.buddy.dock-r.present .buddy-arm-r{animation:none;transform:none}
+.buddy.dock-l.present .buddy-arm-l{animation:bxwave 2.6s ease-in-out infinite}
 /* personality emotes */
 .buddy.em-jump .buddy-bot{animation:em-jump .8s ease}
 .buddy.em-spin .buddy-bot{animation:em-spin .85s ease-in-out}
