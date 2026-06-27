@@ -61,23 +61,23 @@ a{color:inherit;text-decoration:none}
 /* perch for the companion at the top of the page */
 .hero-base{position:absolute;right:11%;top:226px;z-index:0;pointer-events:none}
 .hero-base svg{display:block;filter:drop-shadow(0 10px 16px rgba(8,40,26,.18))}
-/* about-section finale: the iterations walk in, the golem lands on the podium */
-.robot-lineup{display:flex;align-items:flex-end;justify-content:center;gap:clamp(16px,3.6vw,42px);margin-top:clamp(56px,9vh,108px);min-height:104px}
-.mini-bot{display:block;opacity:0;filter:drop-shadow(0 7px 9px rgba(8,40,26,.16));transition:opacity .55s ease,transform .75s cubic-bezier(.22,1.3,.36,1)}
-.robot-lineup .mini-bot:nth-child(1){transform:translateX(-66px) translateY(8px) scale(.84);transition-delay:.04s}
-.robot-lineup .mini-bot:nth-child(2){transform:translateX(-32px) translateY(18px) scale(.84);transition-delay:.17s}
-.robot-lineup .mini-bot:nth-child(4){transform:translateX(32px) translateY(18px) scale(.84);transition-delay:.31s}
-.robot-lineup .mini-bot:nth-child(5){transform:translateX(66px) translateY(8px) scale(.84);transition-delay:.44s}
-.robot-lineup.in .mini-bot{opacity:1;transform:translateY(0) scale(1)}
-.robot-lineup.in .mini-bot:nth-child(1){animation:miniBob 2.6s ease-in-out 1.3s infinite}
-.robot-lineup.in .mini-bot:nth-child(2){animation:miniBob 2.7s ease-in-out 1.55s infinite}
-.robot-lineup.in .mini-bot:nth-child(4){animation:miniBob 2.5s ease-in-out 1.8s infinite}
-.robot-lineup.in .mini-bot:nth-child(5){animation:miniBob 2.8s ease-in-out 2.05s infinite}
-@keyframes miniBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-.about-base{opacity:0;transform:translateY(16px);transition:opacity .6s ease .55s,transform .6s ease .55s}
-.about-base svg{display:block;filter:drop-shadow(0 9px 13px rgba(8,40,26,.2))}
-.robot-lineup.in .about-base{opacity:1;transform:none}
-@media(max-width:900px){.about-base{display:none}.robot-lineup{flex-wrap:wrap;gap:24px 34px}}
+/* about-section finale: the past iterations walk in as you scroll */
+.robot-fleet{display:flex;align-items:flex-end;justify-content:center;gap:clamp(14px,3.4vw,40px);margin-top:clamp(56px,9vh,108px);min-height:108px}
+.mb-wrap{display:block;opacity:0;will-change:transform,opacity}
+.mini-bot{display:block;filter:drop-shadow(0 7px 9px rgba(8,40,26,.16))}
+.mini-bot .leg{transform-box:fill-box;transform-origin:50% 8%}
+.mini-bot.walking{animation:fleetBob .42s ease-in-out infinite}
+.mini-bot.walking .leg.l{animation:legA .42s ease-in-out infinite}
+.mini-bot.walking .leg.r{animation:legB .42s ease-in-out infinite}
+@keyframes fleetBob{0%,100%{transform:translateY(0) rotate(-1.4deg)}50%{transform:translateY(-2.6px) rotate(1.4deg)}}
+@keyframes legA{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(9deg)}}
+@keyframes legB{0%,100%{transform:rotate(9deg)}50%{transform:rotate(-9deg)}}
+/* the golem's resting podium, sitting in the green of the contact block */
+.contact-base{margin:46px auto 4px;width:max-content;opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.contact-base svg{display:block;filter:drop-shadow(0 10px 16px rgba(2,18,10,.35))}
+.contact-base.in{opacity:1;transform:none}
+@media(max-width:900px){.contact-base{display:none}.robot-fleet{flex-wrap:wrap;gap:22px 30px}}
+@media(prefers-reduced-motion:reduce){.mb-wrap{opacity:1!important;transform:none!important}}
 
 .hero-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 26px}
 .hero-status{display:inline-flex;align-items:center;gap:9px;font-size:.86rem;font-weight:500;color:var(--ink-2)}

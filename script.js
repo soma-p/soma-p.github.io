@@ -563,8 +563,9 @@
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
     const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.32;    // big, perched on its base at the top
     const heroActive = () => scrollY < HERO_TH && base && base.getBoundingClientRect().width > 0;
-    const aboutBase = $('#aboutBase'), ABOUT_SCALE = 1.16;           // comes down to the podium among its old selves
-    const aboutActive = () => { if (!aboutBase) return false; const r = aboutBase.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight * 0.8 && r.bottom > innerHeight * 0.26; };
+    const aboutBase = $('#contactBase'), ABOUT_SCALE = 1.2;          // settles onto its podium in the contact green
+    const aboutActive = () => { if (!aboutBase) return false; const r = aboutBase.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight * 0.84 && r.bottom > innerHeight * 0.18; };
+    if (aboutBase) new IntersectionObserver(es => aboutBase.classList.toggle('in', es[0].isIntersecting), { threshold: 0 }).observe(aboutBase);
     const sections = [
       { sel: '#top', side: 'R', y: 0.28, msg: "whoa, that's me!" },
       { sel: '#work', side: 'L', y: 0.44, msg: "here's where I've worked!" },
@@ -589,7 +590,7 @@
       if (scrollY === lastY) return;                               // ignore spurious same-position events (Lenis rAF)
       lastY = scrollY;
       if (heroActive()) { scrolling = false; buddy.classList.remove('present', 'walking', 'dock-r', 'dock-l'); clearTimeout(stopT); setMsg(sections[0].msg); return; }
-      if (aboutActive()) { scrolling = false; buddy.classList.remove('present', 'walking', 'dock-r', 'dock-l'); clearTimeout(stopT); setMsg("the whole gang's here!"); return; }
+      if (aboutActive()) { scrolling = false; buddy.classList.remove('present', 'walking', 'dock-r', 'dock-l'); clearTimeout(stopT); setMsg("let's build something!"); return; }
       scrolling = true; buddy.classList.remove('present', 'dock-r', 'dock-l'); clearTimeout(emoteT);
       const max = (document.documentElement.scrollHeight - innerHeight) || 1, p = clamp(scrollY / max, 0, 1);
       tx = 16 + (0.5 + 0.4 * Math.sin(p * Math.PI * 4 + 1.05)) * (innerWidth - BW - 32);   // travels across while scrolling
@@ -708,6 +709,30 @@
       card.addEventListener('mouseleave', () => { card.style.transform = ''; card.style.transition = ''; });
     });
   }
+
+  /* 12) about-section fleet: the past iterations walk in as the page scrolls */
+  (() => {
+    const fleet = $('.robot-fleet'); if (!fleet || reduce) return;
+    const wraps = $$('.mb-wrap', fleet), n = wraps.length, mid = (n - 1) / 2;
+    if (shot) { wraps.forEach(w => { w.style.opacity = '1'; w.style.transform = 'none'; }); return; }
+    const startX = wraps.map((_, i) => (n % 2 === 1 && i === mid ? 0 : (i < mid ? -1 : 1) * (132 + Math.abs(i - mid) * 64)));
+    const cl = (v, a, b) => Math.min(b, Math.max(a, v));
+    const ease = (t) => t < 0.5 ? 2 * t * t : 1 - ((-2 * t + 2) ** 2) / 2;
+    let scrolling = false, stopT = 0;
+    const update = () => {
+      const r = fleet.getBoundingClientRect();
+      const p = cl((innerHeight - r.top) / (innerHeight * 0.6), 0, 1);
+      wraps.forEach((w, i) => {
+        const lp = cl((p - i * 0.05) / 0.5, 0, 1), e = ease(lp);
+        const x = startX[i] * (1 - e), y = startX[i] === 0 ? 30 * (1 - e) : 0;
+        w.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+        w.style.opacity = cl(lp * 1.7, 0, 1).toFixed(2);
+        w.firstElementChild.classList.toggle('walking', scrolling && lp > 0.02 && lp < 0.99);
+      });
+    };
+    addEventListener('scroll', () => { scrolling = true; clearTimeout(stopT); stopT = setTimeout(() => { scrolling = false; update(); }, 170); update(); }, { passive: true });
+    addEventListener('resize', update); update();
+  })();
 
   /* click-to-copy email */
   const el = $('#emailLink');
