@@ -253,7 +253,7 @@
     const init = () => { size(); drops = Array.from({ length: Math.max(18, Math.round(W * H / 2400)) }, () => ({ x: Math.random() * W, y: Math.random() * H, l: 7 + Math.random() * 11, v: 2.2 + Math.random() * 2.6 })); };
     init(); addEventListener('resize', init);
     const dx = 0.5;
-    const draw = () => { if (run) { c.clearRect(0, 0, W, H); c.strokeStyle = 'rgba(14,122,83,.5)'; c.lineWidth = 1.5; c.lineCap = 'round'; drops.forEach(d => { c.beginPath(); c.moveTo(d.x, d.y); c.lineTo(d.x - d.l * dx, d.y + d.l); c.stroke(); d.y += d.v; d.x += d.v * dx; if (d.y > H + 12) { d.y = -12; d.x = Math.random() * (W + 60); } }); } requestAnimationFrame(draw); };
+    const draw = () => { if (run) { c.clearRect(0, 0, W, H); c.lineWidth = 1.6; c.lineCap = 'round'; drops.forEach(d => { const g = c.createLinearGradient(d.x, d.y, d.x - d.l * dx, d.y + d.l); g.addColorStop(0, 'rgba(96,165,250,0)'); g.addColorStop(1, 'rgba(59,130,246,.75)'); c.strokeStyle = g; c.beginPath(); c.moveTo(d.x, d.y); c.lineTo(d.x - d.l * dx, d.y + d.l); c.stroke(); d.y += d.v; d.x += d.v * dx; if (d.y > H + 12) { d.y = -12; d.x = Math.random() * (W + 60); } }); } requestAnimationFrame(draw); };
     if (reduce) { init(); } else { requestAnimationFrame(draw); onView(cv, v => run = v); }
   })();
 
@@ -277,12 +277,22 @@
     if (reduce) { init(); draw(); run = false; } else { requestAnimationFrame(draw); onView(cv, v => run = v); }
   })();
 
-  /* 7) CSE card: pixel grid */
+  /* 7) CSE card: pixel-art beach */
   (() => {
     const g = $('#pixgrid'); if (!g) return;
-    const cols = 9, rows = 6; g.style.gridTemplateColumns = `repeat(${cols},1fr)`; g.style.gridTemplateRows = `repeat(${rows},1fr)`;
+    const cols = 12, rows = 8; g.style.gridTemplateColumns = `repeat(${cols},1fr)`; g.style.gridTemplateRows = `repeat(${rows},1fr)`;
+    const beach = (col, row) => {
+      const ds = Math.hypot(col - 9.4, row - 1.3);
+      if (ds < 1.7) return '#FFD84D';                         // sun
+      if (ds < 2.5) return '#FFE89A';                         // sun glow
+      if (row <= 2) return row === 2 ? '#BFE6F5' : '#9BD3F0'; // sky
+      if (row === 3) return col % 4 === 0 ? '#7FD4E6' : '#3FB4D0'; // sea + whitecaps
+      if (row === 4) return '#2E97BC';                        // sea
+      if (row === 5) return '#F1E3B4';                        // wet sand
+      return (col % 3 === 0) ? '#E2CE92' : '#E9D8A2';         // sand texture
+    };
     const frag = document.createDocumentFragment();
-    for (let i = 0; i < cols * rows; i++) { const px = document.createElement('span'); px.className = 'px'; px.style.background = Math.random() < 0.5 ? '#0E7A53' : '#34D399'; px.style.transitionDelay = (Math.random() * 0.4).toFixed(2) + 's'; frag.appendChild(px); }
+    for (let r = 0; r < rows; r++) { for (let cl = 0; cl < cols; cl++) { const px = document.createElement('span'); px.className = 'px'; px.style.background = beach(cl, r); px.style.transitionDelay = ((r * 0.03) + Math.random() * 0.16).toFixed(2) + 's'; frag.appendChild(px); } }
     g.appendChild(frag);
   })();
 
@@ -315,6 +325,28 @@
     bubble.classList.add('show');
     const loop = () => { cx += (tx - cx) * 0.07; cy += (ty - cy) * 0.07; buddy.style.transform = `translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px)`; requestAnimationFrame(loop); };
     loop();
+  })();
+
+  /* 9) BioVeritas DNA helix */
+  (() => {
+    const cv = $('#dnaCanvas'); if (!cv) return;
+    const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
+    let W = 0, H = 0, run = true, t = 0;
+    const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    size(); addEventListener('resize', size);
+    const draw = () => {
+      c.clearRect(0, 0, W, H);
+      const cxv = W / 2, amp = W * 0.34, N = 9, gap = H / (N + 1);
+      for (let i = 0; i < N; i++) {
+        const y = gap * (i + 1), ph = t + i * 0.62;
+        const x1 = cxv + Math.sin(ph) * amp, x2 = cxv - Math.sin(ph) * amp, front = Math.cos(ph) >= 0;
+        c.strokeStyle = 'rgba(14,122,83,.3)'; c.lineWidth = 2; c.beginPath(); c.moveTo(x1, y); c.lineTo(x2, y); c.stroke();
+        c.fillStyle = '#0E7A53'; c.beginPath(); c.arc(x1, y, front ? 3.6 : 2.2, 0, 7); c.fill();
+        c.fillStyle = '#34D399'; c.beginPath(); c.arc(x2, y, front ? 2.2 : 3.6, 0, 7); c.fill();
+      }
+    };
+    const frame = () => { if (run) { t += 0.04; draw(); } requestAnimationFrame(frame); };
+    if (reduce) { size(); draw(); } else { requestAnimationFrame(frame); onView(cv, v => run = v); }
   })();
 
   /* click-to-copy email */

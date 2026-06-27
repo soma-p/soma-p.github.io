@@ -22,8 +22,9 @@
   --lg:clamp(2.4rem,1.5rem + 4vw,5.2rem);
   --md:clamp(1.8rem,1.3rem + 2.2vw,3.2rem);
   --sm:clamp(1.3rem,1.1rem + 1vw,1.9rem);
-  --container:min(1240px,92vw);
+  --container:min(1240px,100% - 36px);
 }
+html{overflow-x:hidden}
 
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:88px;-webkit-text-size-adjust:100%}
@@ -272,26 +273,59 @@ a{color:inherit;text-decoration:none}
 .life-grid{display:grid;grid-template-columns:.4fr 1.7fr auto;gap:30px;align-items:center}
 .baymax{display:flex;justify-content:center;align-items:center;padding-left:6px}
 .baymax svg{filter:drop-shadow(0 14px 30px rgba(0,0,0,.45))}
-.baymax-arm{transform-origin:104px 60px;animation:bxwave 2.6s ease-in-out infinite}
-@keyframes bxwave{0%,100%{transform:rotate(2deg)}25%{transform:rotate(-24deg)}50%{transform:rotate(-8deg)}75%{transform:rotate(-24deg)}}
+.baymax-arm{transform-origin:108px 92px;animation:bmwave 2.5s ease-in-out infinite}
+@keyframes bmwave{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(12deg)}}
+@keyframes bxwave{0%,100%{transform:rotate(3deg)}25%{transform:rotate(-22deg)}50%{transform:rotate(-6deg)}75%{transform:rotate(-22deg)}}
 
 /* ===== Spay pets ===== */
 .pet-card{position:relative;overflow:hidden}
 .pet-card .h3,.pet-card h3,.pet-card .meta,.pet-card p,.pet-card .link{position:relative;z-index:1}
 .pets{position:absolute;right:16px;bottom:14px;z-index:0;display:flex;align-items:flex-end;gap:4px;opacity:.95;pointer-events:none;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
-.pet-card:hover .pets{transform:translateY(-5px) rotate(-2deg)}
-.pet.dog .ear-l{transform-origin:19px 19px;animation:earwag 1.5s ease-in-out infinite}
-.pet.dog .ear-r{transform-origin:47px 19px;animation:earwag 1.5s ease-in-out infinite .25s}
-@keyframes earwag{0%,100%{transform:rotate(0)}50%{transform:rotate(-7deg)}}
-.pet.cat .tail{transform-origin:44px 50px;animation:tailwag 1.8s ease-in-out infinite}
-@keyframes tailwag{0%,100%{transform:rotate(0)}50%{transform:rotate(14deg)}}
+.pet-card:hover .pets{transform:translateY(-6px) rotate(-2deg)}
+.pet{transform-box:view-box;transform-origin:32px 60px}
+.pet.dog{animation:petbob 1.7s ease-in-out infinite}
+.pet.cat{animation:petbob 2s ease-in-out infinite .35s}
+@keyframes petbob{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-5px) rotate(1.5deg)}}
+.pet.dog .ear-l{transform-box:view-box;transform-origin:18px 26px;animation:earwag 1.5s ease-in-out infinite}
+.pet.dog .ear-r{transform-box:view-box;transform-origin:46px 26px;animation:earwag 1.5s ease-in-out infinite .25s}
+@keyframes earwag{0%,100%{transform:rotate(0)}50%{transform:rotate(-8deg)}}
+.pet.cat .tail{transform-box:view-box;transform-origin:46px 47px;animation:tailwag 1.8s ease-in-out infinite}
+@keyframes tailwag{0%,100%{transform:rotate(0)}50%{transform:rotate(15deg)}}
+
+/* ===== per-card effects (BioVeritas / Union / Skin / VTR) ===== */
+.fx-card{position:relative;overflow:hidden}
+.fx-card>h3,.fx-card>.meta,.fx-card>p,.fx-card>.link{position:relative;z-index:1}
+.fx-dna,.fx-pins,.fx-scan,.fx-hang{position:absolute;right:16px;bottom:14px;z-index:0;pointer-events:none}
+/* DNA helix */
+.fx-dna{width:62px;height:84px;opacity:.95}
+/* map pins */
+.fx-pins{width:72px;height:56px;opacity:.92}
+.fx-pins span{position:absolute;width:15px;height:15px;border-radius:50% 50% 50% 0;background:var(--accent);transform:rotate(-45deg);animation:pindrop 2.2s ease-in-out infinite}
+.fx-pins span::after{content:"";position:absolute;inset:4.5px;border-radius:50%;background:#fff}
+.fx-pins span:nth-child(1){left:2px;bottom:16px;animation-delay:0s}
+.fx-pins span:nth-child(2){left:28px;bottom:28px;animation-delay:.45s}
+.fx-pins span:nth-child(3){left:50px;bottom:12px;animation-delay:.9s}
+@keyframes pindrop{0%,100%{transform:rotate(-45deg) translateY(0)}50%{transform:rotate(-45deg) translateY(-9px)}}
+/* lesion scanner */
+.fx-scan{width:60px;height:60px;border-radius:8px;overflow:hidden;opacity:.9;background:repeating-linear-gradient(45deg,rgba(14,122,83,.08),rgba(14,122,83,.08) 4px,transparent 4px,transparent 9px)}
+.fx-scan .scanline{position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scanmove 1.9s ease-in-out infinite}
+@keyframes scanmove{0%{top:2px}50%{top:54px}100%{top:2px}}
+.fx-scan .br{position:absolute;width:11px;height:11px;border:2px solid var(--accent)}
+.fx-scan .tl{top:4px;left:4px;border-right:0;border-bottom:0}
+.fx-scan .tr{top:4px;right:4px;border-left:0;border-bottom:0}
+.fx-scan .bl{bottom:4px;left:4px;border-right:0;border-top:0}
+.fx-scan .rb{bottom:4px;right:4px;border-left:0;border-top:0}
+/* swinging hanger */
+.fx-hang{opacity:.92}
+.hang-swing{transform-origin:30px 12px;animation:hangswing 3s ease-in-out infinite}
+@keyframes hangswing{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 
 /* ===== leadership card animations ===== */
 .lead{position:relative;overflow:hidden}
 .lead-body{position:relative;z-index:2}
 .rain-canvas,.net-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.55;pointer-events:none}
 .pixgrid{position:absolute;inset:0;z-index:0;display:grid;pointer-events:none;opacity:0;transition:opacity .3s}
-.lead-pix:hover .pixgrid{opacity:.45}
+.lead-pix:hover .pixgrid{opacity:.8}
 .pixgrid .px{transform:scale(0) rotate(60deg);transition:transform .55s cubic-bezier(.2,.85,.25,1)}
 .lead-pix:hover .pixgrid .px{transform:scale(1) rotate(0)}
 .accel-lines{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;opacity:.5}
@@ -318,10 +352,12 @@ a{color:inherit;text-decoration:none}
 .honor:hover .y{color:var(--accent);transform:translateX(3px)}
 
 /* ===== robot buddy companion ===== */
-.buddy{position:fixed;left:0;top:0;width:62px;z-index:85;pointer-events:none;will-change:transform}
-.buddy-bot{display:block;animation:bob 2.3s ease-in-out infinite;filter:drop-shadow(0 10px 20px rgba(10,40,30,.25))}
+.buddy{position:fixed;left:0;top:0;width:72px;z-index:85;pointer-events:none;will-change:transform}
+.buddy-bot{display:block;animation:bob 2.3s ease-in-out infinite;filter:drop-shadow(0 12px 18px rgba(60,30,10,.3))}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-.buddy-arm-l{transform-origin:16px 54px;animation:bxwave 2.6s ease-in-out infinite}
+.buddy-arm-l{transform-origin:10px 56px;animation:bxwave 2.6s ease-in-out infinite}
+.buddy-eye{transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 0 3px rgba(52,211,153,.95));animation:blink 4.2s steps(1,end) infinite}
+@keyframes blink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.12)}}
 .buddy.flip .buddy-bot{transform:scaleX(-1)}
 .buddy-bubble{position:absolute;bottom:100%;left:50%;transform:translateX(-50%) translateY(-10px);white-space:nowrap;background:var(--ink);color:#fff;font-size:.72rem;font-weight:600;font-family:var(--ff-d);padding:7px 13px;border-radius:100px;opacity:0;transition:opacity .35s,transform .35s}
 .buddy-bubble.show{opacity:1;transform:translateX(-50%) translateY(-14px)}
@@ -335,25 +371,56 @@ a{color:inherit;text-decoration:none}
 .shotmode .hero{padding-top:120px}
 
 /* ---------- responsive ---------- */
-@media(max-width:980px){
-  .hero-grid{grid-template-columns:1fr;gap:40px}
-  .hero-photo{max-width:380px}
-  .stats-grid{grid-template-columns:repeat(3,1fr);gap:28px}
-  .about-grid{grid-template-columns:1fr;gap:34px}
+/* overflow guards: let flex/grid text children shrink instead of pushing width */
+.s-head>div,.s-head p,.work-main,.work-row,.ftext,.paper,.paper>div,.life-grid,.life-grid>div,.card,.lead,.lead-body,.cards,.papers{min-width:0}
+.work-main p,.paper p,.card p,.lead p,.hero-sub{overflow-wrap:break-word}
+
+/* ===== tablet ===== */
+@media(max-width:1024px){
+  .hero{padding:132px 0 60px}
+  .hero-grid{grid-template-columns:1fr;gap:36px}
+  .hero-photo{max-width:360px}
+  .stats{margin-top:48px}
+  .stats-grid{grid-template-columns:repeat(3,1fr);gap:26px 28px}
+  .about-grid{grid-template-columns:1fr;gap:30px}
   .cards{grid-template-columns:repeat(2,1fr)}
   .card.feature{grid-column:span 2}
-  .lead-grid{grid-template-columns:1fr}
-  .ethos{grid-template-columns:1fr}
+  .lead-grid{grid-template-columns:1fr 1fr}
+  .life-grid{grid-template-columns:34px 1fr auto;gap:22px}
+  .baymax svg{width:106px;height:auto}
+  .s-head{gap:18px}
 }
+/* ===== phone ===== */
 @media(max-width:680px){
-  .nav-links{position:fixed;inset:0 0 0 34%;flex-direction:column;justify-content:center;background:#fff;padding:40px;gap:24px;transform:translateX(100%);transition:transform .3s;box-shadow:-20px 0 60px -30px rgba(0,0,0,.4)}
+  .nav-links{position:fixed;inset:0 0 0 32%;flex-direction:column;justify-content:center;background:#fff;padding:40px;gap:22px;transform:translateX(100%);transition:transform .3s;box-shadow:-20px 0 60px -30px rgba(0,0,0,.4);z-index:99}
   .nav-links.open{transform:none}.nav-toggle{display:flex}
-  .work-row{grid-template-columns:1fr;gap:10px}
+  .hero{padding:108px 0 48px}
+  .section{padding:clamp(56px,9vh,90px) 0}
+  .s-head{margin-bottom:32px;flex-direction:column;align-items:stretch;gap:12px}
+  .s-head>div,.s-head p{width:100%;max-width:100%}
+  .s-head h2,.hero h1,.hero-tag,.contact-h,.ilude{overflow-wrap:break-word;max-width:100%}
+  .ilude{font-size:clamp(1.7rem,1.1rem + 3.4vw,2.6rem)}
+  .work-row{grid-template-columns:1fr;gap:8px}
   .paper{grid-template-columns:1fr;gap:8px}
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .cards{grid-template-columns:1fr}.card.feature{grid-column:span 1;flex-direction:column}
-  .card.feature .fmedia img{min-height:220px}
-  .honor{grid-template-columns:60px 1fr;gap:12px}.honor .c{grid-column:2}
-  .gal{grid-template-columns:repeat(2,1fr);grid-auto-rows:150px}.wide{grid-column:span 2}.tall{grid-row:span 1}
+  .life-grid{grid-template-columns:1fr;gap:12px}
+  .baymax{justify-content:flex-start;margin-top:2px}.baymax svg{width:92px;height:auto}
+  .agentic-flow{height:140px}
+  .stats-grid{grid-template-columns:1fr 1fr;gap:22px}
+  .cards{grid-template-columns:1fr}
+  .card.feature{grid-column:span 1;flex-direction:column}
+  .orca-media{min-height:190px}
+  .lead-grid{grid-template-columns:1fr}
+  .honor{grid-template-columns:54px 1fr;gap:6px 12px}.honor .c{grid-column:1 / -1}
+  .gal{grid-template-columns:repeat(2,1fr);grid-auto-rows:140px}.wide{grid-column:span 2}.tall{grid-row:span 1}
+  .contact{border-radius:22px}
+  .marquee span{font-size:.95rem;padding:0 22px}
+}
+/* ===== small phone ===== */
+@media(max-width:420px){
+  .stats-grid{gap:16px}
+  .gal{grid-template-columns:1fr;grid-auto-rows:200px}.wide{grid-column:span 1}
+  .hero-cta{gap:10px}.hero-cta .btn{padding:12px 18px;font-size:.9rem}
+  .chip{font-size:.72rem;padding:4px 9px}
+  .tagpill,.star-pill{font-size:.5rem}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}html{scroll-behavior:auto}}
