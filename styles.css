@@ -343,12 +343,13 @@ a{color:inherit;text-decoration:none}
 @keyframes petblink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
 /* the pets sit upright on hover */
 .pet-pair{position:relative;display:flex;align-items:flex-end}
-.pet-lounge{transition:opacity .35s ease}
-.pet-up{position:absolute;bottom:0;opacity:0;transition:opacity .35s ease;pointer-events:none}
+.pet-lounge{transition:opacity .14s ease}
+.pet-up{position:absolute;bottom:0;opacity:0;transform-origin:bottom center;transition:opacity .2s ease;pointer-events:none}
 .pet-up.dog{left:calc(50% - 42px)}
 .pet-up.cat{left:calc(50% - 39px)}
 .pet-card:hover .pet-lounge{opacity:0}
-.pet-card:hover .pet-up{opacity:1}
+.pet-card:hover .pet-up{animation:sitUp .55s cubic-bezier(.34,1.45,.5,1) forwards}   /* springs up into a sit */
+@keyframes sitUp{0%{opacity:0;transform:translateY(15px) scaleY(.74)}30%{opacity:1}100%{opacity:1;transform:translateY(0) scaleY(1)}}
 .tail-dog-u{transform-box:view-box;transform-origin:58px 76px;animation:tailwag 1s ease-in-out infinite}
 .tail-cat-u{transform-box:view-box;transform-origin:53px 84px;animation:tailswish 2.4s ease-in-out infinite}
 .head-dog-u{transform-box:view-box;transform-origin:42px 47px;animation:headtilt 3s ease-in-out infinite}
@@ -447,19 +448,19 @@ a{color:inherit;text-decoration:none}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 /* legs step while it walks */
 .buddy-leg-l,.buddy-leg-r{transform-box:view-box}
-.buddy-leg-l{transform-origin:34px 90px}
-.buddy-leg-r{transform-origin:58px 90px}
+.buddy-leg-l{transform-origin:34px 93px}
+.buddy-leg-r{transform-origin:58px 93px}
 .buddy.walking .buddy-leg-l{animation:bstep .46s ease-in-out infinite}
 .buddy.walking .buddy-leg-r{animation:bstep .46s ease-in-out infinite;animation-delay:-.23s}
 @keyframes bstep{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(8deg)}}
 .buddy-arm-l,.buddy-arm-r{transform-box:view-box}
-.buddy-arm-l{transform-origin:14px 53px;animation:bxwave 2.6s ease-in-out infinite}
-.buddy-arm-r{transform-origin:78px 53px}
+.buddy-arm-l{transform-origin:14px 48px;animation:bxwave 2.6s ease-in-out infinite}
+.buddy-arm-r{transform-origin:78px 48px}
 /* head moves on its neck */
-.buddy-head{transform-box:view-box;transform-origin:46px 20px;animation:headsway 4.6s ease-in-out infinite}
-@keyframes headsway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.buddy-head{transform-box:view-box;transform-origin:46px 47px;animation:headsway 4.6s ease-in-out infinite}
+@keyframes headsway{0%,100%{transform:rotate(-3.5deg)}50%{transform:rotate(3.5deg)}}
 .buddy.em-look .buddy-head{animation:emlook 1.3s ease-in-out}
-@keyframes emlook{0%,100%{transform:rotate(0)}25%{transform:rotate(-17deg)}65%{transform:rotate(15deg)}}
+@keyframes emlook{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}65%{transform:rotate(9deg)}}
 .buddy-eye{transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 0 4px rgba(255,201,74,.92));animation:blink 4.2s steps(1,end) infinite}
 @keyframes blink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.12)}}
 /* arms-out "presenting" pose when it settles on a section */

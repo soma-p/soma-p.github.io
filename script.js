@@ -504,7 +504,7 @@
         const r = base.getBoundingClientRect();
         targetScale = HERO_SCALE;
         tx = r.left + r.width / 2 - BW / 2;
-        ty = r.top + r.height * 0.52 - 51.5 - 45.6 * targetScale;   // feet on the base surface
+        ty = r.top + r.height * 0.52 - 52.5 - 47.4 * targetScale;   // feet on the base surface
       } else {
         targetScale = 0.86 + 0.3 * clamp((cy / innerHeight - 0.22) / 0.34, 0, 1);
       }
