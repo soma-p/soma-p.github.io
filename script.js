@@ -453,7 +453,7 @@
     const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.32;    // big, perched on its base at the top
     const heroActive = () => scrollY < HERO_TH && base && base.getBoundingClientRect().width > 0;
     const sections = [
-      { sel: '#top', side: 'R', y: 0.28, msg: "hey, I'll show you around!" },
+      { sel: '#top', side: 'R', y: 0.28, msg: "whoa, that's me!" },
       { sel: '#work', side: 'L', y: 0.44, msg: "here's where I've worked!" },
       { sel: '#research', side: 'R', y: 0.44, msg: "poke the map, it's live!" },
       { sel: '#projects', side: 'L', y: 0.44, msg: "stuff I build for fun!" },
@@ -496,6 +496,10 @@
     addEventListener('scroll', onScroll, { passive: true });
     addEventListener('resize', onScroll);
     onScroll(); cx = tx; cy = ty; bubble.classList.add('show'); onStop();
+    buddy.querySelector('.buddy-bot')?.addEventListener('click', () => {   // click it and it tumbles
+      if (buddy.classList.contains('tumble')) return;
+      buddy.classList.add('tumble'); setTimeout(() => buddy.classList.remove('tumble'), 1050);
+    });
 
     const loop = () => {
       const hero = heroActive();

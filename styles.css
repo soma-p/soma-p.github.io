@@ -444,8 +444,11 @@ a{color:inherit;text-decoration:none}
 
 /* ===== robot buddy companion ===== */
 .buddy{position:fixed;left:0;top:0;width:78px;z-index:85;pointer-events:none;will-change:transform;transform-origin:center}
-.buddy-bot{display:block;overflow:visible;animation:bob 2.3s ease-in-out infinite;filter:drop-shadow(0 12px 18px rgba(60,30,10,.32))}
+.buddy-bot{display:block;overflow:visible;pointer-events:auto;cursor:pointer;animation:bob 2.3s ease-in-out infinite;filter:drop-shadow(0 12px 18px rgba(60,30,10,.32))}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+/* click it and it tumbles, then springs back upright */
+.buddy.tumble .buddy-bot{animation:tumble 1.05s cubic-bezier(.3,.85,.4,1)}
+@keyframes tumble{0%{transform:translateY(0) rotate(0)}18%{transform:translateY(-16px) rotate(38deg)}58%{transform:translateY(-14px) rotate(338deg)}78%{transform:translateY(0) rotate(360deg) scaleY(.86)}90%{transform:translateY(-4px) rotate(360deg)}100%{transform:translateY(0) rotate(360deg)}}
 /* legs step while it walks */
 .buddy-leg-l,.buddy-leg-r{transform-box:view-box}
 .buddy-leg-l{transform-origin:34px 93px}
@@ -454,8 +457,8 @@ a{color:inherit;text-decoration:none}
 .buddy.walking .buddy-leg-r{animation:bstep .46s ease-in-out infinite;animation-delay:-.23s}
 @keyframes bstep{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(8deg)}}
 .buddy-arm-l,.buddy-arm-r{transform-box:view-box}
-.buddy-arm-l{transform-origin:14px 48px;animation:bxwave 2.6s ease-in-out infinite}
-.buddy-arm-r{transform-origin:78px 48px}
+.buddy-arm-l{transform-origin:14px 54px;animation:bxwave 2.6s ease-in-out infinite}
+.buddy-arm-r{transform-origin:78px 54px}
 /* head moves on its neck */
 .buddy-head{transform-box:view-box;transform-origin:46px 47px;animation:headsway 4.6s ease-in-out infinite}
 @keyframes headsway{0%,100%{transform:rotate(-3.5deg)}50%{transform:rotate(3.5deg)}}
