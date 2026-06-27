@@ -408,43 +408,85 @@
     g.appendChild(frag);
   })();
 
-  /* 8) scroll companion robot buddy */
+  /* 8) scroll companion: copper-golem buddy — trail, side-docking, presenting, emotes */
   (() => {
     const buddy = $('#buddy'); if (!buddy) return;
     if (reduce || innerWidth < 900) { buddy.style.display = 'none'; return; }
     const bubble = $('#buddyBubble');
-    const BW = 78;
-    const stops = [
-      { sel: '#top', msg: "hey, I'll show you around!" },
-      { sel: '#work', msg: "here's where I've worked!" },
-      { sel: '#research', msg: "poke the map, it's live!" },
-      { sel: '#projects', msg: "stuff I build for fun!" },
-      { sel: '#gallery', msg: "a few good moments!" },
-      { sel: '#leadership', msg: "communities I started!" },
-      { sel: '#honors', msg: "some wins!" },
-      { sel: '#about', msg: "a bit about me!" },
-      { sel: '#contact', msg: "let's talk!" },
+    const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+    // motion-trail canvas, just behind the buddy
+    const tc = document.createElement('canvas'); tc.className = 'buddy-trail'; tc.setAttribute('aria-hidden', 'true');
+    buddy.parentNode.insertBefore(tc, buddy);
+    const g = tc.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
+    const sizeT = () => { tc.width = innerWidth * dpr; tc.height = innerHeight * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    sizeT();
+    const sections = [
+      { sel: '#top', side: 'R', y: 0.28, msg: "hey, I'll show you around!" },
+      { sel: '#work', side: 'L', y: 0.44, msg: "here's where I've worked!" },
+      { sel: '#research', side: 'R', y: 0.44, msg: "poke the map, it's live!" },
+      { sel: '#projects', side: 'L', y: 0.44, msg: "stuff I build for fun!" },
+      { sel: '#gallery', side: 'R', y: 0.46, msg: "a few good moments!" },
+      { sel: '#leadership', side: 'L', y: 0.44, msg: "communities I started!" },
+      { sel: '#honors', side: 'R', y: 0.44, msg: "some wins!" },
+      { sel: '#about', side: 'L', y: 0.46, msg: "a bit about me!" },
+      { sel: '#contact', side: 'R', y: 0.5, msg: "let's talk!" },
     ].map(s => ({ ...s, el: $(s.sel) })).filter(s => s.el);
-    if (!stops.length) { buddy.style.display = 'none'; return; }
-    let p = 0, tx = innerWidth * 0.7, ty = innerHeight * 0.5, cx = tx, cy = ty, curMsg = '';
-    const pick = () => {
-      const max = (document.documentElement.scrollHeight - innerHeight) || 1;
-      p = Math.min(1, Math.max(0, scrollY / max));
-      // starts above the hero photo (upper-right), then weaves slowly across the page
-      const wx = 0.5 + 0.40 * Math.sin(p * Math.PI * 4 + 1.05);
-      tx = 16 + wx * (innerWidth - BW - 32);
-      ty = (0.40 - 0.16 * Math.cos(p * Math.PI * 5)) * innerHeight;
-      const mid = scrollY + innerHeight * 0.5; let best = stops[0];
-      for (const s of stops) { if (s.el.getBoundingClientRect().top + scrollY <= mid) best = s; }
-      if (best.msg !== curMsg) { curMsg = best.msg; bubble.textContent = best.msg; }
+    if (!sections.length) { buddy.style.display = 'none'; return; }
+    let tx = innerWidth * 0.8, ty = innerHeight * 0.3, cx = tx, cy = ty, curMsg = '', scrolling = false, stopT = 0, emoteT = 0, trail = [], lastY = -1;
+    const cur = () => { const mid = scrollY + innerHeight * 0.5; let b = sections[0]; for (const s of sections) if (s.el.getBoundingClientRect().top + scrollY <= mid) b = s; return b; };
+    const setMsg = (m) => { if (m !== curMsg) { curMsg = m; bubble.textContent = m; } };
+    const playEmote = (cls, ms) => { buddy.classList.add(cls); setTimeout(() => buddy.classList.remove(cls), ms); };
+    const emotes = ['em-jump', 'em-nod', 'em-wiggle', 'em-spin'];
+    const scheduleEmote = () => { clearTimeout(emoteT); emoteT = setTimeout(() => { if (!scrolling) { playEmote(emotes[Math.floor(Math.random() * emotes.length)], 850); scheduleEmote(); } }, 2600 + Math.random() * 2600); };
+
+    const onScroll = () => {
+      if (scrollY === lastY) return;                               // ignore spurious same-position events (Lenis rAF)
+      lastY = scrollY;
+      scrolling = true; buddy.classList.remove('present'); clearTimeout(emoteT);
+      const max = (document.documentElement.scrollHeight - innerHeight) || 1, p = clamp(scrollY / max, 0, 1);
+      tx = 16 + (0.5 + 0.4 * Math.sin(p * Math.PI * 4 + 1.05)) * (innerWidth - BW - 32);   // travels across while scrolling
+      ty = (0.4 - 0.16 * Math.cos(p * Math.PI * 5)) * innerHeight;
+      setMsg(cur().msg);
+      clearTimeout(stopT); stopT = setTimeout(onStop, 260);
     };
-    addEventListener('scroll', pick, { passive: true }); addEventListener('resize', pick); pick();
-    cx = tx; cy = ty; bubble.classList.add('show');
+    const onStop = () => {                                          // dock to a side so it never blocks the text
+      scrolling = false; const s = cur();
+      tx = s.side === 'L' ? 16 : innerWidth - BW - 16;
+      ty = clamp(s.y * innerHeight, 84, innerHeight - 150);
+      setMsg(s.msg);
+      setTimeout(() => { if (!scrolling) { buddy.classList.add('present'); scheduleEmote(); } }, 440);
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', () => { sizeT(); onScroll(); });
+    onScroll(); cx = tx; cy = ty; bubble.classList.add('show'); onStop();
+
+    const drawTrail = () => {
+      g.clearRect(0, 0, innerWidth, innerHeight);
+      const n = trail.length; if (n < 2) return;
+      for (let i = 1; i < n; i++) {                                 // fading copper line behind
+        const a = trail[i - 1], b = trail[i], f = i / n;
+        g.strokeStyle = `rgba(232,153,95,${f * 0.5})`; g.lineWidth = 1 + 3 * f; g.lineCap = 'round';
+        g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
+      }
+      for (let i = 0; i < n; i += 4) {                              // patina footprint dots
+        g.fillStyle = `rgba(116,168,146,${(i / n) * 0.45})`;
+        g.beginPath(); g.arc(trail[i].x, trail[i].y, 2.2, 0, 7); g.fill();
+      }
+      const last = trail[n - 1], prev = trail[Math.max(0, n - 6)], vx = last.x - prev.x, vy = last.y - prev.y;
+      for (let k = 1; k <= 3; k++) {                                // faint projection ahead
+        g.fillStyle = `rgba(232,153,95,${0.3 - k * 0.08})`;
+        g.beginPath(); g.arc(last.x + vx * k * 0.5, last.y + vy * k * 0.5, 2.6, 0, 7); g.fill();
+      }
+    };
     const loop = () => {
-      cx += (tx - cx) * 0.045; cy += (ty - cy) * 0.05;
-      buddy.classList.toggle('flip', tx - cx < -0.15);
-      const sc = 0.86 + 0.30 * Math.min(1, Math.max(0, (cy / innerHeight - 0.22) / 0.34));   // grows lower, shrinks higher (depth)
+      cx += (tx - cx) * (scrolling ? 0.07 : 0.09); cy += (ty - cy) * 0.08;
+      const sc = 0.86 + 0.3 * clamp((cy / innerHeight - 0.22) / 0.34, 0, 1);
       buddy.style.transform = `translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px) scale(${sc.toFixed(3)})`;
+      const px = cx + BW / 2, py = cy + 66 * sc, lp = trail[trail.length - 1];
+      if (!lp || Math.hypot(px - lp.x, py - lp.y) > 3) trail.push({ x: px, y: py });
+      if (trail.length > 44) trail.shift();
+      if (!scrolling && trail.length > 1 && Math.random() < 0.3) trail.shift();   // trail melts away when idle
+      drawTrail();
       requestAnimationFrame(loop);
     };
     loop();
@@ -490,7 +532,7 @@
     const card = $('#lifeCard'); if (!card) return;
     const wrap = card.querySelector('.baymax'); const rise = card.querySelector('.bm-rise');
     if (!wrap || !rise) return;
-    const RISE_IN = 106, RISE_OUT = -10; let cur = RISE_IN, tgt = RISE_IN;
+    const RISE_IN = 106, RISE_OUT = 11; let cur = RISE_IN, tgt = RISE_IN;   // feet stay tucked behind the case
     const onScroll = () => {
       const r = card.getBoundingClientRect();
       const p = Math.min(1, Math.max(0, (innerHeight * 0.86 - r.top) / (innerHeight * 0.5)));

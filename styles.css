@@ -320,18 +320,20 @@ a{color:inherit;text-decoration:none}
 .pets{position:absolute;left:0;right:0;bottom:14px;z-index:0;display:flex;align-items:flex-end;justify-content:center;gap:20px;opacity:.96;pointer-events:none;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
 .pet-card:hover .pets{transform:translateY(-5px)}
 .pet{transform-box:view-box}
-.pet.dog{transform-origin:42px 97px;animation:petbob 1.8s ease-in-out infinite}
-.pet.cat{transform-origin:40px 97px;animation:petbob 2.1s ease-in-out infinite .4s}
-@keyframes petbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.tail-dog{transform-box:view-box;transform-origin:58px 76px;animation:tailwag 1s ease-in-out infinite}
-.tail-cat{transform-box:view-box;transform-origin:53px 84px;animation:tailswish 2.4s ease-in-out infinite}
-@keyframes tailwag{0%,100%{transform:rotate(-15deg)}50%{transform:rotate(15deg)}}
-@keyframes tailswish{0%,100%{transform:rotate(0)}50%{transform:rotate(-13deg)}}
-.head-dog{transform-box:view-box;transform-origin:42px 47px;animation:headtilt 3s ease-in-out infinite}
-.head-cat{transform-box:view-box;transform-origin:40px 46px;animation:headtilt 3.4s ease-in-out infinite .5s}
+.pet.dog{transform-origin:60px 66px;animation:petbob 1.8s ease-in-out infinite}
+.pet.cat{transform-origin:58px 60px;animation:petbob 2.1s ease-in-out infinite .4s}
+@keyframes petbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.tail-dog{transform-box:view-box;transform-origin:96px 50px;animation:tailwag 1s ease-in-out infinite}
+.tail-cat{transform-box:view-box;transform-origin:96px 48px;animation:tailswish 2.4s ease-in-out infinite}
+@keyframes tailwag{0%,100%{transform:rotate(-13deg)}50%{transform:rotate(13deg)}}
+@keyframes tailswish{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
+.head-dog{transform-box:view-box;transform-origin:38px 42px;animation:headtilt 3s ease-in-out infinite}
+.head-cat{transform-box:view-box;transform-origin:34px 44px;animation:headtilt 3.4s ease-in-out infinite .5s}
 @keyframes headtilt{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
-.ear-l,.ear-cl{transform-box:view-box;transform-origin:26px 30px;animation:eartwitch 2.6s ease-in-out infinite}
-.ear-r,.ear-cr{transform-box:view-box;transform-origin:58px 30px;animation:eartwitch 2.6s ease-in-out infinite .35s}
+.ear-l,.ear-cl,.ear-cr{transform-box:view-box;animation:eartwitch 2.6s ease-in-out infinite}
+.ear-l{transform-origin:24px 24px}
+.ear-cl{transform-origin:18px 24px}
+.ear-cr{transform-origin:40px 22px;animation-delay:.35s}
 @keyframes eartwitch{0%,88%,100%{transform:rotate(0)}94%{transform:rotate(-9deg)}}
 .pet .eye{transform-box:view-box;transform-origin:center;animation:petblink 4.5s steps(1,end) infinite}
 @keyframes petblink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
@@ -409,10 +411,27 @@ a{color:inherit;text-decoration:none}
 .buddy{position:fixed;left:0;top:0;width:78px;z-index:85;pointer-events:none;will-change:transform;transform-origin:center}
 .buddy-bot{display:block;animation:bob 2.3s ease-in-out infinite;filter:drop-shadow(0 12px 18px rgba(60,30,10,.32))}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-.buddy-arm-l{transform-origin:17px 61px;animation:bxwave 2.6s ease-in-out infinite}
-.buddy-eye{transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 0 3px rgba(52,211,153,.95));animation:blink 4.2s steps(1,end) infinite}
+.buddy-arm-l,.buddy-arm-r{transform-box:view-box}
+.buddy-arm-l{transform-origin:15px 62px;animation:bxwave 2.6s ease-in-out infinite}
+.buddy-arm-r{transform-origin:77px 64px}
+.buddy-eye{transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 0 4px rgba(255,201,74,.92));animation:blink 4.2s steps(1,end) infinite}
 @keyframes blink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.12)}}
-.buddy.flip .buddy-bot{transform:scaleX(-1)}
+/* arms-out "presenting" pose when it settles on a section */
+.buddy.present .buddy-arm-l{animation:armout-l .5s cubic-bezier(.2,1.5,.4,1) forwards}
+.buddy.present .buddy-arm-r{animation:armout-r .5s cubic-bezier(.2,1.5,.4,1) forwards}
+@keyframes armout-l{to{transform:rotate(124deg)}}
+@keyframes armout-r{to{transform:rotate(-124deg)}}
+/* personality emotes */
+.buddy.em-jump .buddy-bot{animation:em-jump .8s ease}
+.buddy.em-spin .buddy-bot{animation:em-spin .85s ease-in-out}
+.buddy.em-nod .buddy-bot{animation:em-nod .7s ease-in-out}
+.buddy.em-wiggle .buddy-bot{animation:em-wiggle .7s ease-in-out}
+@keyframes em-jump{0%,100%{transform:translateY(0)}28%{transform:translateY(-15px)}48%{transform:translateY(0)}68%{transform:translateY(-7px)}}
+@keyframes em-spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+@keyframes em-nod{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}60%{transform:rotate(8deg)}}
+@keyframes em-wiggle{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-5px) rotate(-6deg)}75%{transform:translateX(5px) rotate(6deg)}}
+/* footprint / motion trail */
+.buddy-trail{position:fixed;inset:0;width:100vw;height:100vh;z-index:84;pointer-events:none}
 .buddy-bubble{position:absolute;bottom:100%;left:50%;transform:translateX(-50%) translateY(-10px);white-space:nowrap;background:var(--ink);color:#fff;font-size:.72rem;font-weight:600;font-family:var(--ff-d);padding:7px 13px;border-radius:100px;opacity:0;transition:opacity .35s,transform .35s}
 .buddy-bubble.show{opacity:1;transform:translateX(-50%) translateY(-14px)}
 .buddy-bubble::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--ink)}
