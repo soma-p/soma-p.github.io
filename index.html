@@ -3,485 +3,337 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pranav Kumar Soma — AI Researcher &amp; Engineer @ UCSD</title>
-<meta name="description" content="M.S. CS at UC San Diego (4.00 GPA) building agentic AI, multimodal health AI, and large-scale geospatial ML. ServiceNow, Laboratory for Emerging Intelligence, Qualcomm Institute." />
-<meta name="author" content="Pranav Kumar Soma" />
-<meta name="keywords" content="Pranav Kumar Soma, AI researcher, AI engineer, machine learning engineer, agentic AI, MCP servers, LLM fine-tuning, LoRA, RLHF, RAG, GraphRAG, multimodal AI, health AI, geospatial ML, computational redistricting, UC San Diego, UCSD, ServiceNow, Laboratory for Emerging Intelligence, Qualcomm Institute, ACM CHI 2026, ORCA" />
+<title>Pranav Soma - AI Researcher & Engineer</title>
+<meta name="description" content="Pranav Soma is a CS master's student at UC San Diego (4.00 GPA) who builds AI and ships it. Agentic systems, multimodal health AI, and large-scale ML. ServiceNow, Qualcomm Institute, LEI." />
+<meta name="author" content="Pranav Soma" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Pranav Kumar Soma — AI Researcher &amp; Engineer" />
-<meta property="og:description" content="I build research that ships to real people — agentic AI, multimodal health AI, and national-scale geospatial ML. AI research lead at LEI, researcher at the Qualcomm Institute, SWE at ServiceNow." />
+<meta property="og:title" content="Pranav Soma - AI Researcher & Engineer" />
+<meta property="og:description" content="I build AI and ship it. CS master's at UCSD, lead an agentic platform for 7,000+ people, train multimodal health models, and shipped voice agents at ServiceNow." />
 <meta property="og:image" content="imgs/web/headshot.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,400..500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
 </head>
-<body data-ground="paper">
+<body>
+<div class="progress" id="progress"></div>
 
-<!-- custom cursor -->
-<div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-read" id="cursorRead"></span></div>
-
-<!-- top progress bar (mobile + fallback) -->
-<div class="topbar" id="topbar" aria-hidden="true"></div>
-
-<!-- NAV -->
 <header class="nav" id="nav">
   <div class="nav-inner">
-    <a href="#top" class="brand">PRANAV&nbsp;SOMA<span>.</span></a>
+    <a href="#top" class="brand">Pranav Soma<b>.</b></a>
     <nav class="nav-links" id="navLinks" aria-label="Primary">
       <a href="#work">Work</a>
       <a href="#research">Research</a>
-      <a href="#build">Build</a>
-      <a href="#lead">Lead</a>
-      <a href="#honors">Honors</a>
-      <a href="#contact">Contact</a>
-      <a href="resumes/Pranav_Soma_Resume.pdf" class="nav-cta" target="_blank" rel="noopener">Résumé ↗</a>
+      <a href="#projects">Projects</a>
+      <a href="#leadership">Leadership</a>
+      <a href="#about">About</a>
+      <a href="resumes/Pranav_Soma_Resume.pdf" class="nav-cta" target="_blank" rel="noopener">Résumé</a>
     </nav>
     <button class="nav-toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </header>
 
-<!-- MARGIN RAIL -->
-<aside class="rail" id="rail" aria-hidden="true">
-  <div class="rail-index" id="railIndex">00</div>
-  <div class="rail-spine"><span class="rail-spine-fill" id="spineFill"></span></div>
-  <div class="rail-flag" id="railFlag">SAN DIEGO · SF BAY AREA</div>
-</aside>
-
-<main>
-
-<!-- 00 — HERO -->
-<section class="hero" id="top" data-index="00" data-flag="OPEN TO RESEARCH / AI ENG" data-ground="paper">
-  <canvas class="hero-canvas" id="heroCanvas"></canvas>
-  <div class="hero-grid container">
-    <div class="hero-main">
-      <p class="chrome mono reveal">PRANAV KUMAR SOMA &nbsp;·&nbsp; BUILDER · RESEARCHER</p>
-      <h1 class="hero-claim">
-        <span class="line"><span class="w">I</span> <span class="w">build</span> <span class="w sig">research</span></span>
-        <span class="line"><span class="w">that</span> <span class="w">ships</span> <span class="w">to</span></span>
-        <span class="line"><span class="w">real</span> <span class="w sig">people.</span></span>
-      </h1>
-      <p class="hero-sub reveal">Builder-researcher working at the frontier of applied AI — and shipping it: health, civic, and education systems used by thousands. <strong>M.S. Computer Science, UC&nbsp;San&nbsp;Diego — 4.00&nbsp;GPA.</strong></p>
-      <p class="hero-coords mono reveal">
-        <span>ACM&nbsp;CHI&nbsp;2026</span><i>/</i>
-        <span>SERVICENOW&nbsp;TECHNICAL&nbsp;SKILLS&nbsp;AWARD</span><i>/</i>
-        <span class="live">OPEN&nbsp;TO&nbsp;RESEARCH&nbsp;/&nbsp;AI&nbsp;ROLES&nbsp;·&nbsp;SF&nbsp;BAY&nbsp;AREA <b class="dot"></b></span>
-      </p>
+<!-- HERO -->
+<section class="hero container" id="top">
+  <div class="hero-grid">
+    <div class="hero-text">
+      <p class="eyebrow reveal">AI Researcher &amp; Engineer &middot; UC San Diego</p>
+      <h1 class="reveal"><span class="ln">Pranav</span><span class="ln">Soma<span class="accent">.</span></span></h1>
+      <p class="hero-tag reveal">I build AI and I <span class="accent">ship it.</span></p>
+      <p class="hero-sub reveal">I'm finishing my M.S. in Computer Science at UCSD with a <b>4.00 GPA</b>. Right now I lead an agentic AI platform used by 7,000+ people on campus, train multimodal health models on a supercomputer, and last summer I shipped voice agents to production at <b>ServiceNow</b> and tested them live with Disney+. I'm looking for research and AI engineering roles, ideally in the Bay Area.</p>
       <div class="hero-cta reveal">
-        <a class="btn btn-primary" href="#work">View my work</a>
-        <a class="btn" href="resumes/Pranav_Soma_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a>
-        <a class="btn" href="#contact">Get in touch</a>
+        <a class="btn btn-primary" href="#work">See my work</a>
+        <a class="btn btn-ghost" href="resumes/Pranav_Soma_Resume.pdf" target="_blank" rel="noopener">Résumé</a>
+        <a class="btn btn-ghost" href="mailto:prsoma@ucsd.edu">Email me</a>
       </div>
     </div>
-    <div class="hero-portrait reveal">
-      <div class="portrait-frame">
-        <img src="imgs/web/headshot.jpg" alt="Portrait of Pranav Kumar Soma" loading="eager" width="600" height="600" />
-        <span class="portrait-tag mono">FIG.00 — P. SOMA</span>
+    <div class="hero-photo reveal">
+      <img src="imgs/web/headshot.jpg" alt="Pranav Soma" width="600" height="750" />
+      <div class="hero-badge">Open to roles<br/>in the SF Bay Area</div>
+    </div>
+  </div>
+
+  <div class="stats reveal">
+    <div class="stats-grid">
+      <div class="stat"><div class="n" data-count="4.00" data-dec="2">0</div><div class="l">GPA in my CS master's</div></div>
+      <div class="stat"><div class="n" data-count="8000" data-comma="1">0</div><div class="l">students using my AI tutor</div></div>
+      <div class="stat"><div class="n" data-count="75" data-suffix="%">0</div><div class="l">latency I cut at ServiceNow</div></div>
+      <div class="stat"><div class="n" data-prefix="$" data-count="75" data-suffix="K">0</div><div class="l">raised by a platform I led</div></div>
+      <div class="stat"><div class="n" data-count="7000" data-comma="1" data-suffix="+">0</div><div class="l">students in a group I co-founded</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS MARQUEE -->
+<div class="marquee" aria-label="Tools I use">
+  <div class="marquee-track">
+    <span>Python</span><span>PyTorch</span><span>LLM fine-tuning</span><span>LoRA</span><span>RLHF</span><span>GraphRAG</span><span>MCP servers</span><span>React</span><span>FastAPI</span><span>AWS</span><span>XGBoost</span><span>OpenCV</span><span>Docker</span><span>MongoDB</span><span>C++</span><span>TypeScript</span><span>Node</span><span>Flask</span><span>pymetis</span><span>Transformers</span>
+    <span>Python</span><span>PyTorch</span><span>LLM fine-tuning</span><span>LoRA</span><span>RLHF</span><span>GraphRAG</span><span>MCP servers</span><span>React</span><span>FastAPI</span><span>AWS</span><span>XGBoost</span><span>OpenCV</span><span>Docker</span><span>MongoDB</span><span>C++</span><span>TypeScript</span><span>Node</span><span>Flask</span><span>pymetis</span><span>Transformers</span>
+  </div>
+</div>
+
+<!-- INTERLUDE: lesson -->
+<section class="interlude dark-block">
+  <div class="container">
+    <p class="ilude"><span class="w">A</span> <span class="w">demo</span> <span class="w">is</span> <span class="w">a</span> <span class="w strike">guess.</span> <span class="hl"><span class="w">Production</span> <span class="w">is</span> <span class="w">the</span> <span class="w">proof.</span></span></p>
+    <p class="ilude-note reveal">Most of what I've built is running for real users right now, not sitting on a slide.</p>
+  </div>
+</section>
+
+<!-- WORK -->
+<section class="section" id="work">
+  <div class="container">
+    <div class="s-head reveal">
+      <div><span class="eyebrow">Experience</span><h2>Where I've worked</h2></div>
+      <p>The places I've owned real work, from a live enterprise launch to research that runs for thousands of people.</p>
+    </div>
+
+    <div class="work-list">
+      <div class="work-row reveal">
+        <div><div class="work-when">2025</div><span class="work-tag">Live with Disney+</span></div>
+        <div class="work-main">
+          <h3>Software Engineer Intern <span class="at">@ ServiceNow</span></h3>
+          <p>I took the AI Voice Agents platform off a version of AWS Lex that was about to be killed, moved it to the new one ahead of schedule, and got it into production. We tested it live with Disney+ before my internship was even over. I also rebuilt the language-understanding pipeline across 8 intents and <b>cut response latency by 75%</b>. They gave me a return offer, and I won the Technical Skills Award at UCSD's symposium (out of 800+ interns).</p>
+          <div class="chips"><span class="chip">AWS Lex</span><span class="chip">Lambda</span><span class="chip">JavaScript</span><span class="chip">Python</span><span class="chip">PostgreSQL</span></div>
+        </div>
       </div>
-      <p class="telemetry mono" id="telemetry">SAN DIEGO ⇄ SF BAY AREA</p>
-    </div>
-  </div>
-  <a href="#thesis" class="scrollcue mono" aria-label="Scroll">SCROLL <span>↓</span></a>
-</section>
 
-<!-- THESIS BAND -->
-<section class="band thesis" id="thesis" data-index="00" data-flag="EST. CUPERTINO → SAN DIEGO" data-ground="paper-deep">
-  <div class="container">
-    <p class="lead reveal">Most of what I build sits where a hard idea meets someone who needs it — a deprecating voice platform shipped <em>live with Disney+</em>, an AI tutor running for <em>8,000 students</em>, a health model held to <em>emergency-grade</em> latency. The throughline isn't a domain. It's that the work has to <em>survive contact with the real world</em>.</p>
-  </div>
-</section>
+      <div class="work-row reveal">
+        <div><div class="work-when">2025 - now</div><span class="work-tag">Teradata-funded</span></div>
+        <div class="work-main">
+          <h3>AI Research Fellow &amp; Agentic Systems Lead <span class="at">@ Lab for Emerging Intelligence</span></h3>
+          <p>I lead an agentic AI platform that 7,000+ students, faculty, and staff at UCSD use. That means custom MCP servers over the university's APIs and a workflow engine I built to stay reliable when things go wrong. I also built and shipped an <b>AI tutor</b> that's now running for <b>8,000 students</b> across UCSD, SDSU, and Cal Poly Pomona. We A/B tested it: TA hours dropped 64% and engagement went up 87%.</p>
+          <div class="chips"><span class="chip">MCP servers</span><span class="chip">LoRA / SFT / RLHF</span><span class="chip">FastAPI</span><span class="chip">MongoDB</span></div>
+        </div>
+      </div>
 
-<!-- 01 — SELECTED WORK -->
-<section class="section" id="work" data-index="01" data-flag="SHIPPED · 2024–2025" data-ground="paper">
-  <div class="container">
-    <header class="sec-head reveal">
-      <span class="kicker mono">01 — Selected Work</span>
-      <h2 class="sec-title">Experience</h2>
-      <p class="sec-intro">Roles where I owned outcomes end to end — from a live enterprise deployment to research infrastructure serving thousands.</p>
-    </header>
+      <div class="work-row reveal">
+        <div><div class="work-when">2024 - 2025</div><span class="work-tag">Health AI</span></div>
+        <div class="work-main">
+          <h3>Graduate Researcher <span class="at">@ Qualcomm Institute (HXI Lab)</span></h3>
+          <p>I work on LifeSaver, an assistant that reads sensor, audio, and video data and turns it into something a health database can answer, built for emergency services, the elderly, and rural care. I trained multimodal models on the San Diego Supercomputer Center and used GraphRAG over the UMLS medical ontology to keep answers accurate and fast enough for emergencies. I'm first author on the lab's poster.</p>
+          <div class="chips"><span class="chip">Multimodal LLMs</span><span class="chip">Qwen</span><span class="chip">GraphRAG</span><span class="chip">UMLS</span></div>
+        </div>
+      </div>
 
-    <div class="timeline">
-      <article class="trow reveal">
-        <div class="trow-meta">
-          <span class="mono yr">JUN–SEP 2025</span>
-          <span class="mono flag sig-flag">LIVE WITH DISNEY+</span>
+      <div class="work-row reveal">
+        <div><div class="work-when">2024</div><span class="work-tag">Intern lead</span></div>
+        <div class="work-main">
+          <h3>Software Engineer Intern <span class="at">@ Work4Flow</span></h3>
+          <p>I led a team of 6 interns. We shipped GenAI Observer, a tool that scores the prompts engineers write and tells them how to make them better, plus an integration connecting ServiceNow and Smartsheet with some LLM categorization. Both got the green light from the PM to go to customers.</p>
+          <div class="chips"><span class="chip">LLM eval</span><span class="chip">ServiceNow</span><span class="chip">Smartsheet</span></div>
         </div>
-        <div class="trow-body">
-          <h3>Software Engineer Intern <span class="org">· ServiceNow</span></h3>
-          <p class="trow-sub mono">AI VOICE AGENTS · IT SERVICE MANAGEMENT</p>
-          <p class="trow-lead">Migrated the enterprise AI Voice Agents platform off a deprecating AWS Lex V1 to V2 <strong>ahead of schedule</strong> — shipped to production and validated <strong>live with Disney+</strong> before the internship ended, unblocking customer deployments. Re-architected the NLU pipeline across 8 intents for <strong>75% lower latency</strong>. <strong>Returned offer.</strong></p>
-          <ul class="spec mono">
-            <li><b>Award</b> Technical Skills Award — top intern, UCSD Summer Internship Symposium (800+)</li>
-            <li><b>Stack</b> JavaScript · Python · ServiceNow UI Builder · PostgreSQL · AWS Lex/Lambda/CloudFormation</li>
-          </ul>
-        </div>
-      </article>
-
-      <article class="trow reveal">
-        <div class="trow-meta">
-          <span class="mono yr">APR 2025 — PRESENT</span>
-          <span class="mono flag">TERADATA-FUNDED</span>
-        </div>
-        <div class="trow-body">
-          <h3>AI Research Fellow &amp; Agentic Systems Lead <span class="org">· Laboratory for Emerging Intelligence, UCSD</span></h3>
-          <p class="trow-sub mono">AGENTIC AI · LLM FINE-TUNING</p>
-          <p class="trow-lead">Lead a Teradata-funded agentic-AI platform serving <strong>7,000+ UCSD staff, faculty &amp; students</strong> — custom <strong>MCP servers</strong> over UCSD APIs and a deterministic, fault-graceful workflow executor. Built &amp; deployed the Python <strong>AI Tutor</strong> to UCSD, SDSU &amp; Cal Poly Pomona — <strong>8,000 students</strong> across 8 courses, A/B-tested to <strong>64% fewer TA hours</strong> and <strong>87% higher engagement</strong>.</p>
-          <ul class="spec mono">
-            <li><b>Methods</b> LoRA · SFT · RLHF · Bayesian Knowledge Tracing · MCP · workflow executor</li>
-            <li><b>Stack</b> MongoDB vector store · FastAPI · model-agnostic eval</li>
-          </ul>
-        </div>
-      </article>
-
-      <article class="trow reveal">
-        <div class="trow-meta">
-          <span class="mono yr">NOV 2024 — DEC 2025</span>
-          <span class="mono flag">ACM CHI 2026</span>
-        </div>
-        <div class="trow-body">
-          <h3>Graduate Researcher <span class="org">· Qualcomm Institute / Calit2 — HXI Lab</span></h3>
-          <p class="trow-sub mono">MULTIMODAL HEALTH AI · LIFESAVER</p>
-          <p class="trow-lead">Built multimodal ML pipelines over <strong>TB-scale</strong> sensor, audio &amp; video data, parsing patient signals into structured health-database queries for emergency, elderly &amp; rural care. Fine-tuned Qwen models on the San Diego Supercomputer Center + <strong>GraphRAG</strong> over the UMLS ontology to <strong>EMS-certified diagnostic accuracy</strong>. First-author poster, <strong>accepted to ACM CHI 2026</strong>.</p>
-          <ul class="spec mono">
-            <li><b>Methods</b> Multimodal LLMs · Qwen SFT · GraphRAG · UMLS · robotics actuation</li>
-            <li><b>Compute</b> San Diego Supercomputer Center</li>
-          </ul>
-        </div>
-      </article>
-
-      <article class="trow reveal">
-        <div class="trow-meta">
-          <span class="mono yr">MAY–DEC 2024</span>
-          <span class="mono flag">INTERN LEAD</span>
-        </div>
-        <div class="trow-body">
-          <h3>Software Engineer Intern <span class="org">· Work4Flow</span></h3>
-          <p class="trow-sub mono">GENERATIVE AI · ENTERPRISE INTEGRATIONS</p>
-          <p class="trow-lead">Led a <strong>6-intern team</strong> to ship <strong>GenAI Observer</strong>, an LLM prompt-evaluation tool, and a ServiceNow↔Smartsheet (SPM) integration with LLM-based categorization — both approved by the PM for customer deployment. Built customer-facing GenAI chatbots on ServiceNow CSM.</p>
-          <ul class="spec mono">
-            <li><b>Scope</b> Prompt evaluation · SPM integration · customer-facing chatbots</li>
-          </ul>
-        </div>
-      </article>
-
-      <article class="trow reveal">
-        <div class="trow-meta">
-          <span class="mono yr">SEP 2023 — JUN 2025</span>
-          <span class="mono flag">$75K RAISED</span>
-        </div>
-        <div class="trow-body">
-          <h3>Engineering Manager → Developer <span class="org">· Triton Software Engineering</span></h3>
-          <p class="trow-sub mono">FULL-STACK · SOCIAL IMPACT</p>
-          <p class="trow-lead">As EM of <strong>Spay.LA</strong> (team of 11), owned client scoping &amp; delivery for a MERN fundraising &amp; legislative platform that <strong>raised $75K</strong>. Earlier, built a React landlord-listing platform for <strong>Union Station Homeless Services</strong> — the sole housing provider for the greater LA area.</p>
-          <ul class="spec mono">
-            <li><b>Stack</b> MongoDB · Express · React · Node · Firebase · React Spring · SheetJS</li>
-          </ul>
-        </div>
-      </article>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- STATS BAND -->
-<section class="band stats" data-index="01" data-flag="MEASURED OUTCOMES" data-ground="paper-deep">
-  <div class="container stat-grid">
-    <div class="stat reveal"><span class="num" data-count="4.00" data-dec="2">0.00</span><span class="cap mono">Graduate GPA · M.S. CS</span></div>
-    <div class="stat reveal"><span class="num" data-count="75" data-suffix="%">0%</span><span class="cap mono">Voice-agent latency cut · ServiceNow</span></div>
-    <div class="stat reveal"><span class="num" data-count="8000" data-suffix="" data-comma="1">0</span><span class="cap mono">Students on my AI Tutor</span></div>
-    <div class="stat reveal"><span class="num" data-count="64" data-suffix="%">0%</span><span class="cap mono">Fewer TA hours (A/B tested)</span></div>
-    <div class="stat reveal"><span class="num" data-prefix="$" data-count="75" data-suffix="K">$0</span><span class="cap mono">Raised by a platform I led</span></div>
-    <div class="stat reveal"><span class="num" data-count="7000" data-comma="1" data-suffix="+">0</span><span class="cap mono">In a student federation I co-founded</span></div>
-  </div>
-</section>
-
-<!-- 02 — RESEARCH (SLATE) -->
-<section class="section" id="research" data-index="02" data-flag="ACCEPTED · ACM CHI 2026" data-ground="slate">
+<!-- RESEARCH (dark) -->
+<section class="section dark" id="research">
   <div class="container">
-    <header class="sec-head reveal">
-      <span class="kicker mono">02 — Research</span>
-      <h2 class="sec-title">Research that touches reality</h2>
-      <p class="sec-intro">Three threads where frontier methods meet deployed systems — health, civic, and education.</p>
-    </header>
-
+    <div class="s-head reveal">
+      <div><span class="eyebrow">Research</span><h2>What I'm researching</h2></div>
+      <p>Three projects where the methods are hard and the output has to work for real people.</p>
+    </div>
     <div class="papers">
-      <article class="paper reveal">
-        <div class="paper-no mono">R1</div>
-        <div class="paper-body">
-          <h3>LifeSaver — Multimodal Health AI for Emergency &amp; Rural Care</h3>
-          <p class="paper-venue mono"><span class="foil">ACCEPTED · ACM CHI 2026</span> · Qualcomm Institute / Calit2 — HXI Lab</p>
-          <p class="paper-abstract">An AI Living Assistant that turns terabyte-scale sensor, audio, video &amp; image streams into structured queries against a health database — for emergency services, the elderly, and rural care. I fine-tuned locally hosted Qwen models on the San Diego Supercomputer Center and grounded reasoning with GraphRAG over the UMLS medical ontology, reaching EMS-certified diagnostic accuracy at emergency-grade latency, and built the robotics pipeline tying queries to motor/servo actuation.</p>
-          <p class="paper-tags mono">MULTIMODAL LLMs · QWEN SFT · GRAPHRAG · UMLS · SDSC · ROBOTICS</p>
+      <div class="paper reveal">
+        <div class="pno">01</div>
+        <div>
+          <h3>LifeSaver: multimodal AI for emergency and rural care</h3>
+          <div class="venue">Qualcomm Institute / Calit2 &middot; HXI Lab</div>
+          <p>An assistant that turns messy real-world signals (sensors, audio, video) into structured answers a clinician or first responder can use. I trained the models on a supercomputer and grounded them with GraphRAG over a medical ontology so the answers are both right and fast enough to matter in an emergency. I also wired up the robotics side that drives the actual hardware.</p>
+          <div class="chips"><span class="chip">Multimodal LLMs</span><span class="chip">Qwen SFT</span><span class="chip">GraphRAG</span><span class="chip">UMLS</span><span class="chip">Supercomputer</span></div>
         </div>
-      </article>
-
-      <article class="paper reveal">
-        <div class="paper-no mono">R2</div>
-        <div class="paper-body">
-          <h3>Computational Redistricting — Geospatial ML at Census Scale</h3>
-          <p class="paper-venue mono"><span class="foil">SF EXPLORATORIUM · DEC 2026</span> · UCSD CSE Honors Thesis</p>
-          <p class="paper-abstract">An end-to-end pipeline that generates and scores U.S. congressional redistricting plans over Census-2020 blocks — <strong>158K to 5.5M blocks per state</strong>, 5–18M-row Parquet corpora. Three intentionally distinct generators (greedy k-means++ &amp; Kernighan–Lin, a Sequential Monte Carlo sampler, and XGBoost + pymetis graph partitioning at pooled favored-share <strong>MAE ~0.042</strong> across nine states, Texas held out) compete head-to-head. I authored the fairness metrics — VRA Section-2 Gingles tests, Polsby–Popper compactness, the efficiency gap — and the framework reproduces ground-truth district counts for AL, CA &amp; TX.</p>
-          <p class="paper-tags mono">XGBOOST · PYMETIS · SEQUENTIAL MONTE CARLO · GEOPANDAS · FAIRNESS METRICS</p>
-          <canvas class="paper-canvas" id="mapCanvas"></canvas>
+      </div>
+      <div class="paper reveal">
+        <div class="pno">02</div>
+        <div>
+          <h3>Computational redistricting: fairness in congressional maps</h3>
+          <div class="venue"><span class="star">&#9733;</span> Applying to ACM CHI 2026 &middot; presenting at the SF Exploratorium, Dec 2026 &middot; UCSD CSE honors thesis</div>
+          <p>My honors thesis. It draws and scores U.S. congressional maps over Census data, anywhere from 158K to 5.5 million blocks per state. I built three different map generators (a greedy heuristic, a Monte Carlo sampler, and an XGBoost model with graph partitioning) and wrote the fairness metrics that grade them, things like the efficiency gap and Voting Rights Act compliance. It reproduces the real district counts for Alabama, California, and Texas.</p>
+          <div class="chips"><span class="chip">XGBoost</span><span class="chip">pymetis</span><span class="chip">Monte Carlo</span><span class="chip">GeoPandas</span><span class="chip">Census data</span></div>
         </div>
-      </article>
-
-      <article class="paper reveal">
-        <div class="paper-no mono">R3</div>
-        <div class="paper-body">
-          <h3>Agentic Systems &amp; the Deployed AI Tutor</h3>
-          <p class="paper-venue mono">Laboratory for Emerging Intelligence, UCSD — Teradata-funded</p>
-          <p class="paper-abstract">I lead enterprise, workflow-driven agentic AI for 7,000+ UCSD members — custom MCP servers over UCSD APIs and a novel deterministic, fault-graceful workflow executor, with research into automated skill generation and the interpretability of user intent vs. skill instructions. Alongside it, the Python AI Tutor reaches 8,000 students across 8 courses; an A/B test showed a 64% reduction in TA hours and an 87% increase in engagement — powered by model-agnostic LoRA/SFT/RLHF, Bayesian Knowledge Tracing, and a MongoDB vector store over FastAPI.</p>
-          <p class="paper-tags mono">MCP SERVERS · WORKFLOW EXECUTOR · LoRA+SFT+RLHF · BAYESIAN KNOWLEDGE TRACING · FASTAPI</p>
+      </div>
+      <div class="paper reveal">
+        <div class="pno">03</div>
+        <div>
+          <h3>Agentic systems and a deployed AI tutor</h3>
+          <div class="venue">Lab for Emerging Intelligence &middot; Teradata-funded</div>
+          <p>The agentic platform behind the work at LEI: MCP servers over the university's APIs and a workflow engine built to degrade gracefully when something breaks, because 7,000+ people feel it when it does. The AI tutor that came out of it runs for 8,000 students and cut TA hours by 64% in an A/B test, using LoRA/SFT/RLHF fine-tuning and Bayesian knowledge tracing.</p>
+          <div class="chips"><span class="chip">MCP servers</span><span class="chip">Workflow engine</span><span class="chip">LoRA / SFT / RLHF</span><span class="chip">FastAPI</span></div>
         </div>
-      </article>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- 03 — BUILD / PROJECTS -->
-<section class="section" id="build" data-index="03" data-flag="SHIPPED SOFTWARE" data-ground="paper">
+<!-- INTERLUDE: principle -->
+<section class="interlude light-block">
   <div class="container">
-    <header class="sec-head reveal">
-      <span class="kicker mono">03 — Build</span>
-      <h2 class="sec-title">Things I've built</h2>
-      <p class="sec-intro">From idea to working software — often in service of education, civic, or social-impact goals.</p>
-    </header>
+    <p class="ilude"><span class="w">I'll</span> <span class="w">take</span> <span class="w">the</span> <span class="w">harder</span> <span class="w">problem</span> <span class="w">if</span> <span class="w">it's</span> <span class="w">the</span> <span class="w">one</span> <span class="w">that</span> <span class="hl"><span class="w">actually</span> <span class="w">helps</span> <span class="w">someone.</span></span></p>
+    <p class="ilude-note reveal">The elderly, an ER, students without enough TAs. I keep ending up there on purpose.</p>
+  </div>
+</section>
 
+<!-- PROJECTS -->
+<section class="section" id="projects">
+  <div class="container">
+    <div class="s-head reveal">
+      <div><span class="eyebrow">Projects</span><h2>Stuff I've built</h2></div>
+      <p>Side projects and competition work, taken from idea to something that actually runs.</p>
+    </div>
     <div class="cards">
-      <article class="card card-lead reveal">
-        <div class="card-media"><img src="imgs/web/orca.jpg" alt="ORCA AI music production project" loading="lazy" /></div>
-        <div class="card-text">
-          <h3>ORCA <span class="badge foil mono">BEST PROJECT · SDTC</span></h3>
-          <p class="card-meta mono">1 OF 30 FROM 200+ · SHOWN AT SAIRS 2025</p>
-          <p>An AI music-production system that turns sheet music into audio and back — OpenCV reads the score, hybrid neural networks separate instrument sources, and a CNN converts audio into a score. <strong>98% arrangement accuracy</strong>, validated four ways: SME review, layman testing, cross-entropy loss, and round-trip reconversion.</p>
-          <p class="card-stack mono">PYTHON · OPENCV · CNN · NEURAL SOURCE SEPARATION · FLASK · DOCKER · REACT</p>
+      <div class="card feature reveal">
+        <div class="fmedia"><img src="imgs/web/orca.jpg" alt="ORCA, an AI music production project" loading="lazy" /></div>
+        <div class="ftext">
+          <h3>ORCA <span class="tagpill">Best Project</span></h3>
+          <div class="meta">SDTC, picked 1 of 30 from 200+ &middot; SAIRS 2025</div>
+          <p>An AI music tool that reads sheet music into audio and turns audio back into a score. OpenCV reads the page, neural nets split out the instruments, and a CNN writes the score. It hit 98% accuracy, which I checked four different ways including having actual musicians grade it.</p>
+          <div class="chips"><span class="chip">OpenCV</span><span class="chip">CNN</span><span class="chip">Flask</span><span class="chip">Docker</span><span class="chip">React</span></div>
         </div>
-      </article>
-
-      <article class="card reveal">
+      </div>
+      <div class="card reveal">
         <h3>Spay.LA</h3>
-        <p class="card-meta mono">ENGINEERING MANAGER · TEAM OF 11</p>
-        <p>A MERN fundraising &amp; legislative platform that <strong>raised $75K</strong>. I owned client scoping and delivery end-to-end, with Firebase/Google auth and a React Spring front end.</p>
-        <p class="card-stack mono">MONGODB · EXPRESS · REACT · NODE · FIREBASE</p>
-        <a class="card-link mono" href="https://www.spay.la/" target="_blank" rel="noopener">spay.la ↗</a>
-      </article>
-
-      <article class="card reveal">
+        <div class="meta">Engineering manager, team of 11</div>
+        <p>A fundraising and advocacy platform I led for a real client. It raised $75K. I ran the team and owned everything from scoping with the client to shipping.</p>
+        <a class="link" href="https://www.spay.la/" target="_blank" rel="noopener">spay.la &rarr;</a>
+      </div>
+      <div class="card reveal">
         <h3>BioVeritas</h3>
-        <p class="card-meta mono">AI FOR SCIENTIFIC RIGOR</p>
-        <p>An AI platform that evaluates the logical rigor and authenticity of biological research, using retrieval and context systems to ground its assessments.</p>
-        <p class="card-stack mono">LLMs · RETRIEVAL / RAG · CONTEXT SYSTEMS</p>
-      </article>
-
-      <article class="card reveal">
-        <h3>Union Station Homeless Services</h3>
-        <p class="card-meta mono">SOFTWARE DEVELOPER</p>
-        <p>A React landlord-listing platform for the sole housing provider in greater LA — photo/video upload with downscaling, RegEx validation, state machines, and SheetJS/MongoDB bulk exports.</p>
-        <p class="card-stack mono">REACT · MONGODB · SHEETJS · STATE MACHINES</p>
-      </article>
-
-      <article class="card reveal">
+        <div class="meta">AI for scientific rigor</div>
+        <p>A tool that checks how sound and honest a piece of biology research is, using retrieval to back up what it flags.</p>
+      </div>
+      <div class="card reveal">
+        <h3>Union Station Housing</h3>
+        <div class="meta">Software developer</div>
+        <p>A listing platform for the main housing provider in greater LA. Photo and video upload, form validation, and bulk data exports for their team.</p>
+      </div>
+      <div class="card reveal">
         <h3>Skin Lesion Detector</h3>
-        <p class="card-meta mono">E/ACC RESEARCH GROUP</p>
-        <p>An embedded image-classification system for identifying dermatological lesions — computer vision on constrained on-device hardware.</p>
-        <p class="card-stack mono">COMPUTER VISION · IMAGE CLASSIFICATION · EMBEDDED</p>
-      </article>
-
-      <article class="card reveal">
+        <div class="meta">E/Acc research group</div>
+        <p>An image classifier for spotting skin lesions, built to run on small on-device hardware.</p>
+      </div>
+      <div class="card reveal">
         <h3>Virtual Trial Room</h3>
-        <p class="card-meta mono">E/ACC RESEARCH GROUP</p>
-        <p>A 3D virtual trial room built with deep learning and computer vision, letting users visualize garments without trying them on physically.</p>
-        <p class="card-stack mono">DEEP LEARNING · COMPUTER VISION · 3D</p>
-      </article>
+        <div class="meta">E/Acc research group</div>
+        <p>A 3D fitting room using deep learning and computer vision so you can see how clothes look without trying them on.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- PROOF / GALLERY -->
-<section class="section gallery-sec" id="proof" data-index="03" data-flag="IN THE FIELD" data-ground="paper-deep">
+<!-- GALLERY -->
+<section class="section alt" id="gallery">
   <div class="container">
-    <header class="sec-head reveal">
-      <span class="kicker mono">— In the field</span>
-      <h2 class="sec-title">Proof of work</h2>
-    </header>
-    <div class="gallery">
-      <figure class="g g-tall reveal"><img src="imgs/web/award.jpg" alt="Pranav receiving the Technical Skills Award" loading="lazy" /><figcaption class="mono">Technical Skills Award · UCSD Summer Internship Symposium</figcaption></figure>
-      <figure class="g g-wide reveal"><img src="imgs/web/team.jpg" alt="Pranav with his UCSD student organization" loading="lazy" /><figcaption class="mono">Building communities at UCSD</figcaption></figure>
-      <figure class="g reveal"><img src="imgs/web/grad.jpg" alt="UC San Diego CS commencement" loading="lazy" /><figcaption class="mono">B.S. Computer Science · UC San Diego</figcaption></figure>
-      <figure class="g reveal"><img src="imgs/web/hackathon.jpg" alt="Hackathon" loading="lazy" /><figcaption class="mono">Hackathon</figcaption></figure>
-      <figure class="g reveal"><img src="imgs/web/orca2.jpg" alt="ORCA research" loading="lazy" /><figcaption class="mono">ORCA · research &amp; demo</figcaption></figure>
-      <figure class="g g-wide reveal"><img src="imgs/web/panel.jpg" alt="With peers" loading="lazy" /><figcaption class="mono">With the builders</figcaption></figure>
+    <div class="s-head reveal">
+      <div><span class="eyebrow">In the field</span><h2>A few moments</h2></div>
+    </div>
+    <div class="gal">
+      <figure class="tall reveal"><img src="imgs/web/award.jpg" alt="Receiving the Technical Skills Award" loading="lazy" /><figcaption>Technical Skills Award, UCSD symposium</figcaption></figure>
+      <figure class="wide reveal"><img src="imgs/web/team.jpg" alt="My student organization" loading="lazy" /><figcaption>The team I get to build with</figcaption></figure>
+      <figure class="reveal"><img src="imgs/web/grad.jpg" alt="UC San Diego graduation" loading="lazy" /><figcaption>B.S. Computer Science, UC San Diego</figcaption></figure>
+      <figure class="reveal"><img src="imgs/web/hackathon.jpg" alt="At a hackathon" loading="lazy" /><figcaption>Hackathon</figcaption></figure>
+      <figure class="wide reveal"><img src="imgs/web/panel.jpg" alt="With friends and collaborators" loading="lazy" /><figcaption>With the people I build alongside</figcaption></figure>
+      <figure class="reveal"><img src="imgs/web/orca2.jpg" alt="ORCA demo" loading="lazy" /><figcaption>ORCA, demo day</figcaption></figure>
     </div>
   </div>
 </section>
 
-<!-- 04 — LEAD / COMMUNITIES -->
-<section class="section" id="lead" data-index="04" data-flag="7,000+ STUDENTS" data-ground="paper">
+<!-- LEADERSHIP -->
+<section class="section" id="leadership">
   <div class="container">
-    <header class="sec-head reveal">
-      <span class="kicker mono">04 — Lead</span>
-      <h2 class="sec-title">Communities at scale</h2>
-      <p class="sec-intro">Founding and leading the places where talent gathers — federations, alliances, and research groups that move thousands of builders.</p>
-    </header>
-
+    <div class="s-head reveal">
+      <div><span class="eyebrow">Leadership</span><h2>What I've started</h2></div>
+      <p>I tend to start things. These are the communities I've built and helped run.</p>
+    </div>
     <div class="lead-grid">
-      <article class="lead-card reveal">
+      <div class="lead reveal">
         <h3>Real World AI Network</h3>
-        <p class="lead-role mono">CO-FOUNDER &amp; PRESIDENT · 2026–</p>
-        <p>A federation of <strong>7,000+ students</strong> spanning UCSD's Jacobs School of Engineering, Halıcıoğlu School of Data Science, and Rady School of Management. As the student program of the Societal Computing Innovation Lab, it backs AI research, innovation, and entrepreneurship across the university.</p>
-      </article>
-      <article class="lead-card reveal">
-        <h3>University AI Alliance <span class="badge foil mono">NATION'S LARGEST</span></h3>
-        <p class="lead-role mono">FOUNDING BOARD MEMBER · VP EXTERNAL AFFAIRS · 2025–</p>
-        <p>Helped found the nation's largest student-led frontier-technology initiative — partner universities including MIT, Stanford, Caltech, Cornell &amp; Princeton. Drove engagement with VCs (a16z speedrun, Boost VC, Techstars, Bain Capital Ventures) and execs from Google, Meta &amp; BCG.</p>
-      </article>
-      <article class="lead-card reveal">
+        <div class="role">Co-founder &amp; president</div>
+        <p>I co-founded a 7,000+ student group that spans UCSD's engineering, data science, and business schools. It exists to push AI research, building, and startups across the whole university.</p>
+      </div>
+      <div class="lead reveal">
+        <h3>University AI Alliance <span class="tagpill">Nation's largest</span></h3>
+        <div class="role">Founding board, VP of external affairs</div>
+        <p>I helped start the biggest student-led AI initiative in the country, with people from MIT, Stanford, Caltech, and Cornell. I run the outside relationships: VCs like a16z speedrun and Techstars, and folks from Google and Meta.</p>
+      </div>
+      <div class="lead reveal">
         <h3>CSE Society @ UCSD</h3>
-        <p class="lead-role mono">PRESIDENT · 2025–2026</p>
-        <p>Lead UCSD's oldest computing organization, 100+ members, across its Software Development, Open-Source, and research communities — career fairs, conferences, Tech Talks, and a research journal, with open-source partnerships including Cisco AGNTCY and the Linux Foundation.</p>
-      </article>
-      <article class="lead-card reveal">
+        <div class="role">President</div>
+        <p>I lead UCSD's oldest computing org, 100+ members. We run career fairs, conferences, talks, and a research journal, and we partner with the Linux Foundation and Cisco on open source.</p>
+      </div>
+      <div class="lead reveal">
         <h3>E/Acc Research Group</h3>
-        <p class="lead-role mono">FOUNDER &amp; INAUGURAL PRESIDENT</p>
-        <p>Founded a research group bringing frontier AI into other fields, collaborating across UCLA, UCSB &amp; UCSC. Led 30+ people across ORCA, Virtual Trial Room, and the Skin Lesion Detector.</p>
-      </article>
+        <div class="role">Founder</div>
+        <p>I started a research group that brings AI into other fields, working with UCLA, UCSB, and UCSC. I ran 30+ people across ORCA and a couple of other projects.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- MILESTONES -->
-<section class="section" id="milestones" data-index="04" data-flag="THE ARC" data-ground="paper-deep">
+<!-- INTERLUDE: ambition -->
+<section class="interlude accent-block">
   <div class="container">
-    <header class="sec-head reveal">
-      <span class="kicker mono">— The arc</span>
-      <h2 class="sec-title">Milestones</h2>
-      <p class="sec-intro">From building robots in 2019 to fine-tuning health AI on a supercomputer — a trajectory defined by ownership and range.</p>
-    </header>
-    <ol class="mstones">
-      <li class="reveal"><span class="mono ms-yr">2019–2023</span><div><h4>Project Manager · Cupertino Robotics (FRC)</h4><p>Led a 60-member team, pioneered computer vision on the robot, reached elimination-round alliance captains, and built a nationwide scouting app.</p></div></li>
-      <li class="reveal"><span class="mono ms-yr">2021–2022</span><div><h4>Backend Developer Intern · Infiyoda Solutions</h4><p>Built the multi-vendor system for the JollyKart365 app with Django REST Framework.</p></div></li>
-      <li class="reveal"><span class="mono ms-yr">2023–2025</span><div><h4>Developer → Engineering Manager · Triton Software Engineering</h4><p>EM of Spay.LA (team of 11), a MERN platform that raised $75K, after building a React platform for Union Station Homeless Services.</p></div></li>
-      <li class="reveal"><span class="mono ms-yr">SEP 2024–</span><div><h4>Computational Redistricting Honors Thesis · UCSD CSE</h4><p>Began an end-to-end geospatial ML pipeline scoring U.S. congressional maps with three distinct generators and authored fairness metrics.</p></div></li>
-      <li class="reveal"><span class="mono ms-yr">NOV 2024–</span><div><h4>Research · HXI Lab &amp; Laboratory for Emerging Intelligence</h4><p>Built LifeSaver (multimodal health AI) and led the Teradata-funded Agentic Systems project for 7,000+ UCSD members.</p></div></li>
-      <li class="reveal"><span class="mono ms-yr">JUN–SEP 2025</span><div><h4>ServiceNow Internship &amp; Technical Skills Award</h4><p>Migrated AI Voice Agents to Lex V2 ahead of schedule, validated live with Disney+, earned a return offer and the Technical Skills Award (800+ interns).</p></div></li>
-      <li class="reveal"><span class="mono ms-yr">2025</span><div><h4>AI Tutor deployed across three universities</h4><p>Shipped to UCSD, SDSU &amp; Cal Poly Pomona — 8,000 students, 64% fewer TA hours, 87% more engagement.</p></div></li>
-      <li class="reveal"><span class="mono ms-yr">2025–2026</span><div><h4>Co-Founded Real World AI Network · VP, University AI Alliance</h4><p>A 7,000+ student federation across three UCSD schools, plus founding-board work on the nation's largest student-led frontier-tech initiative.</p></div></li>
-      <li class="reveal sig-ms"><span class="mono ms-yr">2026</span><div><h4>ACM CHI 2026 paper accepted · SF Exploratorium · M.S. completes</h4><p>LifeSaver accepted to ACM CHI 2026; presenting redistricting at the San Francisco Exploratorium (Dec 2026) alongside completing the UCSD M.S. in CS at a 4.00 GPA.</p></div></li>
-    </ol>
+    <p class="ilude"><span class="w">Next,</span> <span class="w">I</span> <span class="w">want</span> <span class="w">to</span> <span class="w">do</span> <span class="w">this</span> <span class="w">where</span> <span class="w">the</span> <span class="hl"><span class="w">models</span> <span class="w">are</span> <span class="w">biggest</span></span> <span class="w">and</span> <span class="w">the</span> <span class="w">stakes</span> <span class="w">are</span> <span class="w">real.</span></p>
+    <p class="ilude-note reveal">Research and AI engineering at the labs pushing the frontier. And I'll keep building the Real World AI Network into something that outlasts me.</p>
   </div>
 </section>
 
-<!-- LESSONS + PRINCIPLES -->
-<section class="section" id="principles" data-index="04" data-flag="HOW I WORK" data-ground="paper">
-  <div class="container two-col">
-    <div class="col reveal">
-      <header class="sec-head">
-        <span class="kicker mono">— Lessons learned</span>
-        <h2 class="sec-title">What the work taught me</h2>
-      </header>
-      <ul class="notes">
-        <li><h4>A demo is a hypothesis; production is the proof.</h4><p>Migrating AI Voice Agents to Lex V2 only mattered once it ran live with Disney+. "It works on my machine" is the start of the work, not the finish.</p></li>
-        <li><h4>Research earns its keep when it meets reality.</h4><p>On LifeSaver, diagnostic accuracy meant nothing without emergency-grade latency — the model had to be right <em>and</em> fast for someone who actually needed the answer.</p></li>
-        <li><h4>Constraints are the design, not the obstacle.</h4><p>California's 5.5M blocks dictated which algorithms were even admissible. Holding Texas out kept me honest about whether I'd built something real or just fit to what I could see.</p></li>
-        <li><h4>Invest at the boundary, not the center.</h4><p>The agentic platform lives or dies on a fault-graceful executor and clean MCP servers — not a clever prompt. When 7,000 users feel a failure, graceful degradation is the feature.</p></li>
-        <li><h4>Lead so the thing outlasts you.</h4><p>Scoping clearly and getting out of the way — from a 6-intern team to a 7,000-student federation — is how communities are built to outlast any one founder.</p></li>
-      </ul>
-    </div>
-    <div class="col reveal">
-      <header class="sec-head">
-        <span class="kicker mono">— Principles</span>
-        <h2 class="sec-title">How I work</h2>
-      </header>
-      <ul class="notes notes-num">
-        <li><h4>Ship to real users, not demos.</h4><p>A model matters once it's in production — a live Disney+ deployment, an AI Tutor for 8,000 students.</p></li>
-        <li><h4>Aim research at people.</h4><p>Health, civic, education — where the output changes a life, not just a benchmark.</p></li>
-        <li><h4>Build communities.</h4><p>Talent compounds when you give it a place to gather. So I keep founding them.</p></li>
-        <li><h4>Bias to agency &amp; ownership.</h4><p>I'd rather own the outcome than wait for permission.</p></li>
-        <li><h4>Range over silos.</h4><p>From C++ PID controllers to LoRA fine-tuning — hard problems don't respect department lines.</p></li>
-        <li><h4>Depth plus rigor.</h4><p>Range only counts if each layer is done right. Competition — robotics, debate, USACO — set the bar.</p></li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- AMBITIONS -->
-<section class="band ambitions" id="ambitions" data-index="04" data-flag="WHERE THIS IS HEADING" data-ground="slate">
+<!-- HONORS -->
+<section class="section alt" id="honors">
   <div class="container">
-    <header class="sec-head reveal">
-      <span class="kicker mono">— Where this is heading</span>
-      <h2 class="sec-title">Ambitions &amp; goals</h2>
-      <p class="sec-intro">I want to build AI that actually reaches the people it's meant to help — systems that hold up in production and touch real lives. The next chapter is doing that at the frontier, where the models and the leverage are largest.</p>
-    </header>
-    <div class="amb-grid">
-      <article class="amb reveal"><span class="amb-tag mono">NEAR-TERM</span><h4>Frontier research at a frontier lab</h4><p>A research / AI-engineering role at a lab pushing the frontier — OpenAI, Anthropic, Google DeepMind, Meta, Microsoft, NVIDIA, Databricks, Amazon. I've built across the stack the field needs: fine-tuning (LoRA/SFT/RLHF), GraphRAG over medical ontologies, custom MCP servers, and the theory to match.</p></article>
-      <article class="amb reveal"><span class="amb-tag mono">BUILDING</span><h4>Grow the Real World AI Network into an institute</h4><p>Keep building the 7,000-student federation into a durable engine for AI research, innovation, and entrepreneurship — an institution that channels talent toward AI that ships.</p></article>
-      <article class="amb reveal"><span class="amb-tag mono">THROUGHLINE</span><h4>Ship research all the way to production</h4><p>My measure of success isn't a paper or a prototype — it's whether it runs for real users. I want to keep closing the gap between research and deployment, where most ideas quietly die.</p></article>
-      <article class="amb reveal"><span class="amb-tag mono">LONG-TERM</span><h4>AI for the people usually last in line for it</h4><p>The elderly, rural and emergency care, students without enough TAs, communities affected by how maps get drawn. I want to spend my career making frontier capability show up where it's needed most.</p></article>
+    <div class="s-head reveal">
+      <div><span class="eyebrow">Recognition</span><h2>Some things I'm proud of</h2></div>
+    </div>
+    <div class="honors">
+      <div class="honor reveal"><div class="y">2025</div><div class="t">ServiceNow Technical Skills Award <span class="star-pill">TOP INTERN</span></div><div class="c">Top intern out of 800+ at UCSD's Summer Internship Symposium.</div></div>
+      <div class="honor reveal"><div class="y">2026</div><div class="t">YC Startup School 2026 <span class="star-pill">YC</span></div><div class="c">Picked for Y Combinator's Startup School.</div></div>
+      <div class="honor reveal"><div class="y">2025</div><div class="t">Best Project, SDTC</div><div class="c">ORCA, chosen as 1 of 30 out of 200+ applications. Also shown at SAIRS 2025.</div></div>
+      <div class="honor reveal"><div class="y">2025</div><div class="t">Cum Laude &amp; CSE Department Honors</div><div class="c">UC San Diego, B.S. Computer Science. Provost Honors every quarter.</div></div>
+      <div class="honor reveal"><div class="y">&middot;</div><div class="t">National Merit Finalist</div><div class="c">Also AP Scholar with Distinction and a National Speech &amp; Debate award.</div></div>
+      <div class="honor reveal"><div class="y">&middot;</div><div class="t">USACO Silver</div><div class="c">USA Computing Olympiad.</div></div>
     </div>
   </div>
 </section>
 
-<!-- 05 — HONORS -->
-<section class="section" id="honors" data-index="05" data-flag="RECOGNITION" data-ground="paper">
+<!-- ABOUT -->
+<section class="section" id="about">
   <div class="container">
-    <header class="sec-head reveal">
-      <span class="kicker mono">05 — Honors</span>
-      <h2 class="sec-title">Recognition</h2>
-    </header>
-    <ul class="ledger">
-      <li class="reveal marquee"><span class="mono led-yr">2026</span><span class="led-title">ACM CHI 2026 — paper accepted <b class="foil mono">FOIL</b></span><span class="led-ctx">First-author work on LifeSaver, top venue in human–computer interaction.</span></li>
-      <li class="reveal marquee"><span class="mono led-yr">2025</span><span class="led-title">ServiceNow Technical Skills Award</span><span class="led-ctx">Top intern of 800+ at UCSD's Summer Internship Symposium.</span></li>
-      <li class="reveal marquee"><span class="mono led-yr">2026</span><span class="led-title">YC Startup School 2026</span><span class="led-ctx">Selected for Y Combinator's Startup School.</span></li>
-      <li class="reveal"><span class="mono led-yr">2025</span><span class="led-title">Best Project · SDTC</span><span class="led-ctx">ORCA — 1 of 30 from 200+ applications; also shown at SAIRS 2025.</span></li>
-      <li class="reveal"><span class="mono led-yr">2025</span><span class="led-title">Cum Laude · CSE Department Honors</span><span class="led-ctx">UC San Diego, B.S. Computer Science — Provost Honors every quarter.</span></li>
-      <li class="reveal"><span class="mono led-yr">—</span><span class="led-title">National Merit Finalist</span><span class="led-ctx">AP Scholar with Distinction · National Speech &amp; Debate Distinction.</span></li>
-      <li class="reveal"><span class="mono led-yr">—</span><span class="led-title">USACO Silver</span><span class="led-ctx">USA Computing Olympiad.</span></li>
-    </ul>
-  </div>
-</section>
-
-<!-- TOOLKIT -->
-<section class="band toolkit" id="toolkit" data-index="05" data-flag="THE STACK" data-ground="paper-deep">
-  <div class="container">
-    <header class="sec-head reveal">
-      <span class="kicker mono">— The stack</span>
-      <h2 class="sec-title">Toolkit</h2>
-    </header>
-    <div class="tk-grid">
-      <div class="tk reveal"><h4 class="mono">LANGUAGES</h4><p>Python · JavaScript / TypeScript · C++ · Java · C · Swift · Kotlin · SQL · ARM-32</p></div>
-      <div class="tk reveal"><h4 class="mono">ML &amp; AI</h4><p>PyTorch · TensorFlow · LoRA / SFT / RLHF · RAG &amp; GraphRAG · LLM agents &amp; MCP · Transformers · XGBoost · OpenCV · CNN/RNN/LSTM · Bayesian Knowledge Tracing · NLP/NLU</p></div>
-      <div class="tk reveal"><h4 class="mono">WEB &amp; FULL-STACK</h4><p>React · Node / Express · FastAPI · Flask · Django · MERN · Firebase · React Spring · REST APIs</p></div>
-      <div class="tk reveal"><h4 class="mono">DATA &amp; CLOUD</h4><p>MongoDB (vector) · PostgreSQL · MySQL · pandas / pyarrow · geopandas / shapely · pymetis · AWS (Lex, Lambda, CloudFormation) · Docker · Git · SDSC</p></div>
-      <div class="tk reveal"><h4 class="mono">ROBOTICS &amp; EMBEDDED</h4><p>ROS · WPILib · PID control · finite state machines · embedded vision · motor/servo actuation</p></div>
-      <div class="tk reveal"><h4 class="mono">ENTERPRISE &amp; TOOLS</h4><p>ServiceNow (ITSM, CSM, SPM) · Smartsheet · UMLS · Windsurf · Jupyter · JUnit · LaTeX · Agile/Scrum</p></div>
+    <div class="about-grid">
+      <div class="about-col reveal">
+        <span class="eyebrow">About</span>
+        <p class="big" style="margin-top:14px">I grew up building robots and somewhere along the way got obsessed with <span class="accent">putting AI in front of real people.</span></p>
+      </div>
+      <div class="about-col reveal">
+        <p>I'm from Cupertino, and I run pretty wide: systems, ML, theory, full-stack, robotics. The thing I keep coming back to is taking something that only works in a notebook and getting it to run for someone who actually needs it, whether that's a student without enough TAs, an ER, or a family in a town with no doctor nearby.</p>
+        <p>I care about the work being real. A demo is a guess. Production is the proof. That mindset came from years of competition, robotics, debate, and a USACO Silver, and it's why I'd rather pick the harder, more useful problem.</p>
+        <p>Next, I want to do this where the models and the stakes are biggest. I'm aiming for research and AI engineering roles at the labs pushing things forward, and I'll keep building the Real World AI Network into something lasting along the way.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- 06 — CONTACT (SLATE) -->
-<section class="section contact" id="contact" data-index="06" data-flag="LET'S BUILD" data-ground="slate">
-  <div class="container">
-    <span class="kicker mono reveal">06 — Contact</span>
-    <h2 class="contact-h reveal">Let's build something<br/>that reaches real people.</h2>
-    <button class="email-copy mono reveal" id="emailCopy" data-email="prsoma@ucsd.edu">prsoma@ucsd.edu <span class="ec-state">COPY</span></button>
-    <div class="contact-links reveal">
-      <a href="https://www.linkedin.com/in/pranav-kumar-soma/" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="https://github.com/soma-p" target="_blank" rel="noopener">GitHub</a>
-      <a href="resumes/Pranav_Soma_Resume.pdf" target="_blank" rel="noopener">Résumé</a>
-    </div>
-    <div class="resume-variants mono reveal">
-      <span>TARGETED RÉSUMÉS —</span>
-      <a href="resumes/Pranav_Soma_SWE.pdf" target="_blank" rel="noopener">Software</a>
-      <a href="resumes/Pranav_Soma_MLE.pdf" target="_blank" rel="noopener">Machine Learning</a>
-      <a href="resumes/Pranav_Soma_FDE.pdf" target="_blank" rel="noopener">Forward Deployed</a>
-    </div>
-    <p class="avail mono reveal">BASED IN SAN DIEGO · OPEN TO RELOCATE ANYWHERE IN THE SF BAY AREA</p>
-    <p class="colophon mono reveal">Set in Fraunces, Inter &amp; JetBrains Mono · built by hand · San Diego, 2026 · <span id="clock">—</span></p>
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <span class="eyebrow">Contact</span>
+  <h2>Let's talk.</h2>
+  <a class="email" id="emailLink" href="mailto:prsoma@ucsd.edu" data-email="prsoma@ucsd.edu">prsoma@ucsd.edu</a>
+  <div class="clinks">
+    <a class="solid" href="resumes/Pranav_Soma_Resume.pdf" target="_blank" rel="noopener">Résumé</a>
+    <a href="https://www.linkedin.com/in/pranav-kumar-soma/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://github.com/soma-p" target="_blank" rel="noopener">GitHub</a>
   </div>
+  <p class="rv">Targeted résumés:
+    <a href="resumes/Pranav_Soma_SWE.pdf" target="_blank" rel="noopener">Software</a>,
+    <a href="resumes/Pranav_Soma_MLE.pdf" target="_blank" rel="noopener">Machine Learning</a>,
+    <a href="resumes/Pranav_Soma_FDE.pdf" target="_blank" rel="noopener">Forward Deployed</a>
+  </p>
+  <p class="avail">Based in San Diego, open to relocating anywhere in the SF Bay Area.</p>
 </section>
 
-</main>
+<footer class="footer">© 2026 Pranav Soma &middot; San Diego, CA</footer>
+
 <script src="script.js"></script>
 </body>
 </html>
