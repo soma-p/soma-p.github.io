@@ -15,7 +15,7 @@
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="manifest" href="site.webmanifest" />
-<meta name="theme-color" content="#2E45FF" />
+<meta name="theme-color" content="#0E7A53" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -40,32 +40,35 @@
 </header>
 
 <!-- HERO -->
-<section class="hero container" id="top">
-  <div class="hero-grid">
-    <div class="hero-text">
-      <p class="eyebrow reveal">AI Researcher &amp; Engineer &middot; UC San Diego</p>
-      <h1 class="reveal"><span class="ln"><span class="scramble" data-text="Pranav">Pranav</span></span><span class="ln"><span class="scramble" data-text="Soma">Soma</span><span class="accent">.</span></span></h1>
-      <p class="hero-tag reveal">I build AI and I <span class="accent">ship it.</span></p>
-      <p class="hero-sub reveal">I finished my CS bachelor's at UCSD in <b>two years</b>, and I'm wrapping my master's in just over one (<b>4.00 GPA</b>). Right now I lead an agentic AI platform used by 7,000+ people on campus, train multimodal health models on a supercomputer, and last summer I shipped voice agents to production at <b>ServiceNow</b>, tested live with customers. I'm looking for research and AI engineering roles, ideally in the Bay Area.</p>
-      <div class="hero-cta reveal">
-        <a class="btn btn-primary" href="#work">See my work</a>
-        <a class="btn btn-ghost" href="resumes/Pranav_Soma_Resume.pdf" target="_blank" rel="noopener">Résumé</a>
-        <a class="btn btn-ghost" href="mailto:prsoma@ucsd.edu">Email me</a>
+<section class="hero" id="top">
+  <canvas class="hero-bg" id="heroBg"></canvas>
+  <div class="container hero-inner">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <p class="eyebrow reveal">AI Researcher &amp; Engineer &middot; UC San Diego</p>
+        <h1 class="reveal"><span class="ln"><span class="scramble" data-text="Pranav">Pranav</span></span><span class="ln"><span class="scramble" data-text="Soma">Soma</span><span class="accent">.</span></span></h1>
+        <p class="hero-tag reveal">I build AI and I <span class="accent">ship it.</span></p>
+        <p class="hero-sub reveal">I finished my CS bachelor's at UCSD in <b>two years</b>, and I'm wrapping my master's in just over one (<b>4.00 GPA</b>). Right now I lead an agentic AI platform used by 7,000+ people on campus, train multimodal health models on a supercomputer, and last summer I shipped voice agents to production at <b>ServiceNow</b>, tested live with customers. I'm looking for research and AI engineering roles, ideally in the Bay Area.</p>
+        <div class="hero-cta reveal">
+          <a class="btn btn-primary" href="#work">See my work</a>
+          <a class="btn btn-ghost" href="resumes/Pranav_Soma_Resume.pdf" target="_blank" rel="noopener">Résumé</a>
+          <a class="btn btn-ghost" href="mailto:prsoma@ucsd.edu">Email me</a>
+        </div>
+      </div>
+      <div class="hero-photo reveal">
+        <img src="imgs/web/headshot.jpg" alt="Pranav Soma" width="600" height="750" />
+        <div class="hero-badge">Open to roles<br/>in the SF Bay Area</div>
       </div>
     </div>
-    <div class="hero-photo reveal">
-      <img src="imgs/web/headshot.jpg" alt="Pranav Soma" width="600" height="750" />
-      <div class="hero-badge">Open to roles<br/>in the SF Bay Area</div>
-    </div>
-  </div>
 
-  <div class="stats reveal">
-    <div class="stats-grid">
-      <div class="stat"><div class="n" data-count="4.00" data-dec="2">0</div><div class="l">GPA in my CS master's</div></div>
-      <div class="stat"><div class="n" data-count="8000" data-comma="1">0</div><div class="l">students using my AI tutor</div></div>
-      <div class="stat"><div class="n" data-count="75" data-suffix="%">0</div><div class="l">latency I cut at ServiceNow</div></div>
-      <div class="stat"><div class="n" data-prefix="$" data-count="75" data-suffix="K">0</div><div class="l">raised by a platform I led</div></div>
-      <div class="stat"><div class="n" data-count="7000" data-comma="1" data-suffix="+">0</div><div class="l">students in a group I co-founded</div></div>
+    <div class="stats reveal">
+      <div class="stats-grid">
+        <div class="stat"><div class="n" data-count="4.00" data-dec="2">0</div><div class="l">GPA in my CS master's</div></div>
+        <div class="stat"><div class="n" data-count="8000" data-comma="1">0</div><div class="l">students using my AI tutor</div></div>
+        <div class="stat"><div class="n" data-count="45" data-suffix="%">0</div><div class="l">AI Voice Agent latency cut</div></div>
+        <div class="stat"><div class="n" data-prefix="$" data-count="75" data-suffix="K">0</div><div class="l">raised by a platform I led</div></div>
+        <div class="stat"><div class="n" data-count="7000" data-comma="1" data-suffix="+">0</div><div class="l">students in a group I co-founded</div></div>
+      </div>
     </div>
   </div>
 </section>
@@ -82,7 +85,7 @@
 <section class="interlude dark-block">
   <div class="container">
     <p class="ilude"><span class="w">A</span> <span class="w">demo</span> <span class="w">is</span> <span class="w">a</span> <span class="w strike">guess.</span> <span class="hl"><span class="w">Production</span> <span class="w">is</span> <span class="w">the</span> <span class="w">proof.</span></span></p>
-    <p class="ilude-note reveal">Most of what I've built is running for real users right now, not sitting on a slide.</p>
+    <p class="ilude-note reveal">Ask me for a link, not a deck. I'll usually have one.</p>
   </div>
 </section>
 
@@ -91,7 +94,7 @@
   <div class="container">
     <div class="s-head reveal">
       <div><span class="eyebrow">Experience</span><h2>Where I've worked</h2></div>
-      <p>The places I've owned real work, from a live enterprise launch to research that runs for thousands of people.</p>
+      <p>Four teams, four problems that looked nothing alike. Here's what I shipped at each.</p>
     </div>
 
     <div class="work-list">
@@ -99,7 +102,7 @@
         <div><div class="work-when">2025</div><span class="work-tag">Live with Disney+</span></div>
         <div class="work-main">
           <h3>Software Engineer Intern <span class="at">@ ServiceNow</span></h3>
-          <p>I took the AI Voice Agents platform off a version of AWS Lex that was about to be killed, moved it to the new one ahead of schedule, and got it into production. We tested it live with Disney+ before my internship was even over. I also rebuilt the language-understanding pipeline across 8 intents and <b>cut response latency by 75%</b>. They gave me a return offer, and I won the Technical Skills Award at UCSD's symposium (out of 800+ interns).</p>
+          <p>I took the AI Voice Agents platform off a version of AWS Lex that was about to be killed, moved it to the new one ahead of schedule, and got it into production. We tested it live with Disney+ before my internship was even over. I also rebuilt the language-understanding pipeline across 8 intents and <b>cut AI Voice Agent latency by 45%</b>. They gave me a return offer, and I won the Technical Skills Award at UCSD's symposium (out of 800+ interns).</p>
           <div class="chips"><span class="chip">AWS Lex</span><span class="chip">Lambda</span><span class="chip">JavaScript</span><span class="chip">Python</span><span class="chip">PostgreSQL</span></div>
         </div>
       </div>
@@ -139,7 +142,7 @@
   <div class="container">
     <div class="s-head reveal">
       <div><span class="eyebrow">Research</span><h2>What I'm researching</h2></div>
-      <p>Three projects where the methods are hard and the output has to work for real people.</p>
+      <p>Three problems I haven't been able to put down. Each one is interactive below, go ahead and poke at it.</p>
     </div>
     <div class="papers">
       <div class="paper reveal">
@@ -157,10 +160,17 @@
           <h3>Computational redistricting: fairness in congressional maps</h3>
           <div class="venue"><span class="star">&#9733;</span> Applying to ACM CHI 2026 &middot; presenting at the SF Exploratorium, Dec 2026 &middot; UCSD CSE honors thesis</div>
           <p>My honors thesis. It draws and scores U.S. congressional maps over Census data, anywhere from 158K to 5.5 million blocks per state. I built three different map generators (a greedy heuristic, a Monte Carlo sampler, and an XGBoost model with graph partitioning) and wrote the fairness metrics that grade them, things like the efficiency gap and Voting Rights Act compliance. It reproduces the real district counts for Alabama, California, and Texas.</p>
+          <div class="redistrict">
+            <canvas id="mapCanvas" aria-label="Interactive districting map"></canvas>
+            <div class="redistrict-bar">
+              <span class="redistrict-cap" id="mapCap">8 districts &middot; click a seed to redraw</span>
+              <button class="redraw" id="redrawMap" type="button">New map &#8635;</button>
+            </div>
+          </div>
           <div class="chips"><span class="chip">XGBoost</span><span class="chip">pymetis</span><span class="chip">Monte Carlo</span><span class="chip">GeoPandas</span><span class="chip">Census data</span></div>
         </div>
       </div>
-      <div class="paper reveal">
+      <div class="paper reveal flow-card" id="agenticCard">
         <div class="pno">03</div>
         <div>
           <h3>Agentic systems and a deployed AI tutor</h3>
@@ -186,11 +196,14 @@
   <div class="container">
     <div class="s-head reveal">
       <div><span class="eyebrow">Projects</span><h2>Stuff I've built</h2></div>
-      <p>Side projects and competition work, taken from idea to something that actually runs.</p>
+      <p>The things I build when nobody's grading them.</p>
     </div>
     <div class="cards">
       <div class="card feature reveal">
-        <div class="fmedia"><img src="imgs/web/orca.jpg" alt="ORCA, an AI music production project" loading="lazy" /></div>
+        <div class="fmedia">
+          <img src="imgs/web/orca.jpg" alt="ORCA, an AI music production project" loading="lazy" />
+          <canvas class="orca-wave" id="orcaWave"></canvas>
+        </div>
         <div class="ftext">
           <h3>ORCA <span class="tagpill">Best Project</span></h3>
           <div class="meta">SDTC, picked 1 of 30 from 200+ &middot; SAIRS 2025</div>
@@ -257,6 +270,7 @@
         <h3>Real World AI Network</h3>
         <div class="role">Co-founder &amp; president</div>
         <p>I co-founded a 7,000+ student group that spans UCSD's engineering, data science, and business schools. It exists to push AI research, building, and startups across the whole university.</p>
+        <a class="lead-link" href="https://rain.ucsd.edu" target="_blank" rel="noopener">rain.ucsd.edu &rarr;</a>
       </div>
       <div class="lead reveal">
         <h3>University AI Alliance <span class="tagpill">Nation's largest</span></h3>
@@ -267,6 +281,7 @@
         <h3>CSE Society @ UCSD</h3>
         <div class="role">President</div>
         <p>I lead UCSD's oldest computing org, 100+ members. We run career fairs, conferences, talks, and a research journal, and we partner with the Linux Foundation and Cisco on open source.</p>
+        <a class="lead-link" href="https://csesucsd.com" target="_blank" rel="noopener">csesucsd.com &rarr;</a>
       </div>
       <div class="lead reveal">
         <h3>E/Acc Research Group</h3>
@@ -281,7 +296,7 @@
 <section class="interlude accent-block">
   <div class="container">
     <p class="ilude"><span class="w">Next,</span> <span class="w">I</span> <span class="w">want</span> <span class="w">to</span> <span class="w">do</span> <span class="w">this</span> <span class="w">where</span> <span class="w">the</span> <span class="hl"><span class="w">models</span> <span class="w">are</span> <span class="w">biggest</span></span> <span class="w">and</span> <span class="w">the</span> <span class="w">stakes</span> <span class="w">are</span> <span class="w">real.</span></p>
-    <p class="ilude-note reveal">Research and AI engineering at the labs pushing the frontier. And I'll keep building the Real World AI Network into something that outlasts me.</p>
+    <p class="ilude-note reveal">The frontier labs are where the hardest version of my problem lives. That's where I want to be.</p>
   </div>
 </section>
 
@@ -292,12 +307,12 @@
       <div><span class="eyebrow">Recognition</span><h2>Some things I'm proud of</h2></div>
     </div>
     <div class="honors">
-      <div class="honor reveal"><div class="y">2025</div><div class="t">ServiceNow Technical Skills Award <span class="star-pill">TOP INTERN</span></div><div class="c">Top intern out of 800+ at UCSD's Summer Internship Symposium.</div></div>
-      <div class="honor reveal"><div class="y">2026</div><div class="t">YC Startup School 2026 <span class="star-pill">YC</span></div><div class="c">Picked for Y Combinator's Startup School.</div></div>
+      <div class="honor reveal"><div class="y">2022</div><div class="t">USACO Silver</div><div class="c">USA Computing Olympiad.</div></div>
+      <div class="honor reveal"><div class="y">2022</div><div class="t">National Merit Finalist</div><div class="c">Also AP Scholar with Distinction and a National Speech &amp; Debate award.</div></div>
       <div class="honor reveal"><div class="y">2025</div><div class="t">Best Project, SDTC</div><div class="c">ORCA, chosen as 1 of 30 out of 200+ applications. Also shown at SAIRS 2025.</div></div>
+      <div class="honor reveal"><div class="y">2025</div><div class="t">ServiceNow Technical Skills Award <span class="star-pill">TOP INTERN</span></div><div class="c">Top intern out of 800+ at UCSD's Summer Internship Symposium.</div></div>
       <div class="honor reveal"><div class="y">2025</div><div class="t">Cum Laude &amp; CSE Department Honors</div><div class="c">UC San Diego, B.S. Computer Science. Provost Honors every quarter.</div></div>
-      <div class="honor reveal"><div class="y">&middot;</div><div class="t">National Merit Finalist</div><div class="c">Also AP Scholar with Distinction and a National Speech &amp; Debate award.</div></div>
-      <div class="honor reveal"><div class="y">&middot;</div><div class="t">USACO Silver</div><div class="c">USA Computing Olympiad.</div></div>
+      <div class="honor reveal"><div class="y">2026</div><div class="t">YC Startup School 2026 <span class="star-pill">YC</span></div><div class="c">Picked for Y Combinator's Startup School.</div></div>
     </div>
   </div>
 </section>
@@ -311,9 +326,9 @@
         <p class="big" style="margin-top:14px">I grew up building robots and somewhere along the way got obsessed with <span class="accent">putting AI in front of real people.</span></p>
       </div>
       <div class="about-col reveal">
-        <p>I'm from Cupertino, I move fast (I finished undergrad in two years and I'm wrapping my master's in a year and a quarter), and I run pretty wide: systems, ML, theory, full-stack, robotics. The thing I keep coming back to is taking something that only works in a notebook and getting it to run for someone who actually needs it, whether that's a student without enough TAs, an ER, or a family in a town with no doctor nearby.</p>
-        <p>I care about the work being real. A demo is a guess. Production is the proof. That mindset came from years of competition, robotics, debate, and a USACO Silver, and it's why I'd rather pick the harder, more useful problem.</p>
-        <p>Next, I want to do this where the models and the stakes are biggest. I'm aiming for research and AI engineering roles at the labs pushing things forward, and I'll keep building the Real World AI Network into something lasting along the way.</p>
+        <p>I'm from Cupertino, I move fast (undergrad in two years, master's in a year and a quarter), and I run pretty wide: systems, ML, theory, full-stack, robotics. The constant is that I like taking something that only works in a notebook and getting it all the way to someone who needs it, a student short on TAs, an ER, a family in a town with no doctor nearby.</p>
+        <p>The range isn't an accident. I came up through competitive robotics and debate and a USACO Silver, where you only get credit for the thing that actually works on the day. I'd rather be the person who can carry a problem from the math to the deploy button than stop at either end.</p>
+        <p>The other half of my time goes into building rooms for people: RAIN, the University AI Alliance, CSE Society. The crowd around a problem ends up mattering as much as the problem. Long term I want to keep doing both, the research and the rooms it happens in.</p>
       </div>
     </div>
   </div>
