@@ -447,27 +447,46 @@
       <figure class="reveal"><img src="imgs/web/hackathon2.jpg" alt="The CSE Society crew at SanDHacks" loading="lazy" /><figcaption>SanDHacks, the whole crew</figcaption></figure>
       <!-- a patronus, curled up in the corner -->
       <div class="patronus" aria-hidden="true">
-        <svg viewBox="0 0 190 140" width="190" height="140">
+        <svg viewBox="0 0 230 185" width="230" height="185">
           <defs>
-            <radialGradient id="patG" cx="42%" cy="38%" r="72%">
-              <stop offset="0" stop-color="#eef8ff"/><stop offset="52%" stop-color="#a9dbff"/><stop offset="100%" stop-color="#5aa6ee"/>
+            <radialGradient id="patBody" cx="46%" cy="40%" r="70%">
+              <stop offset="0" stop-color="#f4fcff"/><stop offset="44%" stop-color="#c2e8ff"/><stop offset="100%" stop-color="#5ea9ef"/>
             </radialGradient>
-            <filter id="patBlur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4.5"/></filter>
-            <g id="wolfShape">
-              <path d="M150 88 C184 83 202 112 187 135 C178 149 157 150 147 140 C165 138 176 122 169 107 C163 95 147 94 137 104 C141 90 145 85 150 88 Z"/>
-              <path d="M22 110 C15 104 22 88 38 81 C44 63 67 59 81 68 C105 50 139 57 157 82 C171 99 166 119 148 124 C121 134 85 132 69 123 C59 118 53 108 54 100 C48 108 35 113 22 110 Z"/>
-              <path d="M59 69 L50 45 L75 62 Z"/>
-              <path d="M78 64 L87 42 L98 63 Z"/>
-            </g>
+            <linearGradient id="patWisp" x1="0" y1="1" x2="0.2" y2="0">
+              <stop offset="0" stop-color="#9fd4ff" stop-opacity="0"/><stop offset="1" stop-color="#e8f6ff" stop-opacity=".95"/>
+            </linearGradient>
+            <filter id="patGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+            <filter id="patSoft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.1"/></filter>
           </defs>
-          <use href="#wolfShape" fill="#8fccff" filter="url(#patBlur)" opacity=".55"/>
-          <use href="#wolfShape" fill="url(#patG)" opacity=".9"/>
-          <use href="#wolfShape" fill="none" stroke="#eef8ff" stroke-width="1.1" opacity=".75"/>
-          <circle cx="24" cy="107" r="2.8" fill="#2f6fab" opacity=".7"/>
-          <path d="M43 92 q6 4 12 1" fill="none" stroke="#2f6fab" stroke-width="1.7" stroke-linecap="round" opacity=".6"/>
-          <circle class="mote m1" cx="150" cy="44" r="2.2" fill="#d6efff"/>
-          <circle class="mote m2" cx="122" cy="28" r="1.6" fill="#d6efff"/>
-          <circle class="mote m3" cx="168" cy="64" r="1.8" fill="#d6efff"/>
+          <ellipse cx="120" cy="110" rx="98" ry="58" fill="#7cc0ff" opacity=".15" filter="url(#patGlow)"/>
+          <path filter="url(#patSoft)" fill="url(#patBody)" opacity=".7" d="M176 110 C204 102 220 118 215 144 C212 162 195 168 185 158 C200 156 207 140 200 126 C194 114 181 112 171 120 Z"/>
+          <g stroke="url(#patWisp)" fill="none" stroke-linecap="round" opacity=".85">
+            <path d="M203 134 C217 126 224 138 220 152" stroke-width="2.2"/><path d="M194 152 C208 152 215 164 211 176" stroke-width="1.8"/>
+          </g>
+          <g filter="url(#patSoft)" fill="url(#patBody)" opacity=".72">
+            <path d="M96 142 C96 158 104 166 112 162 C108 154 106 148 104 140 Z"/><path d="M120 146 C120 162 128 170 136 166 C132 158 130 152 128 144 Z"/><path d="M150 142 C152 158 160 164 167 159 C162 152 159 146 158 140 Z"/>
+          </g>
+          <path filter="url(#patSoft)" fill="url(#patBody)" opacity=".86" d="M84 92 C104 70 150 68 176 92 C198 112 194 142 170 152 C146 162 108 160 90 150 C74 142 68 124 74 110 C77 102 80 97 84 92 Z"/>
+          <path filter="url(#patSoft)" fill="url(#patBody)" opacity=".85" d="M86 96 C76 80 66 70 60 60 C70 60 86 72 96 90 Z"/>
+          <path filter="url(#patSoft)" fill="url(#patBody)" opacity=".9" d="M28 64 C26 55 35 46 48 44 C53 35 68 35 74 46 C80 56 76 71 65 75 C57 79 45 77 39 71 C33 70 30 67 28 64 Z"/>
+          <g stroke="url(#patWisp)" fill="none" stroke-linecap="round">
+            <path d="M96 78 C96 58 90 46 96 32" stroke-width="3"/><path d="M112 72 C114 54 108 42 114 28" stroke-width="2.6"/><path d="M128 70 C132 54 128 42 136 32" stroke-width="2.4"/><path d="M84 86 C80 70 72 60 76 46" stroke-width="2.3"/><path d="M146 74 C152 60 150 48 160 42" stroke-width="2"/><path d="M162 82 C170 70 172 58 182 54" stroke-width="1.7"/>
+          </g>
+          <g stroke="#dff1ff" fill="none" stroke-linecap="round" opacity=".72">
+            <path d="M104 38 C94 28 98 16 110 16 C120 16 122 26 114 28 C108 29 108 22 112 22" stroke-width="2"/><path d="M134 36 C128 24 136 12 148 16 C156 19 154 30 146 28" stroke-width="1.7"/><path d="M78 48 C68 40 70 28 80 28" stroke-width="1.5"/>
+          </g>
+          <path d="M48 44 L42 22 L62 38 Z" fill="url(#patBody)"/><path d="M64 42 L72 20 L84 40 Z" fill="url(#patBody)"/><path d="M50 42 L46 27 L58 38 Z" fill="#dff1ff" opacity=".5"/>
+          <g stroke="#4f9fe6" fill="none" stroke-linecap="round" opacity=".85">
+            <path d="M52 50 C52 44 56 42 56 48 C56 54 52 54 52 48" stroke-width="1.3"/><path d="M56 47 L56 60" stroke-width="1.1"/><path d="M52 56 C48 58 46 62 48 66" stroke-width="1"/><path d="M60 56 C64 58 66 62 64 66" stroke-width="1"/>
+          </g>
+          <ellipse cx="45" cy="58" rx="3.3" ry="4" fill="#0a2a44"/><ellipse cx="45" cy="58" rx="1.9" ry="3" fill="#bdecff"/><circle cx="45" cy="57" r="1" fill="#fff"/>
+          <ellipse cx="60" cy="57" rx="3.3" ry="4" fill="#0a2a44"/><ellipse cx="60" cy="57" rx="1.9" ry="3" fill="#bdecff"/><circle cx="60" cy="56" r="1" fill="#fff"/>
+          <circle cx="27" cy="64" r="2.8" fill="#2f6fab"/><path d="M32 70 q5 3 11 1" fill="none" stroke="#3a7fbf" stroke-width="1" stroke-linecap="round" opacity=".55"/>
+          <ellipse cx="120" cy="104" rx="20" ry="13" fill="#f4fcff" opacity=".4" filter="url(#patSoft)"/>
+          <g fill="#eaf7ff">
+            <circle class="mote m1" cx="112" cy="14" r="1.6"/><circle class="spark s1" cx="150" cy="28" r="1.3"/><circle class="mote m2" cx="86" cy="24" r="1.2"/>
+            <circle class="spark s2" cx="212" cy="126" r="1.4"/><circle class="spark s3" cx="40" cy="44" r="1.1"/><circle class="mote m3" cx="190" cy="158" r="1.3"/><circle class="spark s1" cx="70" cy="100" r="1"/>
+          </g>
         </svg>
       </div>
     </div>
