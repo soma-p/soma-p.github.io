@@ -181,7 +181,16 @@ a{color:inherit;text-decoration:none}
 .card .link{margin-top:14px;font-weight:600;color:var(--accent)}
 
 /* ---------- GALLERY — scrapbook collage of pinned polaroids ---------- */
-.gal{column-count:3;column-gap:22px}
+.gal{column-count:3;column-gap:22px;position:relative}
+/* a patronus curled into the bottom-right negative space */
+.patronus{position:absolute;right:2px;bottom:6px;width:clamp(150px,15vw,205px);pointer-events:none;filter:drop-shadow(0 0 13px rgba(125,193,255,.6)) drop-shadow(0 0 26px rgba(125,193,255,.35));animation:patBreath 4.6s ease-in-out infinite}
+.patronus svg{width:100%;height:auto;display:block}
+@keyframes patBreath{0%,100%{opacity:.74;transform:translateY(0) scale(1)}50%{opacity:.97;transform:translateY(-3px) scale(1.015)}}
+.patronus .mote{animation:patMote 3.6s ease-in-out infinite}
+.patronus .mote.m2{animation-delay:1.2s}.patronus .mote.m3{animation-delay:2.3s}
+@keyframes patMote{0%{opacity:0;transform:translateY(7px)}45%{opacity:.85}100%{opacity:0;transform:translateY(-15px)}}
+@media(prefers-reduced-motion:reduce){.patronus{animation:none}.patronus .mote{display:none}}
+@media(max-width:680px){.patronus{display:none}}
 .gal figure{position:relative;break-inside:avoid;margin:0 0 24px;background:#fff;padding:11px 11px 0;border-radius:5px;
   box-shadow:0 18px 36px -18px rgba(10,10,11,.45),0 0 0 1px rgba(0,0,0,.05);
   transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
