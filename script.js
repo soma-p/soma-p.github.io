@@ -489,6 +489,8 @@
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
     const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.32;    // big, perched on its base at the top
     const heroActive = () => scrollY < HERO_TH && base && base.getBoundingClientRect().width > 0;
+    const aboutBase = $('#aboutBase'), ABOUT_SCALE = 1.16;           // comes down to the podium among its old selves
+    const aboutActive = () => { if (!aboutBase) return false; const r = aboutBase.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight * 0.8 && r.bottom > innerHeight * 0.26; };
     const sections = [
       { sel: '#top', side: 'R', y: 0.28, msg: "whoa, that's me!" },
       { sel: '#work', side: 'L', y: 0.44, msg: "here's where I've worked!" },
@@ -513,6 +515,7 @@
       if (scrollY === lastY) return;                               // ignore spurious same-position events (Lenis rAF)
       lastY = scrollY;
       if (heroActive()) { scrolling = false; buddy.classList.remove('present', 'walking', 'dock-r', 'dock-l'); clearTimeout(stopT); setMsg(sections[0].msg); return; }
+      if (aboutActive()) { scrolling = false; buddy.classList.remove('present', 'walking', 'dock-r', 'dock-l'); clearTimeout(stopT); setMsg("the whole gang's here!"); return; }
       scrolling = true; buddy.classList.remove('present', 'dock-r', 'dock-l'); clearTimeout(emoteT);
       const max = (document.documentElement.scrollHeight - innerHeight) || 1, p = clamp(scrollY / max, 0, 1);
       tx = 16 + (0.5 + 0.4 * Math.sin(p * Math.PI * 4 + 1.05)) * (innerWidth - BW - 32);   // travels across while scrolling
@@ -521,7 +524,7 @@
       clearTimeout(stopT); stopT = setTimeout(onStop, 260);
     };
     const onStop = () => {                                          // dock to whichever side is closer (keeps off the text)
-      if (heroActive()) return;
+      if (heroActive() || aboutActive()) return;
       scrolling = false; const s = cur();
       const side = (cx + BW / 2) < innerWidth / 2 ? 'L' : 'R';
       buddy.classList.toggle('dock-r', side === 'R'); buddy.classList.toggle('dock-l', side === 'L');
@@ -540,12 +543,18 @@
 
     const loop = () => {
       const hero = heroActive();
+      const about = !hero && aboutActive();
       let targetScale;
       if (hero) {                                                   // sit big on the base at the top of the page
         const r = base.getBoundingClientRect();
         targetScale = HERO_SCALE;
         tx = r.left + r.width / 2 - BW / 2;
         ty = r.top + r.height * 0.52 - 52.5 - 47.4 * targetScale;   // feet on the base surface
+      } else if (about) {                                           // comes down onto the podium for the finale
+        const r = aboutBase.getBoundingClientRect();
+        targetScale = ABOUT_SCALE;
+        tx = r.left + r.width / 2 - BW / 2;
+        ty = r.top + r.height * 0.5 - 52.5 - 41 * targetScale;      // feet on the podium surface
       } else {
         targetScale = 0.86 + 0.3 * clamp((cy / innerHeight - 0.22) / 0.34, 0, 1);
       }
@@ -555,7 +564,7 @@
       buddy.classList.toggle('bub-r', ccx > innerWidth - 132);
       buddy.classList.toggle('bub-l', ccx < 132);
       const vel = Math.hypot(cx - pcx, cy - pcy); pcx = cx; pcy = cy;
-      buddy.classList.toggle('walking', !hero && vel > 0.5);        // step the legs while moving
+      buddy.classList.toggle('walking', !hero && !about && vel > 0.5);  // step the legs while moving
       requestAnimationFrame(loop);
     };
     loop();
@@ -612,6 +621,19 @@
     const loop = () => { cur += (tgt - cur) * 0.12; rise.setAttribute('transform', `translate(0 ${cur.toFixed(1)})`); requestAnimationFrame(loop); };
     loop();
   })();
+
+  /* 11) projects: cards tilt toward the cursor (3D parallax) */
+  if (!reduce && matchMedia('(pointer:fine)').matches) {
+    $$('#projects .card').forEach(card => {
+      card.addEventListener('mouseenter', () => { card.style.transition = 'transform .12s ease-out, box-shadow .3s, border-color .3s'; });
+      card.addEventListener('mousemove', (e) => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `perspective(720px) rotateY(${px * 7}deg) rotateX(${-py * 7}deg) translateY(-5px)`;
+      });
+      card.addEventListener('mouseleave', () => { card.style.transform = ''; card.style.transition = ''; });
+    });
+  }
 
   /* click-to-copy email */
   const el = $('#emailLink');
