@@ -254,82 +254,135 @@
     if (reduce) { gen(); reveal = 1; anim = false; draw(); } else { trigger(); }
   })();
 
-  /* 4) agentic workflow — a loop that orbits the text */
+  /* 4) agentic workflow — a rounded-rect circuit that frames the text */
   (() => {
     const cv = $('#agenticFlow'); if (!cv) return;
     const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
-    let W = 0, H = 0, run = true, pulse = 0, cx = 0, cy = 0, rx = 0, ry = 0;
+    let W = 0, H = 0, run = true, pulse = 0, cx = 0, cy = 0, hw = 0, hh = 0, rad = 0, path = [], topMid = 0;
     const labels = ['Request', 'Plan', 'Tools · MCP', 'Execute', 'Verify', 'Respond'];
-    const N = labels.length, A0 = -Math.PI / 2;           // first node at top
-    const pt = (a) => ({ x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a) });
-    const layout = () => { cx = W / 2; cy = H / 2; rx = Math.max(70, W / 2 - 56); ry = Math.max(50, H / 2 - 30); };
+    const N = labels.length;
+    const layout = () => {
+      cx = W / 2; cy = H / 2; hw = Math.max(80, W / 2 - 50); hh = Math.max(46, H / 2 - 26); rad = Math.min(38, hh, hw);
+      // sample the rounded-rect perimeter into equal-ish steps (clockwise from left end of top edge)
+      path = []; const step = 3;
+      const seg = (x1, y1, x2, y2) => { const d = Math.hypot(x2 - x1, y2 - y1), n = Math.max(1, Math.round(d / step)); for (let i = 0; i < n; i++) path.push({ x: x1 + (x2 - x1) * i / n, y: y1 + (y2 - y1) * i / n }); };
+      const arc = (ox, oy, a0, a1) => { const n = Math.max(2, Math.round(Math.abs(a1 - a0) * rad / step)); for (let i = 0; i < n; i++) { const a = a0 + (a1 - a0) * i / n; path.push({ x: ox + Math.cos(a) * rad, y: oy + Math.sin(a) * rad }); } };
+      seg(cx - hw + rad, cy - hh, cx + hw - rad, cy - hh);                 // top
+      arc(cx + hw - rad, cy - hh + rad, -Math.PI / 2, 0);                  // TR
+      seg(cx + hw, cy - hh + rad, cx + hw, cy + hh - rad);                 // right
+      arc(cx + hw - rad, cy + hh - rad, 0, Math.PI / 2);                   // BR
+      seg(cx + hw - rad, cy + hh, cx - hw + rad, cy + hh);                 // bottom
+      arc(cx - hw + rad, cy + hh - rad, Math.PI / 2, Math.PI);             // BL
+      seg(cx - hw, cy + hh - rad, cx - hw, cy - hh + rad);                 // left
+      arc(cx - hw + rad, cy - hh + rad, Math.PI, Math.PI * 1.5);           // TL
+      const P = 4 * (hw - rad) + 4 * (hh - rad) + 2 * Math.PI * rad;        // perimeter
+      topMid = (hw - rad) / P;                                             // fraction at top-edge midpoint
+    };
+    const at = (f) => { const L = path.length; const i = Math.floor((((f % 1) + 1) % 1) * L) % L; return path[i] || { x: cx, y: cy }; };
+    const tangentAt = (f) => { const L = path.length, i = Math.floor((((f % 1) + 1) % 1) * L) % L, a = path[(i - 2 + L) % L], b = path[(i + 2) % L]; return Math.atan2(b.y - a.y, b.x - a.x); };
     const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); layout(); };
     size(); addEventListener('resize', size);
-    const arrowAt = (a, alpha) => {                       // arrowhead riding the ellipse, pointing along travel
-      const p = pt(a), tang = Math.atan2(ry * Math.cos(a), -rx * Math.sin(a));
-      c.save(); c.translate(p.x, p.y); c.rotate(tang); c.fillStyle = `rgba(79,191,139,${alpha})`;
-      c.beginPath(); c.moveTo(-5, -5); c.lineTo(6, 0); c.lineTo(-5, 5); c.closePath(); c.fill(); c.restore();
-    };
+    const roundRectPath = () => { c.beginPath(); c.moveTo(cx - hw + rad, cy - hh); c.arcTo(cx + hw, cy - hh, cx + hw, cy - hh + rad, rad); c.arcTo(cx + hw, cy + hh, cx + hw - rad, cy + hh, rad); c.arcTo(cx - hw, cy + hh, cx - hw, cy + hh - rad, rad); c.arcTo(cx - hw, cy - hh, cx - hw + rad, cy - hh, rad); c.closePath(); };
+    const arrowAt = (f, alpha) => { const p = at(f), ang = tangentAt(f); c.save(); c.translate(p.x, p.y); c.rotate(ang); c.fillStyle = `rgba(79,191,139,${alpha})`; c.beginPath(); c.moveTo(-5, -5); c.lineTo(6, 0); c.lineTo(-5, 5); c.closePath(); c.fill(); c.restore(); };
+    const F0 = () => topMid;                                              // first node anchored to top-centre
     const draw = () => {
       c.clearRect(0, 0, W, H);
-      // faint orbit track
-      c.strokeStyle = 'rgba(79,191,139,.16)'; c.lineWidth = 1.4;
-      c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, 0, 7); c.stroke();
-      // arrowheads at the midpoint of each hop
-      for (let i = 0; i < N; i++) arrowAt(A0 + (i + 0.5) * (2 * Math.PI / N), 0.7);
-      // travelling comet pulse (head + fading trail)
-      for (let k = 0; k < 10; k++) {
-        const a = A0 + (pulse - k * 0.018) * 2 * Math.PI, p = pt(a), al = (1 - k / 10);
-        c.fillStyle = `rgba(52,211,153,${al * 0.5})`; c.beginPath(); c.arc(p.x, p.y, 4.5 - k * 0.3, 0, 7); c.fill();
-      }
-      const head = pt(A0 + pulse * 2 * Math.PI);
+      c.strokeStyle = 'rgba(79,191,139,.18)'; c.lineWidth = 1.4; roundRectPath(); c.stroke();
+      for (let i = 0; i < N; i++) arrowAt(F0() + (i + 0.5) / N, 0.7);
+      for (let k = 0; k < 12; k++) { const p = at(F0() + pulse - k * 0.012), al = 1 - k / 12; c.fillStyle = `rgba(52,211,153,${al * 0.5})`; c.beginPath(); c.arc(p.x, p.y, 4.6 - k * 0.28, 0, 7); c.fill(); }
+      const head = at(F0() + pulse);
       c.fillStyle = '#34D399'; c.shadowColor = '#34D399'; c.shadowBlur = 16; c.beginPath(); c.arc(head.x, head.y, 5, 0, 7); c.fill(); c.shadowBlur = 0;
-      // nodes + labels offset radially outward
       for (let i = 0; i < N; i++) {
-        const a = A0 + i * (2 * Math.PI / N), p = pt(a), ux = Math.cos(a), uy = Math.sin(a);
-        c.fillStyle = '#0E7A53'; c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 1.5;
+        const p = at(F0() + i / N), ux = p.x - cx, uy = p.y - cy;
+        const hor = Math.abs(ux) > Math.abs(uy);                          // labels go outward along the dominant axis
+        c.fillStyle = '#0E7A53'; c.strokeStyle = 'rgba(255,255,255,.5)'; c.lineWidth = 1.5;
         c.beginPath(); c.arc(p.x, p.y, 6, 0, 7); c.fill(); c.stroke();
         c.font = '600 10.5px "Space Grotesk",sans-serif';
-        c.textAlign = ux > 0.25 ? 'left' : ux < -0.25 ? 'right' : 'center';
-        c.textBaseline = uy > 0.25 ? 'top' : uy < -0.25 ? 'bottom' : 'middle';
-        const lx = p.x + ux * 12, ly = p.y + uy * 11;
-        c.fillStyle = 'rgba(13,23,18,.85)'; const tw = c.measureText(labels[i]).width;
-        const ox = c.textAlign === 'left' ? 0 : c.textAlign === 'right' ? -tw : -tw / 2;
-        c.fillRect(lx + ox - 4, ly + (uy > 0.25 ? -1 : uy < -0.25 ? -13 : -7), tw + 8, 14);
+        c.textAlign = hor ? (ux > 0 ? 'left' : 'right') : 'center';
+        c.textBaseline = hor ? 'middle' : (uy > 0 ? 'top' : 'bottom');
+        const lx = p.x + (hor ? Math.sign(ux) * 12 : 0), ly = p.y + (hor ? 0 : Math.sign(uy) * 11);
+        const tw = c.measureText(labels[i]).width;
+        let ox = -tw / 2; if (c.textAlign === 'left') ox = 0; else if (c.textAlign === 'right') ox = -tw;
+        let oy = -7; if (c.textBaseline === 'top') oy = -1; else if (c.textBaseline === 'bottom') oy = -13;
+        c.fillStyle = 'rgba(13,23,18,.85)'; c.fillRect(lx + ox - 4, ly + oy, tw + 8, 14);
         c.fillStyle = 'rgba(159,240,200,.92)'; c.fillText(labels[i], lx, ly);
       }
     };
-    const frame = () => { if (run) { pulse = (pulse + 0.0018) % 1; draw(); } requestAnimationFrame(frame); };
+    const frame = () => { if (run) { pulse = (pulse + 0.0016) % 1; draw(); } requestAnimationFrame(frame); };
     if (reduce) { size(); draw(); } else { requestAnimationFrame(frame); onView(cv, v => run = v); }
   })();
 
-  /* 5) RAIN card: diagonal droplets */
+  /* 5) RAIN card: diagonal droplets + occasional lightning */
   (() => {
     const cv = $('#rainCanvas'); if (!cv) return;
     const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
-    let W = 0, H = 0, run = true, drops = [];
+    let W = 0, H = 0, run = true, drops = [], flash = 0, bolt = null, cool = 80;
     const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
     const init = () => { size(); drops = Array.from({ length: Math.max(18, Math.round(W * H / 2400)) }, () => ({ x: Math.random() * W, y: Math.random() * H, l: 7 + Math.random() * 11, v: 2.2 + Math.random() * 2.6 })); };
     init(); addEventListener('resize', init);
     const dx = 0.5;
-    const draw = () => { if (run) { c.clearRect(0, 0, W, H); c.lineWidth = 1.6; c.lineCap = 'round'; drops.forEach(d => { const g = c.createLinearGradient(d.x, d.y, d.x - d.l * dx, d.y + d.l); g.addColorStop(0, 'rgba(96,165,250,0)'); g.addColorStop(1, 'rgba(59,130,246,.75)'); c.strokeStyle = g; c.beginPath(); c.moveTo(d.x, d.y); c.lineTo(d.x + d.l * dx, d.y + d.l); c.stroke(); d.y += d.v; d.x += d.v * dx; if (d.y > H + 12) { d.y = -12; d.x = Math.random() * (W + 60); } }); } requestAnimationFrame(draw); };
+    const makeBolt = () => {                                  // jagged fork from the top
+      const segs = 7 + Math.floor(Math.random() * 4), main = []; let x = W * (0.25 + Math.random() * 0.5), y = 0;
+      main.push({ x, y });
+      for (let i = 0; i < segs; i++) { y += H / segs * (0.7 + Math.random() * 0.6); x += (Math.random() - 0.5) * W * 0.28; main.push({ x, y }); if (y >= H) break; }
+      const branch = [], bi = 2 + Math.floor(Math.random() * 2);
+      if (main[bi]) { let bx = main[bi].x, by = main[bi].y; branch.push({ x: bx, y: by }); for (let k = 0; k < 3; k++) { by += H / 9; bx += (Math.random() - 0.3) * W * 0.24; branch.push({ x: bx, y: by }); } }
+      return { main, branch };
+    };
+    const strokeBolt = (pts, w, style) => { if (!pts || pts.length < 2) return; c.strokeStyle = style; c.lineWidth = w; c.lineJoin = 'round'; c.beginPath(); c.moveTo(pts[0].x, pts[0].y); for (let i = 1; i < pts.length; i++) c.lineTo(pts[i].x, pts[i].y); c.stroke(); };
+    const strike = () => { bolt = makeBolt(); flash = 1; cool = 110 + Math.floor(Math.random() * 160); };
+    const host = cv.closest('.lead') || cv.parentElement;
+    host?.addEventListener('mouseenter', strike);                 // a bolt every time you hover the panel
+    const draw = () => {
+      if (run) {
+        c.clearRect(0, 0, W, H); c.lineWidth = 1.6; c.lineCap = 'round';
+        drops.forEach(d => { const g = c.createLinearGradient(d.x, d.y, d.x - d.l * dx, d.y + d.l); g.addColorStop(0, 'rgba(96,165,250,0)'); g.addColorStop(1, 'rgba(59,130,246,.75)'); c.strokeStyle = g; c.beginPath(); c.moveTo(d.x, d.y); c.lineTo(d.x + d.l * dx, d.y + d.l); c.stroke(); d.y += d.v; d.x += d.v * dx; if (d.y > H + 12) { d.y = -12; d.x = Math.random() * (W + 60); } });
+        if (cool > 0) cool--;
+        if (flash <= 0.02 && cool <= 0 && Math.random() < 0.02) { bolt = makeBolt(); flash = 1; cool = 110 + Math.floor(Math.random() * 160); }
+        if (flash > 0.02 && bolt) {
+          c.fillStyle = `rgba(96,165,250,${flash * 0.22})`; c.fillRect(0, 0, W, H);          // brief blue sky-flash
+          c.shadowColor = 'rgba(37,99,235,.85)'; c.shadowBlur = 14;
+          strokeBolt(bolt.main, 4, `rgba(37,99,235,${flash})`);                              // saturated blue, reads on white
+          strokeBolt(bolt.branch, 2.4, `rgba(37,99,235,${flash * 0.8})`);
+          strokeBolt(bolt.main, 1.6, `rgba(191,219,254,${Math.min(1, flash + 0.3)})`);        // bright hot core
+          c.shadowBlur = 0; flash *= 0.82;
+        }
+      }
+      requestAnimationFrame(draw);
+    };
     if (reduce) { init(); } else { requestAnimationFrame(draw); onView(cv, v => run = v); }
   })();
 
-  /* 6) AI Alliance card: network */
+  /* 6) AI Alliance card: a living network — hubs, signals between chapters, radar pings */
   (() => {
     const cv = $('#netCanvas'); if (!cv) return;
     const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
-    let W = 0, H = 0, run = true, pts = [];
+    let W = 0, H = 0, run = true, pts = [], pulses = [], rings = [];
+    const D = 80;
     const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
-    const init = () => { size(); pts = Array.from({ length: Math.max(10, Math.round(W * H / 5200)) }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3 })); };
+    const init = () => {
+      size(); const n = Math.max(11, Math.round(W * H / 4600));
+      pts = Array.from({ length: n }, (_, i) => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, hub: i % 4 === 0, r: i % 4 === 0 ? 3.1 : 1.8 }));
+      pulses = []; rings = [];
+    };
     init(); addEventListener('resize', init);
+    const spawn = () => {
+      if (pulses.length > 5) return; const a = Math.floor(Math.random() * pts.length); let b = -1, best = D;
+      for (let j = 0; j < pts.length; j++) { if (j === a) continue; const d = Math.hypot(pts[a].x - pts[j].x, pts[a].y - pts[j].y); if (d < best) { best = d; b = j; } }
+      if (b >= 0) pulses.push({ a, b, p: 0, sp: 0.02 + Math.random() * 0.02 });
+    };
     const draw = () => {
       if (run) {
         c.clearRect(0, 0, W, H);
         pts.forEach(p => { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1; });
-        for (let i = 0; i < pts.length; i++) { for (let j = i + 1; j < pts.length; j++) { const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y); if (d < 74) { c.strokeStyle = `rgba(14,122,83,${(1 - d / 74) * 0.5})`; c.lineWidth = 1; c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke(); } } }
-        pts.forEach(p => { c.fillStyle = 'rgba(14,122,83,.85)'; c.beginPath(); c.arc(p.x, p.y, 1.9, 0, 7); c.fill(); });
+        for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y); if (d < D) { c.strokeStyle = `rgba(14,122,83,${(1 - d / D) * 0.5})`; c.lineWidth = 1; c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke(); } }
+        if (Math.random() < 0.06) spawn();
+        if (Math.random() < 0.014) { const h = pts.find(p => p.hub) || pts[0]; if (h) rings.push({ x: h.x, y: h.y, r: 3, a: 0.7 }); }
+        pulses.forEach(pu => { const a = pts[pu.a], b = pts[pu.b]; pu.p += pu.sp; const x = a.x + (b.x - a.x) * pu.p, y = a.y + (b.y - a.y) * pu.p; c.fillStyle = '#5EEAD4'; c.shadowColor = '#34D399'; c.shadowBlur = 8; c.beginPath(); c.arc(x, y, 2.3, 0, 7); c.fill(); c.shadowBlur = 0; });
+        pulses = pulses.filter(pu => pu.p < 1);
+        rings.forEach(rg => { rg.r += 0.7; rg.a *= 0.96; c.strokeStyle = `rgba(52,211,153,${rg.a})`; c.lineWidth = 1.2; c.beginPath(); c.arc(rg.x, rg.y, rg.r, 0, 7); c.stroke(); });
+        rings = rings.filter(rg => rg.a > 0.05);
+        pts.forEach(p => { if (p.hub) { c.fillStyle = 'rgba(52,211,153,.95)'; c.shadowColor = '#34D399'; c.shadowBlur = 8; } else { c.fillStyle = 'rgba(14,122,83,.85)'; c.shadowBlur = 0; } c.beginPath(); c.arc(p.x, p.y, p.r, 0, 7); c.fill(); c.shadowBlur = 0; });
       }
       requestAnimationFrame(draw);
     };
@@ -360,29 +413,40 @@
     const buddy = $('#buddy'); if (!buddy) return;
     if (reduce || innerWidth < 900) { buddy.style.display = 'none'; return; }
     const bubble = $('#buddyBubble');
+    const BW = 78;
     const stops = [
-      { sel: '#top', side: 0.92, y: 0.5, msg: "hey, I'll show you around" },
-      { sel: '#work', side: 0.04, y: 0.42, msg: "here's where I've worked" },
-      { sel: '#research', side: 0.92, y: 0.46, msg: "poke the map, it's live" },
-      { sel: '#projects', side: 0.04, y: 0.5, msg: "stuff I build for fun" },
-      { sel: '#gallery', side: 0.92, y: 0.5, msg: "a few good moments" },
-      { sel: '#leadership', side: 0.04, y: 0.45, msg: "communities I started" },
-      { sel: '#honors', side: 0.92, y: 0.5, msg: "some wins" },
-      { sel: '#about', side: 0.04, y: 0.5, msg: "a bit about me" },
-      { sel: '#contact', side: 0.92, y: 0.55, msg: "let's talk!" },
+      { sel: '#top', msg: "hey, I'll show you around!" },
+      { sel: '#work', msg: "here's where I've worked!" },
+      { sel: '#research', msg: "poke the map, it's live!" },
+      { sel: '#projects', msg: "stuff I build for fun!" },
+      { sel: '#gallery', msg: "a few good moments!" },
+      { sel: '#leadership', msg: "communities I started!" },
+      { sel: '#honors', msg: "some wins!" },
+      { sel: '#about', msg: "a bit about me!" },
+      { sel: '#contact', msg: "let's talk!" },
     ].map(s => ({ ...s, el: $(s.sel) })).filter(s => s.el);
     if (!stops.length) { buddy.style.display = 'none'; return; }
-    let tx = innerWidth * 0.9, ty = innerHeight * 0.5, cx = tx, cy = ty, curMsg = '';
+    let p = 0, tx = innerWidth * 0.7, ty = innerHeight * 0.5, cx = tx, cy = ty, curMsg = '';
     const pick = () => {
+      const max = (document.documentElement.scrollHeight - innerHeight) || 1;
+      p = Math.min(1, Math.max(0, scrollY / max));
+      // starts above the hero photo (upper-right), then weaves slowly across the page
+      const wx = 0.5 + 0.40 * Math.sin(p * Math.PI * 4 + 1.05);
+      tx = 16 + wx * (innerWidth - BW - 32);
+      ty = (0.40 - 0.16 * Math.cos(p * Math.PI * 5)) * innerHeight;
       const mid = scrollY + innerHeight * 0.5; let best = stops[0];
       for (const s of stops) { if (s.el.getBoundingClientRect().top + scrollY <= mid) best = s; }
-      tx = best.side * (innerWidth - 82) + 10; ty = best.y * innerHeight;
-      buddy.classList.toggle('flip', best.side > 0.5);
       if (best.msg !== curMsg) { curMsg = best.msg; bubble.textContent = best.msg; }
     };
     addEventListener('scroll', pick, { passive: true }); addEventListener('resize', pick); pick();
-    bubble.classList.add('show');
-    const loop = () => { cx += (tx - cx) * 0.07; cy += (ty - cy) * 0.07; buddy.style.transform = `translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px)`; requestAnimationFrame(loop); };
+    cx = tx; cy = ty; bubble.classList.add('show');
+    const loop = () => {
+      cx += (tx - cx) * 0.045; cy += (ty - cy) * 0.05;
+      buddy.classList.toggle('flip', tx - cx < -0.15);
+      const sc = 0.86 + 0.30 * Math.min(1, Math.max(0, (cy / innerHeight - 0.22) / 0.34));   // grows lower, shrinks higher (depth)
+      buddy.style.transform = `translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px) scale(${sc.toFixed(3)})`;
+      requestAnimationFrame(loop);
+    };
     loop();
   })();
 
@@ -419,6 +483,23 @@
     };
     const frame = () => { if (run) { t += 0.04; draw(); } requestAnimationFrame(frame); };
     if (reduce) { size(); draw(); } else { requestAnimationFrame(frame); onView(cv, v => run = v); }
+  })();
+
+  /* 10) Baymax steps out of his red carrying case as you scroll */
+  (() => {
+    const card = $('#lifeCard'); if (!card) return;
+    const wrap = card.querySelector('.baymax'); const rise = card.querySelector('.bm-rise');
+    if (!wrap || !rise) return;
+    const RISE_IN = 106, RISE_OUT = -10; let cur = RISE_IN, tgt = RISE_IN;
+    const onScroll = () => {
+      const r = card.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (innerHeight * 0.86 - r.top) / (innerHeight * 0.5)));
+      tgt = RISE_IN + (RISE_OUT - RISE_IN) * p; wrap.classList.toggle('out', p > 0.8);
+    };
+    addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); onScroll();
+    if (reduce) { rise.setAttribute('transform', `translate(0 ${RISE_OUT})`); wrap.classList.add('out'); return; }
+    const loop = () => { cur += (tgt - cur) * 0.12; rise.setAttribute('transform', `translate(0 ${cur.toFixed(1)})`); requestAnimationFrame(loop); };
+    loop();
   })();
 
   /* click-to-copy email */
