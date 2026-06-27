@@ -207,7 +207,7 @@ a{color:inherit;text-decoration:none}
 .ilude{font-family:var(--ff-d);font-weight:700;font-size:clamp(2rem,1.1rem + 4.4vw,4.8rem);line-height:1.03;letter-spacing:-.035em;max-width:22ch}
 .ilude .hl{display:inline}
 .light-block .ilude .hl{color:var(--accent)}
-.dark-block .ilude .hl{color:#7C8BFF}
+.dark-block .ilude .hl{color:#4FBF8B}
 .accent-block .ilude .hl{text-decoration:underline;text-decoration-color:rgba(255,255,255,.55);text-underline-offset:8px;text-decoration-thickness:3px}
 .ilude .w{display:inline-block;opacity:0;transform:translateY(.5em);transition:opacity .5s ease,transform .55s cubic-bezier(.2,.85,.25,1)}
 .ilude.in .w{opacity:1;transform:none}
@@ -257,6 +257,76 @@ a{color:inherit;text-decoration:none}
 /* ---------- leadership link ---------- */
 .lead-link{display:inline-block;margin-top:14px;font-weight:600;font-size:.9rem;color:var(--accent)}
 .lead-link:hover{text-decoration:underline}
+
+/* ===== ORCA waveform panel ===== */
+.orca-media{position:relative;min-height:300px;display:block;overflow:hidden;background:radial-gradient(130% 130% at 28% 18%,#0f4030,#06140e 72%)}
+.orca-media::after{content:none}
+.orca-wave{position:absolute;inset:0;width:100%;height:100%;display:block}
+.orca-badge{position:absolute;left:18px;top:16px;z-index:2;font-family:var(--ff-d);font-size:.78rem;font-weight:600;letter-spacing:.03em;color:#9ff0c8;background:rgba(0,0,0,.3);padding:6px 13px;border-radius:100px}
+
+/* ===== agentic node-graph workflow ===== */
+.agentic-flow{display:block;width:100%;height:158px;margin:20px 0 16px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.025)}
+
+/* ===== AILA / Baymax ===== */
+#lifeCard{display:block}
+.life-grid{display:grid;grid-template-columns:.4fr 1.7fr auto;gap:30px;align-items:center}
+.baymax{display:flex;justify-content:center;align-items:center;padding-left:6px}
+.baymax svg{filter:drop-shadow(0 14px 30px rgba(0,0,0,.45))}
+.baymax-arm{transform-origin:104px 60px;animation:bxwave 2.6s ease-in-out infinite}
+@keyframes bxwave{0%,100%{transform:rotate(2deg)}25%{transform:rotate(-24deg)}50%{transform:rotate(-8deg)}75%{transform:rotate(-24deg)}}
+
+/* ===== Spay pets ===== */
+.pet-card{position:relative;overflow:hidden}
+.pet-card .h3,.pet-card h3,.pet-card .meta,.pet-card p,.pet-card .link{position:relative;z-index:1}
+.pets{position:absolute;right:16px;bottom:14px;z-index:0;display:flex;align-items:flex-end;gap:4px;opacity:.95;pointer-events:none;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.pet-card:hover .pets{transform:translateY(-5px) rotate(-2deg)}
+.pet.dog .ear-l{transform-origin:19px 19px;animation:earwag 1.5s ease-in-out infinite}
+.pet.dog .ear-r{transform-origin:47px 19px;animation:earwag 1.5s ease-in-out infinite .25s}
+@keyframes earwag{0%,100%{transform:rotate(0)}50%{transform:rotate(-7deg)}}
+.pet.cat .tail{transform-origin:44px 50px;animation:tailwag 1.8s ease-in-out infinite}
+@keyframes tailwag{0%,100%{transform:rotate(0)}50%{transform:rotate(14deg)}}
+
+/* ===== leadership card animations ===== */
+.lead{position:relative;overflow:hidden}
+.lead-body{position:relative;z-index:2}
+.rain-canvas,.net-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.55;pointer-events:none}
+.pixgrid{position:absolute;inset:0;z-index:0;display:grid;pointer-events:none;opacity:0;transition:opacity .3s}
+.lead-pix:hover .pixgrid{opacity:.45}
+.pixgrid .px{transform:scale(0) rotate(60deg);transition:transform .55s cubic-bezier(.2,.85,.25,1)}
+.lead-pix:hover .pixgrid .px{transform:scale(1) rotate(0)}
+.accel-lines{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;opacity:.5}
+.accel-lines span{position:absolute;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--accent));animation:accel 1.7s linear infinite}
+.accel-lines span:nth-child(1){top:16%;width:38%;animation-delay:0s}
+.accel-lines span:nth-child(2){top:33%;width:55%;animation-delay:.35s}
+.accel-lines span:nth-child(3){top:52%;width:30%;animation-delay:.7s}
+.accel-lines span:nth-child(4){top:68%;width:48%;animation-delay:.2s}
+.accel-lines span:nth-child(5){top:84%;width:40%;animation-delay:.5s}
+@keyframes accel{0%{transform:translateX(-130%)}100%{transform:translateX(260%)}}
+
+/* ===== gallery pizzazz ===== */
+.gal figure{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.gal figure:hover{transform:translateY(-6px) rotate(-1.2deg);box-shadow:0 26px 54px -26px rgba(10,10,11,.55);z-index:2}
+.gal figure::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(160deg,rgba(14,122,83,.45),transparent 62%);opacity:0;transition:opacity .35s;pointer-events:none}
+.gal figure:hover::before{opacity:1}
+
+/* ===== awards pizzazz ===== */
+.honor{position:relative;transition:background .3s;padding-left:14px}
+.honor::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--accent);transform:scaleY(0);transform-origin:top;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.honor:hover::before{transform:scaleY(1)}
+.honor:hover{background:rgba(14,122,83,.05)}
+.honor .y{transition:color .3s,transform .3s}
+.honor:hover .y{color:var(--accent);transform:translateX(3px)}
+
+/* ===== robot buddy companion ===== */
+.buddy{position:fixed;left:0;top:0;width:62px;z-index:85;pointer-events:none;will-change:transform}
+.buddy-bot{display:block;animation:bob 2.3s ease-in-out infinite;filter:drop-shadow(0 10px 20px rgba(10,40,30,.25))}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.buddy-arm-l{transform-origin:16px 54px;animation:bxwave 2.6s ease-in-out infinite}
+.buddy.flip .buddy-bot{transform:scaleX(-1)}
+.buddy-bubble{position:absolute;bottom:100%;left:50%;transform:translateX(-50%) translateY(-10px);white-space:nowrap;background:var(--ink);color:#fff;font-size:.72rem;font-weight:600;font-family:var(--ff-d);padding:7px 13px;border-radius:100px;opacity:0;transition:opacity .35s,transform .35s}
+.buddy-bubble.show{opacity:1;transform:translateX(-50%) translateY(-14px)}
+.buddy-bubble::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--ink)}
+@media(max-width:900px){.buddy{display:none}}
 
 /* ---------- reveal ---------- */
 .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}

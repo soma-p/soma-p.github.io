@@ -153,27 +153,30 @@
     if (reduce) { blobs.forEach(b => paint(b, b.bx, b.by)); } else { requestAnimationFrame(frame); onView(cv, v => { run = v; }); }
   })();
 
-  /* 2) ORCA waveform */
+  /* 2) ORCA waveform (mirrored audio panel) */
   (() => {
     const cv = $('#orcaWave'); if (!cv) return;
     const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
-    let W = 0, H = 0, run = true, hover = 0, amp = 0.5; const N = 46;
+    let W = 0, H = 0, run = true, hover = 0, amp = 0.55; const N = 60;
     const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
     size(); addEventListener('resize', size);
     const host = cv.closest('.card');
     host?.addEventListener('mouseenter', () => hover = 1); host?.addEventListener('mouseleave', () => hover = 0);
-    const bar = (t) => {
-      c.clearRect(0, 0, W, H); const bw = W / N;
+    const roundBar = (x, y, w, h, r) => { r = Math.min(r, w / 2, h / 2); c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); c.fill(); };
+    const draw = (t) => {
+      c.clearRect(0, 0, W, H); const mid = H / 2, bw = W / N;
       for (let i = 0; i < N; i++) {
-        const s = (Math.sin(t * 0.004 + i * 0.5) * 0.5 + 0.5) * (Math.sin(t * 0.0021 + i * 0.27) * 0.5 + 0.5);
-        const h = Math.max(2, (0.1 + amp * (0.18 + 0.82 * s)) * H);
-        const x = i * bw + bw * 0.16; const g = c.createLinearGradient(0, H - h, 0, H);
-        g.addColorStop(0, '#4FBF8B'); g.addColorStop(1, '#0E7A53'); c.fillStyle = g;
-        c.fillRect(x, H - h, bw * 0.68, h);
+        const env = Math.sin((i / (N - 1)) * Math.PI);
+        const s = (Math.sin(t * 0.0035 + i * 0.45) * 0.5 + 0.5) * (Math.sin(t * 0.0019 + i * 0.23) * 0.5 + 0.5);
+        const h = Math.max(3, (0.08 + amp * (0.2 + 0.8 * s)) * (H * 0.46) * (0.45 + 0.55 * env));
+        const w = bw * 0.5, x = i * bw + (bw - w) / 2;
+        const g = c.createLinearGradient(0, mid - h, 0, mid + h);
+        g.addColorStop(0, '#34D399'); g.addColorStop(0.5, '#10B981'); g.addColorStop(1, '#0E7A53');
+        c.fillStyle = g; roundBar(x, mid - h, w, h * 2, w / 2);
       }
     };
-    const frame = (t) => { if (run) { amp += ((hover ? 1 : 0.5) - amp) * 0.06; bar(t); } requestAnimationFrame(frame); };
-    if (reduce) { size(); amp = 0.6; bar(0); } else { requestAnimationFrame(frame); onView(cv, v => run = v); }
+    const frame = (t) => { if (run) { amp += ((hover ? 0.95 : 0.55) - amp) * 0.06; draw(t); } requestAnimationFrame(frame); };
+    if (reduce) { size(); draw(0); } else { requestAnimationFrame(frame); onView(cv, v => run = v); }
   })();
 
   /* 3) interactive redistricting */
@@ -213,30 +216,105 @@
     if (reduce) { gen(); reveal = 1; anim = false; draw(); } else { trigger(); }
   })();
 
-  /* 4) agentic workflow arrows */
+  /* 4) agentic node-graph workflow */
   (() => {
-    const card = $('#agenticCard'); if (!card) return;
-    const NS = 'http://www.w3.org/2000/svg', XL = 'http://www.w3.org/1999/xlink';
-    const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'flow-arrows'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('preserveAspectRatio', 'none');
-    card.appendChild(svg);
-    const uid = 'apath';
-    const rr = (x, y, w, h, r) => `M${x + r},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r} V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${x + r} A${r},${r} 0 0 1 ${x},${y + h - r} V${y + r} A${r},${r} 0 0 1 ${x + r},${y} Z`;
-    const build = () => {
-      const w = card.clientWidth, h = card.clientHeight; if (!w || !h) return;
-      const p = 1.5, d = rr(p, p, w - 2 * p, h - 2 * p, 19);
-      svg.setAttribute('viewBox', `0 0 ${w} ${h}`); svg.innerHTML = '';
-      const mk = (cls) => { const el = document.createElementNS(NS, 'path'); el.setAttribute('d', d); el.setAttribute('class', cls); return el; };
-      svg.appendChild(mk('flow-base')); svg.appendChild(mk('flow-dash'));
-      const mp = mk(''); mp.setAttribute('id', uid); mp.setAttribute('fill', 'none'); mp.setAttribute('stroke', 'none'); svg.appendChild(mp);
-      if (reduce) return;
-      for (let i = 0; i < 4; i++) {
-        const head = document.createElementNS(NS, 'path'); head.setAttribute('d', 'M-7,-4 L4,0 L-7,4 Z'); head.setAttribute('class', 'flow-head');
-        const am = document.createElementNS(NS, 'animateMotion'); am.setAttribute('dur', '8s'); am.setAttribute('repeatCount', 'indefinite'); am.setAttribute('rotate', 'auto'); am.setAttribute('begin', `-${i * 2}s`);
-        const mpath = document.createElementNS(NS, 'mpath'); mpath.setAttributeNS(XL, 'href', '#' + uid); mpath.setAttribute('href', '#' + uid);
-        am.appendChild(mpath); head.appendChild(am); svg.appendChild(head);
-      }
+    const cv = $('#agenticFlow'); if (!cv) return;
+    const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
+    let W = 0, H = 0, run = true, pulse = 0, nodes = [];
+    const labels = ['Request', 'Plan', 'Tools · MCP', 'Execute', 'Verify', 'Respond'];
+    const layout = () => {
+      const n = labels.length, padX = Math.max(46, W * 0.07), padY = 40, uw = W - padX * 2;
+      nodes = labels.map((lab, i) => ({ x: padX + uw * (i / (n - 1)), y: (i % 2 === 0) ? padY : H - padY, lab }));
     };
-    build(); addEventListener('resize', build); setTimeout(build, 350); setTimeout(build, 1300);
+    const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); layout(); };
+    size(); addEventListener('resize', size);
+    const arrow = (a, b, t) => { const px = a.x + (b.x - a.x) * t, py = a.y + (b.y - a.y) * t, ang = Math.atan2(b.y - a.y, b.x - a.x); c.save(); c.translate(px, py); c.rotate(ang); c.fillStyle = 'rgba(79,191,139,.85)'; c.beginPath(); c.moveTo(-5, -4.5); c.lineTo(5, 0); c.lineTo(-5, 4.5); c.closePath(); c.fill(); c.restore(); };
+    const draw = () => {
+      c.clearRect(0, 0, W, H);
+      for (let i = 0; i < nodes.length - 1; i++) { const a = nodes[i], b = nodes[i + 1]; c.strokeStyle = 'rgba(79,191,139,.35)'; c.lineWidth = 2; c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke(); arrow(a, b, 0.6); }
+      const seg = nodes.length - 1, fp = (pulse % 1) * seg, si = Math.floor(fp), ft = fp - si;
+      if (si < nodes.length - 1) { const a = nodes[si], b = nodes[si + 1]; c.fillStyle = '#34D399'; c.shadowColor = '#34D399'; c.shadowBlur = 14; c.beginPath(); c.arc(a.x + (b.x - a.x) * ft, a.y + (b.y - a.y) * ft, 5, 0, 7); c.fill(); c.shadowBlur = 0; }
+      nodes.forEach(nd => {
+        c.fillStyle = '#0E7A53'; c.strokeStyle = 'rgba(255,255,255,.3)'; c.lineWidth = 1.5; c.beginPath(); c.arc(nd.x, nd.y, 7, 0, 7); c.fill(); c.stroke();
+        c.fillStyle = 'rgba(255,255,255,.88)'; c.font = '600 11px "Space Grotesk",sans-serif'; c.textAlign = 'center'; c.textBaseline = (nd.y < H / 2) ? 'bottom' : 'top';
+        c.fillText(nd.lab, nd.x, (nd.y < H / 2) ? nd.y - 12 : nd.y + 12);
+      });
+    };
+    const frame = () => { if (run) { pulse += 0.006; draw(); } requestAnimationFrame(frame); };
+    if (reduce) { size(); draw(); } else { requestAnimationFrame(frame); onView(cv, v => run = v); }
+  })();
+
+  /* 5) RAIN card: diagonal droplets */
+  (() => {
+    const cv = $('#rainCanvas'); if (!cv) return;
+    const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
+    let W = 0, H = 0, run = true, drops = [];
+    const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    const init = () => { size(); drops = Array.from({ length: Math.max(18, Math.round(W * H / 2400)) }, () => ({ x: Math.random() * W, y: Math.random() * H, l: 7 + Math.random() * 11, v: 2.2 + Math.random() * 2.6 })); };
+    init(); addEventListener('resize', init);
+    const dx = 0.5;
+    const draw = () => { if (run) { c.clearRect(0, 0, W, H); c.strokeStyle = 'rgba(14,122,83,.5)'; c.lineWidth = 1.5; c.lineCap = 'round'; drops.forEach(d => { c.beginPath(); c.moveTo(d.x, d.y); c.lineTo(d.x - d.l * dx, d.y + d.l); c.stroke(); d.y += d.v; d.x += d.v * dx; if (d.y > H + 12) { d.y = -12; d.x = Math.random() * (W + 60); } }); } requestAnimationFrame(draw); };
+    if (reduce) { init(); } else { requestAnimationFrame(draw); onView(cv, v => run = v); }
+  })();
+
+  /* 6) AI Alliance card: network */
+  (() => {
+    const cv = $('#netCanvas'); if (!cv) return;
+    const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
+    let W = 0, H = 0, run = true, pts = [];
+    const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    const init = () => { size(); pts = Array.from({ length: Math.max(10, Math.round(W * H / 5200)) }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3 })); };
+    init(); addEventListener('resize', init);
+    const draw = () => {
+      if (run) {
+        c.clearRect(0, 0, W, H);
+        pts.forEach(p => { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1; });
+        for (let i = 0; i < pts.length; i++) { for (let j = i + 1; j < pts.length; j++) { const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y); if (d < 74) { c.strokeStyle = `rgba(14,122,83,${(1 - d / 74) * 0.5})`; c.lineWidth = 1; c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke(); } } }
+        pts.forEach(p => { c.fillStyle = 'rgba(14,122,83,.85)'; c.beginPath(); c.arc(p.x, p.y, 1.9, 0, 7); c.fill(); });
+      }
+      requestAnimationFrame(draw);
+    };
+    if (reduce) { init(); draw(); run = false; } else { requestAnimationFrame(draw); onView(cv, v => run = v); }
+  })();
+
+  /* 7) CSE card: pixel grid */
+  (() => {
+    const g = $('#pixgrid'); if (!g) return;
+    const cols = 9, rows = 6; g.style.gridTemplateColumns = `repeat(${cols},1fr)`; g.style.gridTemplateRows = `repeat(${rows},1fr)`;
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < cols * rows; i++) { const px = document.createElement('span'); px.className = 'px'; px.style.background = Math.random() < 0.5 ? '#0E7A53' : '#34D399'; px.style.transitionDelay = (Math.random() * 0.4).toFixed(2) + 's'; frag.appendChild(px); }
+    g.appendChild(frag);
+  })();
+
+  /* 8) scroll companion robot buddy */
+  (() => {
+    const buddy = $('#buddy'); if (!buddy) return;
+    if (reduce || innerWidth < 900) { buddy.style.display = 'none'; return; }
+    const bubble = $('#buddyBubble');
+    const stops = [
+      { sel: '#top', side: 0.92, y: 0.5, msg: "hey, I'll show you around" },
+      { sel: '#work', side: 0.04, y: 0.42, msg: "here's where I've worked" },
+      { sel: '#research', side: 0.92, y: 0.46, msg: "poke the map, it's live" },
+      { sel: '#projects', side: 0.04, y: 0.5, msg: "stuff I build for fun" },
+      { sel: '#gallery', side: 0.92, y: 0.5, msg: "a few good moments" },
+      { sel: '#leadership', side: 0.04, y: 0.45, msg: "communities I started" },
+      { sel: '#honors', side: 0.92, y: 0.5, msg: "some wins" },
+      { sel: '#about', side: 0.04, y: 0.5, msg: "a bit about me" },
+      { sel: '#contact', side: 0.92, y: 0.55, msg: "let's talk!" },
+    ].map(s => ({ ...s, el: $(s.sel) })).filter(s => s.el);
+    if (!stops.length) { buddy.style.display = 'none'; return; }
+    let tx = innerWidth * 0.9, ty = innerHeight * 0.5, cx = tx, cy = ty, curMsg = '';
+    const pick = () => {
+      const mid = scrollY + innerHeight * 0.5; let best = stops[0];
+      for (const s of stops) { if (s.el.getBoundingClientRect().top + scrollY <= mid) best = s; }
+      tx = best.side * (innerWidth - 82) + 10; ty = best.y * innerHeight;
+      buddy.classList.toggle('flip', best.side > 0.5);
+      if (best.msg !== curMsg) { curMsg = best.msg; bubble.textContent = best.msg; }
+    };
+    addEventListener('scroll', pick, { passive: true }); addEventListener('resize', pick); pick();
+    bubble.classList.add('show');
+    const loop = () => { cx += (tx - cx) * 0.07; cy += (ty - cy) * 0.07; buddy.style.transform = `translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px)`; requestAnimationFrame(loop); };
+    loop();
   })();
 
   /* click-to-copy email */
