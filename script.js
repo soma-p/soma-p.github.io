@@ -377,48 +377,85 @@
     if (reduce) { init(); } else { requestAnimationFrame(draw); onView(cv, v => run = v); }
   })();
 
-  /* 6) AI Alliance card: a living network — hubs, signals between chapters, radar pings */
+  /* 6) AI Alliance card: a radar scope that lights up the member universities */
   (() => {
     const cv = $('#netCanvas'); if (!cv) return;
     const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
-    let W = 0, H = 0, run = true, pts = [], pulses = [], rings = [];
-    const D = 80;
-    const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    let W = 0, H = 0, run = true, nodes = [], pings = [], sweep = 0, hov = false, mx = -1e4, my = -1e4, cx = 0, cy = 0, maxR = 0;
+    const named = ['MIT', 'Stanford', 'Caltech', 'Cornell'];
+    const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); cx = W * 0.5; cy = H * 0.5; maxR = Math.hypot(W, H) * 0.55; };
     const init = () => {
-      size(); const n = Math.max(11, Math.round(W * H / 4600));
-      pts = Array.from({ length: n }, (_, i) => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, hub: i % 4 === 0, r: i % 4 === 0 ? 3.1 : 1.8 }));
-      pulses = []; rings = [];
+      size(); const total = Math.max(10, Math.round(W * H / 4200));
+      nodes = Array.from({ length: total }, (_, i) => {
+        const ang = Math.random() * Math.PI * 2, rad = (0.16 + Math.random() * 0.8) * Math.min(W, H) * 0.5;
+        return { x: cx + Math.cos(ang) * rad, y: cy + Math.sin(ang) * rad, ang: (ang % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2), lit: 0, label: i < named.length ? named[i] : null, big: i < named.length };
+      });
+      pings = [];
     };
     init(); addEventListener('resize', init);
-    let hov = false, mx = -1e4, my = -1e4;
     const host = cv.closest('.lead') || cv.parentElement;
     host.addEventListener('mousemove', e => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
     host.addEventListener('mouseenter', () => { hov = true; });
     host.addEventListener('mouseleave', () => { hov = false; mx = -1e4; my = -1e4; });
-    const spawn = () => {
-      if (pulses.length > 8) return; const a = Math.floor(Math.random() * pts.length); let b = -1, best = D;
-      for (let j = 0; j < pts.length; j++) { if (j === a) continue; const d = Math.hypot(pts[a].x - pts[j].x, pts[a].y - pts[j].y); if (d < best) { best = d; b = j; } }
-      if (b >= 0) pulses.push({ a, b, p: 0, sp: 0.02 + Math.random() * 0.02 });
-    };
+    host.addEventListener('click', () => { if (mx > -1e3) pings.push({ x: mx, y: my, r: 4, a: 0.85 }); });
     const draw = () => {
       if (run) {
         c.clearRect(0, 0, W, H);
-        pts.forEach(p => {
-          if (hov && mx > -1e3) { const dx = mx - p.x, dy = my - p.y, d = Math.hypot(dx, dy); if (d < 120 && d > 1) { p.vx += dx / d * 0.04; p.vy += dy / d * 0.04; } }   // drawn toward the cursor
-          p.vx *= 0.99; p.vy *= 0.99; p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1;
+        c.strokeStyle = 'rgba(14,122,83,.13)'; c.lineWidth = 1;
+        for (let k = 1; k <= 3; k++) { c.beginPath(); c.arc(cx, cy, maxR * k / 3.2, 0, 7); c.stroke(); }
+        c.beginPath(); c.moveTo(cx - maxR, cy); c.lineTo(cx + maxR, cy); c.moveTo(cx, cy - maxR); c.lineTo(cx, cy + maxR); c.stroke();
+        sweep = (sweep + (hov ? 0.05 : 0.02)) % (Math.PI * 2);       // rotating radar sweep with a fading trail
+        for (let k = 0; k < 26; k++) { const a = sweep - k * 0.05; c.strokeStyle = `rgba(52,211,153,${(1 - k / 26) * 0.22})`; c.lineWidth = 2; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(a) * maxR, cy + Math.sin(a) * maxR); c.stroke(); }
+        c.strokeStyle = 'rgba(159,240,200,.6)'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(sweep) * maxR, cy + Math.sin(sweep) * maxR); c.stroke();
+        nodes.forEach(n => {                                         // a node lights up as the sweep crosses it
+          const d = Math.abs(((sweep - n.ang + Math.PI) % (Math.PI * 2)) - Math.PI);
+          if (d < 0.12) n.lit = 1; n.lit *= 0.97;
+          if (hov && mx > -1e3) { const dm = Math.hypot(n.x - mx, n.y - my); if (dm < 90) n.lit = Math.max(n.lit, 1 - dm / 90); }
         });
-        for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y); if (d < D) { c.strokeStyle = `rgba(14,122,83,${(1 - d / D) * (hov ? 0.75 : 0.5)})`; c.lineWidth = 1; c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke(); } }
-        if (hov && mx > -1e3) {                                     // wire the cursor into the network
-          pts.forEach(p => { const d = Math.hypot(p.x - mx, p.y - my); if (d < 110) { c.strokeStyle = `rgba(94,234,212,${(1 - d / 110) * 0.7})`; c.lineWidth = 1.2; c.beginPath(); c.moveTo(mx, my); c.lineTo(p.x, p.y); c.stroke(); } });
-          c.fillStyle = '#5EEAD4'; c.shadowColor = '#34D399'; c.shadowBlur = 10; c.beginPath(); c.arc(mx, my, 3.2, 0, 7); c.fill(); c.shadowBlur = 0;
-        }
-        if (Math.random() < (hov ? 0.2 : 0.06)) spawn();
-        if (Math.random() < (hov ? 0.06 : 0.014)) { const h = pts.find(p => p.hub) || pts[0]; if (h) rings.push({ x: h.x, y: h.y, r: 3, a: 0.7 }); }
-        pulses.forEach(pu => { const a = pts[pu.a], b = pts[pu.b]; pu.p += pu.sp; const x = a.x + (b.x - a.x) * pu.p, y = a.y + (b.y - a.y) * pu.p; c.fillStyle = '#5EEAD4'; c.shadowColor = '#34D399'; c.shadowBlur = 8; c.beginPath(); c.arc(x, y, 2.3, 0, 7); c.fill(); c.shadowBlur = 0; });
-        pulses = pulses.filter(pu => pu.p < 1);
-        rings.forEach(rg => { rg.r += 0.7; rg.a *= 0.96; c.strokeStyle = `rgba(52,211,153,${rg.a})`; c.lineWidth = 1.2; c.beginPath(); c.arc(rg.x, rg.y, rg.r, 0, 7); c.stroke(); });
-        rings = rings.filter(rg => rg.a > 0.05);
-        pts.forEach(p => { if (p.hub) { c.fillStyle = 'rgba(52,211,153,.95)'; c.shadowColor = '#34D399'; c.shadowBlur = 8; } else { c.fillStyle = 'rgba(14,122,83,.85)'; c.shadowBlur = 0; } c.beginPath(); c.arc(p.x, p.y, p.r, 0, 7); c.fill(); c.shadowBlur = 0; });
+        for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) { const a = nodes[i], b = nodes[j]; if (a.lit < 0.25 || b.lit < 0.25) continue; const d = Math.hypot(a.x - b.x, a.y - b.y); if (d < 116) { c.strokeStyle = `rgba(52,211,153,${Math.min(a.lit, b.lit) * (1 - d / 116) * 0.65})`; c.lineWidth = 1; c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y); c.stroke(); } }
+        if (hov && mx > -1e3 && Math.random() < 0.04) pings.push({ x: mx, y: my, r: 4, a: 0.5 });
+        pings.forEach(pg => { pg.r += 1.7; pg.a *= 0.95; c.strokeStyle = `rgba(94,234,212,${pg.a})`; c.lineWidth = 1.4; c.beginPath(); c.arc(pg.x, pg.y, pg.r, 0, 7); c.stroke(); });
+        pings = pings.filter(pg => pg.a > 0.04);
+        c.font = '600 9px "Space Grotesk",sans-serif'; c.textAlign = 'center';
+        nodes.forEach(n => {
+          const lit = n.lit; c.fillStyle = `rgba(52,211,153,${0.5 + 0.5 * lit})`;
+          if (lit > 0.1) { c.shadowColor = '#34D399'; c.shadowBlur = 8 * lit; }
+          c.beginPath(); c.arc(n.x, n.y, (n.big ? 3.2 : 1.9) + lit * 1.6, 0, 7); c.fill(); c.shadowBlur = 0;
+          if (n.label) { c.fillStyle = `rgba(159,240,200,${0.4 + 0.6 * lit})`; c.fillText(n.label, n.x, n.y - 8); }
+        });
+        c.fillStyle = 'rgba(159,240,200,.9)'; c.shadowColor = '#34D399'; c.shadowBlur = 10; c.beginPath(); c.arc(cx, cy, 3.2, 0, 7); c.fill(); c.shadowBlur = 0;
+      }
+      requestAnimationFrame(draw);
+    };
+    if (reduce) { init(); draw(); run = false; } else { requestAnimationFrame(draw); onView(cv, v => run = v); }
+  })();
+
+  /* 6b) Innovate card: ideas drift up as sparks and ignite */
+  (() => {
+    const cv = $('#sparkCanvas'); if (!cv) return;
+    const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
+    let W = 0, H = 0, run = true, parts = [], hov = false, mx = -1e4, my = -1e4;
+    const size = () => { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    const mk = () => ({ x: Math.random() * W, y: H + Math.random() * 24, vy: 0.25 + Math.random() * 0.6, ph: Math.random() * 6.28, r: 1 + Math.random() * 1.8, ig: 0, cool: 50 + Math.random() * 200 });
+    const init = () => { size(); parts = Array.from({ length: Math.max(16, Math.round(W * H / 2500)) }, mk); };
+    init(); addEventListener('resize', init);
+    const host = cv.closest('.lead') || cv.parentElement;
+    host.addEventListener('mousemove', e => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+    host.addEventListener('mouseenter', () => { hov = true; });
+    host.addEventListener('mouseleave', () => { hov = false; mx = -1e4; my = -1e4; });
+    const draw = () => {
+      if (run) {
+        c.clearRect(0, 0, W, H);
+        parts.forEach(p => {
+          p.y -= p.vy; p.x += Math.sin(p.y * 0.03 + p.ph) * 0.4;
+          if (hov && mx > -1e3) { const dx = mx - p.x, dy = my - p.y, d = Math.hypot(dx, dy); if (d < 105 && d > 1) { p.x += dx / d * 0.9; p.y += dy / d * 0.9; if (d < 48 && p.cool > 12) p.cool = 12; } }   // ideas swarm + spark near the cursor
+          p.cool--; if (p.cool <= 0 && p.ig <= 0.02) { p.ig = 1; p.cool = 110 + Math.random() * 220; }
+          p.ig *= 0.93;
+          if (p.y < -12) { Object.assign(p, mk()); p.y = H + 12; }
+          c.fillStyle = `rgba(150,136,250,${0.38 + 0.55 * p.ig})`; c.shadowColor = '#8B7DF2'; c.shadowBlur = 6 + p.ig * 14;
+          c.beginPath(); c.arc(p.x, p.y, p.r + p.ig * 2.6, 0, 7); c.fill(); c.shadowBlur = 0;
+          if (p.ig > 0.3) { c.strokeStyle = `rgba(205,196,255,${p.ig * 0.7})`; c.lineWidth = 1.2; c.beginPath(); c.arc(p.x, p.y, (1 - p.ig) * 15 + 4, 0, 7); c.stroke(); }
+        });
       }
       requestAnimationFrame(draw);
     };
