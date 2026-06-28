@@ -339,10 +339,12 @@
       { t: 'A = π r²', col: '#b0431f' },
       { t: 'e = lim (1 + 1/n)ⁿ', col: '#1f6f4f' },
     ];
-    let idx = 0, phase = 'walk', t = 0, prog = 0, gx = -42, hov = false;
+    let idx = 0, phase = 'walk', t = 0, holdT = 0, prog = 0, gx = -42, hov = false, follow = false, mx = -1e4;
     const host = cv.closest('.paper') || cv.parentElement;
     host.addEventListener('mouseenter', () => { hov = true; });
     host.addEventListener('mouseleave', () => { hov = false; });
+    cv.addEventListener('mousemove', (e) => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; follow = true; });   // it ambles over to the cursor
+    cv.addEventListener('mouseleave', () => { follow = false; mx = -1e4; });
     cv.addEventListener('click', () => { if (phase === 'write' || phase === 'hold') { phase = 'erase'; prog = 0; } });
     const rr = (x, y, w, h, r) => { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); };
     const drawTutor = (fx, fy, walk, point) => {                     // a lean purple teaching bot
@@ -378,11 +380,16 @@
         c.fillStyle = '#fbfdfc'; c.strokeStyle = '#cfd8d3'; c.lineWidth = 2; rr(bx, by, bw, bh, 8); c.fill(); c.stroke();
         c.fillStyle = '#aeb9b3'; c.fillRect(bx + 14, by + bh, bw - 28, 5);
         c.fillStyle = '#1f6f4f'; c.fillRect(bx + bw - 54, by + bh + 1, 14, 3); c.fillStyle = '#2456c8'; c.fillRect(bx + bw - 36, by + bh + 1, 14, 3);
-        const sp = hov ? 1.8 : 1, targetX = bx - 20;
-        if (phase === 'walk') { gx += (targetX - gx) * 0.06 * sp; if (Math.abs(gx - targetX) < 1.2) { gx = targetX; phase = 'write'; prog = 0; } }
-        else if (phase === 'write') { prog += 0.006 * sp; if (prog >= 1) { prog = 1; phase = 'hold'; t = 0; } }
-        else if (phase === 'hold') { if (t > (hov ? 50 : 110)) { phase = 'erase'; prog = 0; } }
-        else if (phase === 'erase') { prog += 0.02 * sp; if (prog >= 1) { idx = (idx + 1) % lessons.length; phase = 'write'; prog = 0; } }
+        const sp = hov ? 1.6 : 1, home = bx - 20;
+        const rtx = (follow && mx > -1e3) ? Math.min(W - 26, Math.max(8, mx - 4)) : home;   // amble toward the cursor, else back to the board
+        gx += (rtx - gx) * 0.09;
+        const moving = Math.abs(rtx - gx) > 0.9, atBoard = !moving && gx > home - 7;
+        if (atBoard) {                                              // only teaches while standing at the board
+          if (phase === 'walk') { phase = 'write'; prog = 0; }
+          else if (phase === 'write') { prog += 0.006 * sp; if (prog >= 1) { prog = 1; phase = 'hold'; holdT = 0; } }
+          else if (phase === 'hold') { if (++holdT > (hov ? 60 : 120)) { phase = 'erase'; prog = 0; } }
+          else if (phase === 'erase') { prog += 0.02 * sp; if (prog >= 1) { idx = (idx + 1) % lessons.length; phase = 'write'; prog = 0; } }
+        }
         const f = lessons[idx];
         const fontFor = (sz) => f.mono ? `600 ${sz}px "SF Mono", Menlo, Consolas, monospace` : `600 ${sz}px Georgia, "Times New Roman", serif`;
         let fs = f.mono ? 16 : 19; c.font = fontFor(fs);
@@ -402,7 +409,7 @@
           }
         }
         if (phase !== 'walk') { c.fillStyle = 'rgba(110,120,115,.32)'; c.font = '12px Georgia, serif'; c.fillText(f.mono ? '# try it yourself' : '— worked example', txX + 2, txY + 28); }
-        drawTutor(gx, groundY, phase === 'walk', phase === 'write' || phase === 'hold');
+        drawTutor(gx, groundY, moving, atBoard && (phase === 'write' || phase === 'hold'));
       }
       requestAnimationFrame(draw);
     };
@@ -629,9 +636,11 @@
     addEventListener('scroll', onScroll, { passive: true });
     addEventListener('resize', onScroll);
     onScroll(); cx = tx; cy = ty; bubble.classList.add('show'); onStop();
-    buddy.querySelector('.buddy-bot')?.addEventListener('click', () => {   // click it and it tumbles
-      if (buddy.classList.contains('tumble')) return;
-      buddy.classList.add('tumble'); setTimeout(() => buddy.classList.remove('tumble'), 1050);
+    buddy.querySelector('.buddy-bot')?.addEventListener('click', () => {   // click it: it falls to pieces, then rebuilds
+      if (buddy.classList.contains('shatter')) return;
+      const prev = curMsg; buddy.classList.remove('present'); buddy.classList.add('shatter'); setMsg('...oof.');
+      setTimeout(() => setMsg('good as new!'), 1500);
+      setTimeout(() => { buddy.classList.remove('shatter'); setMsg(prev); }, 2100);
     });
 
     const loop = () => {
