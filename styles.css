@@ -249,7 +249,15 @@ a{color:inherit;text-decoration:none}
 /* ---------- scroll progress ---------- */
 .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--accent);z-index:200;transition:width .08s linear}
 /* a robot pup curled up asleep beside the podium */
-.lying-dog{position:absolute;left:50%;transform:translateX(-50%);top:calc(100% - 18px);width:72px;height:auto;pointer-events:none;filter:drop-shadow(0 5px 6px rgba(2,18,10,.32))}
+.lying-dog{position:absolute;left:50%;transform:translateX(-50%);top:calc(100% - 34px);width:78px;height:auto;overflow:visible;pointer-events:none;filter:drop-shadow(0 5px 6px rgba(2,18,10,.32))}
+.lying-dog .dog-core{transform-box:fill-box;transform-origin:50% 92%;animation:dogBreathe 3.4s ease-in-out infinite}
+@keyframes dogBreathe{0%,100%{transform:scaleY(1) translateY(0)}50%{transform:scaleY(1.04) translateY(-1px)}}
+.lying-dog .d-ear{transform-box:fill-box;transform-origin:80% 12%;animation:dogEar 4.6s ease-in-out infinite}
+@keyframes dogEar{0%,86%,100%{transform:rotate(0)}90%{transform:rotate(-10deg)}94%{transform:rotate(5deg)}}
+.lying-dog .z{font:700 15px Georgia,serif;fill:#cfe8da;opacity:0;transform-box:fill-box;transform-origin:center;animation:dogZ 3.6s ease-in-out infinite}
+.lying-dog .z2{animation-delay:1.2s}.lying-dog .z3{animation-delay:2.4s}
+@keyframes dogZ{0%{opacity:0;transform:translate(0,4px) scale(.7)}30%{opacity:.85}100%{opacity:0;transform:translate(7px,-22px) scale(1.1)}}
+@media(prefers-reduced-motion:reduce){.lying-dog .dog-core,.lying-dog .d-ear{animation:none}.lying-dog .z{display:none}}
 
 /* ---------- skills marquee ---------- */
 .marquee{overflow:hidden;border-block:1px solid var(--line);padding:18px 0;background:#fff;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
