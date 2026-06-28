@@ -1,5 +1,5 @@
 /* ============================================================
-   PRANAV SOMA — bold, high-contrast, modern
+   PRANAV SOMA: bold, high-contrast, modern
    white base · massive type · one deep-green accent · zero gimmicks
    ============================================================ */
 
@@ -184,7 +184,7 @@ a{color:inherit;text-decoration:none}
 .tagpill{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--accent);color:#fff;padding:4px 9px;border-radius:6px}
 .card .link{margin-top:14px;font-weight:600;color:var(--accent)}
 
-/* ---------- GALLERY — scrapbook collage of pinned polaroids ---------- */
+/* ---------- GALLERY: scrapbook collage of pinned polaroids ---------- */
 .gal{column-count:4;column-gap:16px}
 .gal figure{position:relative;break-inside:avoid;margin:0 0 14px;background:#fff;padding:8px 8px 0;border-radius:5px;
   box-shadow:0 18px 36px -18px rgba(10,10,11,.45),0 0 0 1px rgba(0,0,0,.05);
@@ -341,7 +341,7 @@ a{color:inherit;text-decoration:none}
 .orca-wave{position:absolute;inset:0;width:100%;height:100%;display:block}
 .orca-badge{position:absolute;left:18px;top:16px;z-index:2;font-family:var(--ff-d);font-size:.78rem;font-weight:600;letter-spacing:.03em;color:#9ff0c8;background:rgba(0,0,0,.3);padding:6px 13px;border-radius:100px}
 
-/* ===== agentic node-graph workflow — orbits the text ===== */
+/* ===== agentic node-graph workflow: orbits the text ===== */
 .flow-around{position:relative;overflow:hidden;padding:58px 56px 58px 0}
 .flow-around>.pno,.flow-around>div{position:relative;z-index:2}
 .flow-around>.pno{margin-top:-20px}
@@ -406,7 +406,7 @@ a{color:inherit;text-decoration:none}
 .fx-dna,.fx-pins,.fx-scan,.fx-hang,.fx-code,.fx-agents{position:absolute;right:16px;bottom:14px;z-index:0;pointer-events:none}
 /* DNA helix */
 .fx-dna{width:70px;height:96px;opacity:.95;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
-/* map pins — mini-map with route + sonar ping */
+/* map pins: mini-map with route + sonar ping */
 .fx-pins{width:82px;height:60px;opacity:.95}
 .fx-pins .map-bg{fill:rgba(14,122,83,.05);stroke:rgba(14,122,83,.2);stroke-width:1}
 .fx-pins .route{stroke-dashoffset:0;animation:routedraw 3.4s linear infinite}
@@ -417,7 +417,7 @@ a{color:inherit;text-decoration:none}
 @keyframes routedraw{to{stroke-dashoffset:-48}}
 @keyframes pindrop{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @keyframes sonar{0%{transform:scale(.3);opacity:.9}70%{opacity:0}100%{transform:scale(2.6);opacity:0}}
-/* lesion scanner — grid + lesion + lock-on box */
+/* lesion scanner: grid + lesion + lock-on box */
 .fx-scan{width:60px;height:60px;border-radius:8px;overflow:hidden;opacity:.92;background:repeating-linear-gradient(45deg,rgba(14,122,83,.07),rgba(14,122,83,.07) 4px,transparent 4px,transparent 9px)}
 .fx-scan .scan-svg{position:absolute;inset:0;width:100%;height:100%}
 .fx-scan .lesion{animation:lesionpulse 2.6s ease-in-out infinite}
@@ -431,7 +431,7 @@ a{color:inherit;text-decoration:none}
 .fx-scan .tr{top:4px;right:4px;border-left:0;border-bottom:0}
 .fx-scan .bl{bottom:4px;left:4px;border-right:0;border-top:0}
 .fx-scan .rb{bottom:4px;right:4px;border-left:0;border-top:0}
-/* swinging hanger — garment swaps between two outfits */
+/* swinging hanger: garment swaps between two outfits */
 .fx-hang{opacity:.95}
 .hang-swing{transform-box:view-box;transform-origin:32px 12px;animation:hangswing 3s ease-in-out infinite}
 .fx-hang .sA{animation:outfitswap 4.2s ease-in-out infinite}

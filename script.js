@@ -146,7 +146,7 @@
   /* ===== centerpieces ===== */
   const onView = (node, cb) => { new IntersectionObserver(es => cb(es[0].isIntersecting), { threshold: 0 }).observe(node); };
 
-  /* 1) hero neural flow-field — drifting constellation with travelling data pulses */
+  /* 1) hero neural flow-field: drifting constellation with travelling data pulses */
   (() => {
     const cv = $('#heroBg'); if (!cv) return;
     const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
@@ -265,7 +265,7 @@
     if (reduce) { gen(); reveal = 1; anim = false; draw(); } else { trigger(); }
   })();
 
-  /* 4) agentic workflow — a rounded-rect circuit that frames the text */
+  /* 4) agentic workflow: a rounded-rect circuit that frames the text */
   (() => {
     const cv = $('#agenticFlow'); if (!cv) return;
     const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
@@ -391,7 +391,7 @@
         c.fillStyle = '#1f6f4f'; c.fillRect(bx + bw - 54, by + bh + 1, 14, 3); c.fillStyle = '#2456c8'; c.fillRect(bx + bw - 36, by + bh + 1, 14, 3);
         const sp = hov ? 1.6 : 1, home = bx - 20;
         const rtx = (follow && mx > -1e3) ? Math.min(W - 26, Math.max(8, mx - 4)) : home;   // walks toward the cursor, else back to the board
-        const step = 2.2;                                           // steady walking pace — no teleporting to the cursor
+        const step = 2.2;                                           // steady walking pace, no teleporting to the cursor
         if (Math.abs(rtx - gx) > step) gx += Math.sign(rtx - gx) * step; else gx = rtx;
         const moving = Math.abs(rtx - gx) > 0.5, atBoard = !moving && gx > home - 7;
         if (phase === 'walk') { phase = 'write'; prog = 0; }        // board keeps teaching wherever the bot wanders
@@ -416,7 +416,7 @@
             c.fillStyle = '#dfe6e2'; c.strokeStyle = '#b3bdb8'; c.lineWidth = 1; rr(ex - 9, txY - 13, 15, 26, 2); c.fill(); c.stroke();
           }
         }
-        if (phase !== 'walk') { c.fillStyle = 'rgba(110,120,115,.32)'; c.font = '12px Georgia, serif'; c.fillText(f.mono ? '# try it yourself' : '— worked example', txX + 2, txY + 28); }
+        if (phase !== 'walk') { c.fillStyle = 'rgba(110,120,115,.32)'; c.font = '12px Georgia, serif'; c.fillText(f.mono ? '# try it yourself' : 'worked example', txX + 2, txY + 28); }
         drawTutor(gx, groundY, moving, atBoard && (phase === 'write' || phase === 'hold'));
       }
       requestAnimationFrame(draw);
@@ -588,7 +588,7 @@
     g.appendChild(frag);
   })();
 
-  /* 8) scroll companion: copper-golem buddy — trail, side-docking, presenting, emotes */
+  /* 8) scroll companion: copper-golem buddy: trail, side-docking, presenting, emotes */
   (() => {
     const buddy = $('#buddy'); if (!buddy) return;
     const orb = $('#askOrb');
@@ -717,7 +717,7 @@
     loop();
   })();
 
-  /* 9) BioVeritas DNA helix — twin backbones, colour-coded base pairs, verification scan */
+  /* 9) BioVeritas DNA helix: twin backbones, colour-coded base pairs, verification scan */
   (() => {
     const cv = $('#dnaCanvas'); if (!cv) return;
     const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
@@ -817,7 +817,7 @@
     }).catch(() => { location.href = 'mailto:' + el.dataset.email; });
   });
 
-  /* podium pup naps; a click wakes it — eyes open — before it dozes off again */
+  /* podium pup naps; a click wakes it (eyes open) before it dozes off again */
   (() => {
     const dog = $('.lying-dog'); if (!dog) return;
     let t;
@@ -834,21 +834,21 @@
     const log = $('#askLog'), chipsBox = $('#askChips'), form = $('#askForm'), input = $('#askIn');
     const KB = [
       { k: ['hello', 'hi', 'hey', 'yo', 'sup', 'greetings'], a: "Hey! I'm Pranav's end-crystal sidekick. Ask me about his work, projects, what he's after, or how to reach him." },
-      { k: ['who', 'about', 'yourself', 'introduce', 'summary', 'who is', 'tell me about'], a: "Pranav Soma is a CS master's student at UC San Diego (4.00 GPA) who builds AI and ships it — agentic systems, multimodal health models, and large-scale ML. He turns research into things people actually use." },
+      { k: ['who', 'about', 'yourself', 'introduce', 'summary', 'who is', 'tell me about'], a: "Pranav Soma is a CS master's student at UC San Diego (4.00 GPA) who builds AI and ships it: agentic systems, multimodal health models, and large-scale ML. He turns research into things people actually use." },
       { k: ['work', 'experience', 'job', 'servicenow', 'intern', 'company', 'employ', 'worked'], a: "He's been a software engineer at ServiceNow (shipping voice agents), worked at UCSD's Qualcomm Institute, and leads engineering in the Innovate Research Group. He also built and runs an AI tutor used by ~8,000 students." },
-      { k: ['research', 'paper', 'study', 'agentic', 'lab', 'aila'], a: "His research spans agentic AI platforms, an AI tutor with real eval pipelines, AILA, and multimodal health models — he likes problems where the model has to be both capable and trustworthy." },
+      { k: ['research', 'paper', 'study', 'agentic', 'lab', 'aila'], a: "His research spans agentic AI platforms, an AI tutor with real eval pipelines, AILA, and multimodal health models. He likes problems where the model has to be both capable and trustworthy." },
       { k: ['project', 'build', 'built', 'portfolio', 'made', 'favorite', 'best', 'cool', 'show'], a: "Highlights: ORCA (an award-winning sheet-music to audio AI), AIDE (an intent-based IDE), AgentSpace (two-way expert agents over MCP + A2A), and BioVeritas (checks scientific rigor with retrieval). They're all in the projects section, animated." },
-      { k: ['orca', 'music', 'sheet', 'audio', 'song'], a: "ORCA reads sheet music into audio and turns audio back into a score — OpenCV + neural nets + a CNN, at 98% accuracy (verified four ways, including by real musicians). It won Best Project at SAIRS 2025." },
-      { k: ['tutor', 'teach', 'student', '8000', 'learning'], a: "He built an AI tutor running for ~8,000 students, with multi-layer eval pipelines so the feedback is actually correct — not just fluent." },
+      { k: ['orca', 'music', 'sheet', 'audio', 'song'], a: "ORCA reads sheet music into audio and turns audio back into a score: OpenCV + neural nets + a CNN, at 98% accuracy (verified four ways, including by real musicians). It won Best Project at SAIRS 2025." },
+      { k: ['tutor', 'teach', 'student', '8000', 'learning'], a: "He built an AI tutor running for ~8,000 students, with multi-layer eval pipelines so the feedback is actually correct, not just fluent." },
       { k: ['agent', 'agentspace', 'aide', 'mcp', 'a2a', 'rag', 'graphrag'], a: "He's deep in agentic systems: AIDE (intent classification, code injection, runtime correctness loops) and AgentSpace (two-way GraphRAG over skill + personality embeddings, exposed over MCP and A2A for multi-agent delegation)." },
-      { k: ['skill', 'tech', 'stack', 'language', 'tool', 'know', 'expertise'], a: "Python and ML at the core — agentic frameworks, RAG/GraphRAG, OpenCV, CNNs, multimodal models — plus the ship-it stack (React, Flask, Docker). He's product-minded, not just a model-tinkerer." },
+      { k: ['skill', 'tech', 'stack', 'language', 'tool', 'know', 'expertise'], a: "Python and ML at the core: agentic frameworks, RAG/GraphRAG, OpenCV, CNNs, multimodal models, and the ship-it stack (React, Flask, Docker). He's product-minded, not just a model-tinkerer." },
       { k: ['school', 'degree', 'gpa', 'ucsd', 'university', 'college', 'grade', 'education'], a: "He's doing his CS master's at UC San Diego with a 4.00 GPA." },
-      { k: ['contact', 'email', 'reach', 'connect', 'linkedin', 'github', 'message'], a: "Easiest is email: <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>. His LinkedIn, GitHub, and résumé are all linked at the bottom of the page — and he reads everything." },
-      { k: ['hire', 'hiring', 'looking', 'seeking', 'role', 'opportunity', 'available', 'relocate', 'location', 'based', 'where'], a: "He's after roles at top AI companies — software, ML, or forward-deployed. He's based in San Diego and happy to relocate anywhere in the SF Bay Area." },
-      { k: ['robot', 'golem', 'dog', 'mascot', 'crystal', 'fun', 'animation'], a: "Ha — every creature here is hand-built SVG + canvas. The green guy is his golem guide; I'm the end-crystal that orbits it. It's his way of showing, not telling." },
+      { k: ['contact', 'email', 'reach', 'connect', 'linkedin', 'github', 'message'], a: "Easiest is email: <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>. His LinkedIn, GitHub, and résumé are all linked at the bottom of the page, and he reads everything." },
+      { k: ['hire', 'hiring', 'looking', 'seeking', 'role', 'opportunity', 'available', 'relocate', 'location', 'based', 'where'], a: "He's after roles at top AI companies: software, ML, or forward-deployed. He's based in San Diego and happy to relocate anywhere in the SF Bay Area." },
+      { k: ['robot', 'golem', 'dog', 'mascot', 'crystal', 'fun', 'animation'], a: "Ha, every creature here is hand-built SVG + canvas. The green guy is his golem guide; I'm the end-crystal that orbits it. It's his way of showing, not telling." },
       { k: ['thanks', 'thank', 'nice', 'awesome', 'great', 'love', 'amazing'], a: "Anytime! If you like what you see, his résumé and email are at the bottom of the page." },
     ];
-    const FALLBACK = "Good question — I keep it to the highlights: his work, research, projects, skills, what he's looking for, and how to reach him. Try one of those, or email him at <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>.";
+    const FALLBACK = "Good question. I keep it to the highlights: his work, research, projects, skills, what he's looking for, and how to reach him. Try one of those, or email him at <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>.";
     const STOP = new Set(['the', 'a', 'an', 'is', 'are', 'of', 'to', 'and', 'or', 'do', 'does', 'what', 'whats', 'how', 'about', 'tell', 'me', 'you', 'your', 'his', 'him', 'he', 'for', 'in', 'on', 'at', 'with', 'can', 'i', 'pranav', 'soma']);
     const norm = (s) => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((w) => w && !STOP.has(w));
     const reply = (q) => {
@@ -877,7 +877,7 @@
     let greeted = false;
     const open = () => {
       panel.hidden = false; panel.classList.remove('closing'); document.body.classList.add('chat-open');
-      if (!greeted) { greeted = true; setTimeout(() => addBot("Hey — I'm Pranav's sidekick. Ask me about his work, projects, what he's after, or how to reach him; or tap a chip below."), 240); }
+      if (!greeted) { greeted = true; setTimeout(() => addBot("Hey, I'm Pranav's sidekick. Ask me about his work, projects, what he's after, or how to reach him; or tap a chip below."), 240); }
       setTimeout(() => input.focus(), 320);
     };
     const close = () => { panel.classList.add('closing'); document.body.classList.remove('chat-open'); setTimeout(() => { panel.hidden = true; panel.classList.remove('closing'); }, 240); };
