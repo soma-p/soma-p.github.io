@@ -666,15 +666,24 @@
       }
       return py;
     };
-    const onStop = () => {                                          // dock to whichever side is closer (keeps off the text)
+    const hitsText = (box) => $$(TEXTSEL).some(el => {             // does any visible text element overlap this box?
+      const r = el.getBoundingClientRect();
+      if (!r.width || r.bottom < -30 || r.top > innerHeight + 30 || !el.textContent.trim()) return false;
+      return r.right > box.left - 6 && r.left < box.right + 6 && r.bottom > box.top - 6 && r.top < box.bottom + 6;
+    });
+    const onStop = () => {
       if (heroActive() || aboutActive()) return;
-      scrolling = false; const s = cur();
-      const side = (cx + BW / 2) < innerWidth / 2 ? 'L' : 'R';
+      scrolling = false; const s = cur(); setMsg(s.msg);
+      const settle = () => setTimeout(() => { if (!scrolling) { buddy.classList.add('present'); scheduleEmote(); } }, 440);
+      if (!hitsText(buddy.getBoundingClientRect())) {              // landed clear of any text: let it stay right there
+        buddy.classList.remove('dock-r', 'dock-l');
+        tx = cx; ty = cy; settle(); return;
+      }
+      const side = (cx + BW / 2) < innerWidth / 2 ? 'L' : 'R';     // otherwise dock to whichever side is closer, off the text
       buddy.classList.toggle('dock-r', side === 'R'); buddy.classList.toggle('dock-l', side === 'L');
       tx = side === 'L' ? 16 : innerWidth - BW - 16;
       ty = clearDockY(tx, clamp(s.y * innerHeight, 84, innerHeight - 150), 112);
-      setMsg(s.msg);
-      setTimeout(() => { if (!scrolling) { buddy.classList.add('present'); scheduleEmote(); } }, 440);
+      settle();
     };
     addEventListener('scroll', onScroll, { passive: true });
     addEventListener('resize', onScroll);
