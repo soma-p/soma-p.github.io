@@ -882,7 +882,8 @@
       "The collaborators and friends behind RAIN, the University AI Alliance, and CSE Society.",
       "The ORCA team with the Best Project award at the San Diego Undergrad Tech Conference.",
       "Demoing ORCA live: sheet music into audio, and audio back into a score.",
-      "The CSE Society crew at SanDHacks."
+      "The CSE Society crew at SanDHacks.",
+      "Admitted to Y Combinator's Startup School 2026 at the Chase Center in San Francisco."
     ];
     const open = (d) => {
       elMeta.textContent = d.meta || '';
