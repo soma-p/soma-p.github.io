@@ -626,7 +626,7 @@ a{color:inherit;text-decoration:none}
 
 /* ===== ask sidekicks: end-crystal orb + chest minecart, and the chatbot they open ===== */
 .buddy-rail{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:83;pointer-events:none;overflow:visible;opacity:0;transition:opacity .5s}
-.buddy-rail.live{opacity:.94}
+.buddy-rail.moving{opacity:.94}
 #railTie{fill:none;stroke:#6b4a2e;stroke-width:3.6;stroke-linecap:round}
 #railBack{fill:none;stroke:#566069;stroke-width:3;stroke-linecap:round}
 #railFront{fill:none;stroke:#9aa3ad;stroke-width:3.2;stroke-linecap:round}

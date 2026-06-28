@@ -616,8 +616,8 @@
     let tx = innerWidth * 0.8, ty = innerHeight * 0.3, cx = tx, cy = ty, curMsg = '', scrolling = false, stopT = 0, emoteT = 0, lastY = -1;
     let pcx = cx, pcy = cy, scl = 1;
     let oang = 0, ocx = tx, ocy = ty, orbHover = false, orbReady = false;
-    let mcx = tx, mcy = ty + 120, pmx = mcx, pmy = mcy, cartReady = false, railLive = false, cartAng = 0, faceDir = 1, cartSide = 1, parkedF = 0;
-    const railPts = [], WHEEL = 62;
+    let mcx = tx, mcy = ty + 120, pmx = mcx, pmy = mcy, cartReady = false, cartAng = 0, faceDir = 1, cartSide = 1, parkedF = 0, cartHeading = 0, moveHold = 0;
+    const railPts = [], ppPath = [], WHEEL = 62;
     if (orb) { orb.addEventListener('mouseenter', () => { orbHover = true; }); orb.addEventListener('mouseleave', () => { orbHover = false; }); }
     // rebuild the curved rail from the path the cart has travelled (segmented ties + two offset rails)
     const drawRail = () => {
@@ -640,7 +640,6 @@
       backEl.setAttribute('d', 'M' + back.join(' L'));
       frontEl.setAttribute('d', 'M' + front.join(' L'));
       tieEl.setAttribute('d', ties.join(' '));
-      if (!railLive) { rail.classList.add('live'); railLive = true; }
     };
     const cur = () => { const mid = scrollY + innerHeight * 0.5; let b = sections[0]; for (const s of sections) if (s.el.getBoundingClientRect().top + scrollY <= mid) b = s; return b; };
     const setMsg = (m) => { if (m !== curMsg) { curMsg = m; bubble.textContent = m; } };
@@ -737,21 +736,40 @@
         orb.style.filter = `drop-shadow(0 4px 10px rgba(123,44,191,.5)) brightness(${(0.82 + depth * 0.18).toFixed(2)})`;
         if (!orbReady) { orb.classList.add('live'); orbReady = true; }
       }
-      if (cart) {                                                       // chest-cart rolls on a rail at the golem's foot line, beside it, towards the page centre
-        const br = buddy.getBoundingClientRect(), gcx = cx + BW / 2, footY = br.bottom - 5;   // exact foot line at any scale
+      if (cart) {                                                       // chest-cart pure-pursues the golem along a rail; track shows only while it rolls
+        const br = buddy.getBoundingClientRect(), gcx = cx + BW / 2, footY = br.bottom - 5;
         if (gcx > innerWidth / 2 + 50) cartSide = -1; else if (gcx < innerWidth / 2 - 50) cartSide = 1;
-        const OFF = (hero || about) ? br.width * 0.34 + 36 : br.width * 0.42 + 46;   // tuck onto the podium siding when docked, else sit clear beside it
+        const OFF = (hero || about) ? br.width * 0.34 + 36 : br.width * 0.42 + 46;
         const ctgx = clamp(gcx + cartSide * OFF - 44, 6, innerWidth - 92), ctgy = footY - WHEEL;
-        mcx += (ctgx - mcx) * 0.06; mcy += (ctgy - mcy) * 0.10;
+        const pl = ppPath[ppPath.length - 1];                           // the golem-side path the cart should follow
+        if (!pl || Math.hypot(ctgx - pl.x, ctgy - pl.y) > 8) ppPath.push({ x: ctgx, y: ctgy });
+        if (ppPath.length > 60) ppPath.splice(0, ppPath.length - 60);
+        const distGoal = Math.hypot(ctgx - mcx, ctgy - mcy);
+        if (ppPath.length < 2) { mcx += (ctgx - mcx) * 0.1; mcy += (ctgy - mcy) * 0.1; }
+        else if (distGoal > 2.5) {                                      // pure pursuit: steer toward a look-ahead point on the path; capped turn rate smooths the curve
+          let ci = 0, cd = Infinity;
+          for (let i = 0; i < ppPath.length; i++) { const d = Math.hypot(ppPath[i].x - mcx, ppPath[i].y - mcy); if (d < cd) { cd = d; ci = i; } }
+          let look = ppPath[ppPath.length - 1], acc = 0;
+          for (let i = ci; i < ppPath.length - 1; i++) { const s = Math.hypot(ppPath[i + 1].x - ppPath[i].x, ppPath[i + 1].y - ppPath[i].y); if (acc + s >= 46) { look = ppPath[i + 1]; break; } acc += s; }
+          let dh = Math.atan2(look.y - mcy, look.x - mcx) - cartHeading;
+          while (dh > Math.PI) dh -= 2 * Math.PI; while (dh < -Math.PI) dh += 2 * Math.PI;
+          let rev = 1;
+          if (Math.abs(dh) > Math.PI / 2) { dh += dh > 0 ? -Math.PI : Math.PI; rev = -1; }   // goal behind → reverse, don't loop around
+          cartHeading += clamp(dh, -0.13, 0.13);                        // capped steering = smooth arc
+          cartHeading = Math.atan2(Math.sin(cartHeading), Math.cos(cartHeading));
+          const speed = Math.min(distGoal * 0.18, 38) * rev;
+          mcx += Math.cos(cartHeading) * speed; mcy += Math.sin(cartHeading) * speed;
+        }
         const vx = mcx - pmx, vy = mcy - pmy, spd = Math.hypot(vx, vy); pmx = mcx; pmy = mcy;
+        if (spd > 0.4) moveHold = 24; else if (moveHold > 0) moveHold--;
+        rail.classList.toggle('moving', moveHold > 0);                  // the track fades out when the golem isn't moving
         cart.classList.toggle('rolling', spd > 0.35);
-        if (vx > 0.3) faceDir = 1; else if (vx < -0.3) faceDir = -1;    // mirror to face the way it travels
+        const ch = Math.cos(cartHeading); if (ch > 0.15) faceDir = 1; else if (ch < -0.15) faceDir = -1;   // face the way it points
         if (cartFace) cartFace.setAttribute('transform', faceDir < 0 ? 'translate(96,0) scale(-1,1)' : '');
-        const gpx = mcx + 44, gpy = mcy + WHEEL;                        // wheel-contact point feeds the rail
+        const gpx = mcx + 44, gpy = mcy + WHEEL;
         if (Math.abs(vx) < 0.5) parkedF++; else parkedF = 0;
-        if (parkedF > 6) {                                              // parked: a clean, level siding under the cart
-          railPts.length = 0; railPts.push({ x: gpx - 74, y: gpy }, { x: gpx - 34, y: gpy }, { x: gpx + 6, y: gpy });
-        } else {                                                        // travelling: lay curved track along the path it takes
+        if (parkedF > 6) { railPts.length = 0; railPts.push({ x: gpx - 74, y: gpy }, { x: gpx - 34, y: gpy }, { x: gpx + 6, y: gpy }); }
+        else {
           const last = railPts[railPts.length - 1];
           if (!last || Math.abs(gpx - last.x) > 5) railPts.push({ x: gpx, y: gpy });
           let len = 0;
