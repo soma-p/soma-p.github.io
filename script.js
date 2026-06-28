@@ -591,9 +591,8 @@
   /* 8) scroll companion: copper-golem buddy — trail, side-docking, presenting, emotes */
   (() => {
     const buddy = $('#buddy'); if (!buddy) return;
-    const orb = $('#askOrb'), cart = $('#askCart'), rail = $('#buddyRail');
-    const cartFace = cart && cart.querySelector('.cart-face'), tieEl = $('#railTie'), backEl = $('#railBack'), frontEl = $('#railFront');
-    if (reduce || innerWidth < 900) { buddy.style.display = 'none'; [orb, cart, rail].forEach(el => { if (el) el.style.display = 'none'; }); return; }
+    const orb = $('#askOrb');
+    if (reduce || innerWidth < 900) { buddy.style.display = 'none'; if (orb) orb.style.display = 'none'; return; }
     const bubble = $('#buddyBubble');
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
     const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.32;    // big, perched on its base at the top
@@ -616,31 +615,7 @@
     let tx = innerWidth * 0.8, ty = innerHeight * 0.3, cx = tx, cy = ty, curMsg = '', scrolling = false, stopT = 0, emoteT = 0, lastY = -1;
     let pcx = cx, pcy = cy, scl = 1;
     let oang = 0, ocx = tx, ocy = ty, orbHover = false, orbReady = false;
-    let mcx = tx, mcy = ty + 120, pmx = mcx, pmy = mcy, cartReady = false, cartAng = 0, faceDir = 1, cartSide = 1, parkedF = 0, cartHeading = 0, moveHold = 0;
-    const railPts = [], ppPath = [], WHEEL = 62;
     if (orb) { orb.addEventListener('mouseenter', () => { orbHover = true; }); orb.addEventListener('mouseleave', () => { orbHover = false; }); }
-    // rebuild the curved rail from the path the cart has travelled (segmented ties + two offset rails)
-    const drawRail = () => {
-      if (railPts.length < 2 || !backEl) return;
-      const pts = railPts.slice(), n = pts.length, h = pts[n - 1], hb = pts[Math.max(0, n - 3)];
-      let tX = h.x - hb.x, tY = h.y - hb.y; const tl = Math.hypot(tX, tY) || 1; tX /= tl; tY /= tl;
-      pts.push({ x: h.x + tX * 56, y: h.y + tY * 56 });                 // a little track ahead of the cart
-      const t0 = pts[0], t1 = pts[1]; let bX = t0.x - t1.x, bY = t0.y - t1.y; const bl = Math.hypot(bX, bY) || 1;
-      pts.unshift({ x: t0.x + bX / bl * 14, y: t0.y + bY / bl * 14 });  // and a touch behind
-      const g = 3.4, back = [], front = [], ties = []; let acc = 0;
-      for (let i = 0; i < pts.length; i++) {
-        const p = pts[i], pa = pts[Math.max(0, i - 1)], pb = pts[Math.min(pts.length - 1, i + 1)];
-        let dx = pb.x - pa.x, dy = pb.y - pa.y; const dl = Math.hypot(dx, dy) || 1; dx /= dl; dy /= dl;
-        const nx = -dy, ny = dx;                                        // perpendicular to the track
-        back.push(`${(p.x + nx * -g).toFixed(1)} ${(p.y + ny * -g).toFixed(1)}`);
-        front.push(`${(p.x + nx * g).toFixed(1)} ${(p.y + ny * g).toFixed(1)}`);
-        if (i > 0) acc += Math.hypot(p.x - pts[i - 1].x, p.y - pts[i - 1].y);
-        if (i > 0 && acc >= 14) { acc = 0; ties.push(`M${(p.x + nx * (-g - 2.6)).toFixed(1)} ${(p.y + ny * (-g - 2.6)).toFixed(1)} L${(p.x + nx * (g + 2.6)).toFixed(1)} ${(p.y + ny * (g + 2.6)).toFixed(1)}`); }
-      }
-      backEl.setAttribute('d', 'M' + back.join(' L'));
-      frontEl.setAttribute('d', 'M' + front.join(' L'));
-      tieEl.setAttribute('d', ties.join(' '));
-    };
     const cur = () => { const mid = scrollY + innerHeight * 0.5; let b = sections[0]; for (const s of sections) if (s.el.getBoundingClientRect().top + scrollY <= mid) b = s; return b; };
     const setMsg = (m) => { if (m !== curMsg) { curMsg = m; bubble.textContent = m; } };
     const playEmote = (cls, ms) => { buddy.classList.add(cls); setTimeout(() => buddy.classList.remove(cls), ms); };
@@ -725,66 +700,17 @@
       buddy.classList.toggle('bub-l', ccx < 132);
       const vel = Math.hypot(cx - pcx, cy - pcy); pcx = cx; pcy = cy;
       buddy.classList.toggle('walking', !hero && !about && vel > 0.5);  // step the legs while moving
-      if (orb) {                                                        // end-crystal swirls the head — crossing in front of and ducking behind the golem
-        if (!orbHover) oang += scrolling ? 0.013 : 0.022;
-        const R = scrolling ? 26 : 46, hcx = cx + BW / 2, hcy = cy + 16 * scl, sn = Math.sin(oang);
-        const otx = hcx + Math.cos(oang) * R - 28, oty = hcy + sn * R * 0.5 - 31;
+      if (orb) {                                                        // end-crystal orbits the WHOLE golem (head + body), crossing in front and ducking behind
+        if (!orbHover) oang += scrolling ? 0.016 : 0.024;
+        const br = buddy.getBoundingClientRect(), sn = Math.sin(oang);
+        const f = scrolling ? 0.82 : 1, Rx = br.width * 0.64 * f, Ry = br.height * 0.5 * f;
+        const otx = br.left + br.width / 2 + Math.cos(oang) * Rx - 28, oty = br.top + br.height / 2 + sn * Ry - 31;
         ocx += (otx - ocx) * 0.16; ocy += (oty - ocy) * 0.16;
-        const depth = (sn + 1) / 2;                                     // 0 = far side (behind), 1 = near side (front)
-        orb.style.zIndex = sn > 0 ? 90 : 84;                           // pop above / tuck below the golem (z 85)
-        orb.style.transform = `translate(${ocx.toFixed(1)}px,${ocy.toFixed(1)}px) scale(${(orbHover ? 1.24 : 0.74 + depth * 0.34).toFixed(3)})`;
-        orb.style.filter = `drop-shadow(0 4px 10px rgba(123,44,191,.5)) brightness(${(0.82 + depth * 0.18).toFixed(2)})`;
+        const depth = (sn + 1) / 2;                                     // 0 = far arc (up + behind), 1 = near arc (down + in front)
+        orb.style.zIndex = sn > 0 ? 90 : 84;                           // pop in front of / tuck behind the golem (z 85)
+        orb.style.transform = `translate(${ocx.toFixed(1)}px,${ocy.toFixed(1)}px) scale(${(orbHover ? 1.24 : 0.7 + depth * 0.36).toFixed(3)})`;
+        orb.style.filter = `drop-shadow(0 4px 10px rgba(123,44,191,.5)) brightness(${(0.8 + depth * 0.2).toFixed(2)})`;
         if (!orbReady) { orb.classList.add('live'); orbReady = true; }
-      }
-      if (cart) {                                                       // chest-cart pure-pursues the golem along a rail; track shows only while it rolls
-        const br = buddy.getBoundingClientRect(), gcx = cx + BW / 2, footY = br.bottom - 5;
-        if (gcx > innerWidth / 2 + 50) cartSide = -1; else if (gcx < innerWidth / 2 - 50) cartSide = 1;
-        const OFF = (hero || about) ? br.width * 0.34 + 36 : br.width * 0.42 + 46;
-        const ctgx = clamp(gcx + cartSide * OFF - 44, 6, innerWidth - 92), ctgy = footY - WHEEL;
-        const pl = ppPath[ppPath.length - 1];                           // the golem-side path the cart should follow
-        if (!pl || Math.hypot(ctgx - pl.x, ctgy - pl.y) > 8) ppPath.push({ x: ctgx, y: ctgy });
-        if (ppPath.length > 60) ppPath.splice(0, ppPath.length - 60);
-        const distGoal = Math.hypot(ctgx - mcx, ctgy - mcy);
-        if (ppPath.length < 2) { mcx += (ctgx - mcx) * 0.1; mcy += (ctgy - mcy) * 0.1; }
-        else if (distGoal > 2.5) {                                      // pure pursuit: steer toward a look-ahead point on the path; capped turn rate smooths the curve
-          let ci = 0, cd = Infinity;
-          for (let i = 0; i < ppPath.length; i++) { const d = Math.hypot(ppPath[i].x - mcx, ppPath[i].y - mcy); if (d < cd) { cd = d; ci = i; } }
-          let look = ppPath[ppPath.length - 1], acc = 0;
-          for (let i = ci; i < ppPath.length - 1; i++) { const s = Math.hypot(ppPath[i + 1].x - ppPath[i].x, ppPath[i + 1].y - ppPath[i].y); if (acc + s >= 46) { look = ppPath[i + 1]; break; } acc += s; }
-          let dh = Math.atan2(look.y - mcy, look.x - mcx) - cartHeading;
-          while (dh > Math.PI) dh -= 2 * Math.PI; while (dh < -Math.PI) dh += 2 * Math.PI;
-          let rev = 1;
-          if (Math.abs(dh) > Math.PI / 2) { dh += dh > 0 ? -Math.PI : Math.PI; rev = -1; }   // goal behind → reverse, don't loop around
-          cartHeading += clamp(dh, -0.13, 0.13);                        // capped steering = smooth arc
-          cartHeading = Math.atan2(Math.sin(cartHeading), Math.cos(cartHeading));
-          const speed = Math.min(distGoal * 0.18, 38) * rev;
-          mcx += Math.cos(cartHeading) * speed; mcy += Math.sin(cartHeading) * speed;
-        }
-        const vx = mcx - pmx, vy = mcy - pmy, spd = Math.hypot(vx, vy); pmx = mcx; pmy = mcy;
-        if (spd > 0.4) moveHold = 24; else if (moveHold > 0) moveHold--;
-        rail.classList.toggle('moving', moveHold > 0);                  // the track fades out when the golem isn't moving
-        cart.classList.toggle('rolling', spd > 0.35);
-        const ch = Math.cos(cartHeading); if (ch > 0.15) faceDir = 1; else if (ch < -0.15) faceDir = -1;   // face the way it points
-        if (cartFace) cartFace.setAttribute('transform', faceDir < 0 ? 'translate(96,0) scale(-1,1)' : '');
-        const gpx = mcx + 44, gpy = mcy + WHEEL;
-        if (Math.abs(vx) < 0.5) parkedF++; else parkedF = 0;
-        if (parkedF > 6) { railPts.length = 0; railPts.push({ x: gpx - 74, y: gpy }, { x: gpx - 34, y: gpy }, { x: gpx + 6, y: gpy }); }
-        else {
-          const last = railPts[railPts.length - 1];
-          if (!last || Math.abs(gpx - last.x) > 5) railPts.push({ x: gpx, y: gpy });
-          let len = 0;
-          for (let i = railPts.length - 1; i > 0; i--) { len += Math.hypot(railPts[i].x - railPts[i - 1].x, railPts[i].y - railPts[i - 1].y); if (len > 150) { railPts.splice(0, i); break; } }
-        }
-        drawRail();
-        let ang = 0;                                                    // tilt to the slope of the rail beneath it
-        if (railPts.length > 1) {
-          const a = railPts[Math.max(0, railPts.length - 4)], b = railPts[railPts.length - 1];
-          let dx = b.x - a.x, dy = b.y - a.y; if (dx < 0) { dx = -dx; dy = -dy; }
-          if (Math.hypot(dx, dy) > 3) ang = clamp(Math.atan2(dy, dx) * 180 / Math.PI, -17, 17);
-        }
-        cartAng += (ang - cartAng) * 0.12;
-        cart.style.transform = `translate(${mcx.toFixed(1)}px,${mcy.toFixed(1)}px) rotate(${cartAng.toFixed(2)}deg)`;
-        if (!cartReady) { cart.classList.add('live'); cartReady = true; }
       }
       requestAnimationFrame(loop);
     };
@@ -907,7 +833,7 @@
     const panel = $('#askPanel'); if (!panel) return;
     const log = $('#askLog'), chipsBox = $('#askChips'), form = $('#askForm'), input = $('#askIn');
     const KB = [
-      { k: ['hello', 'hi', 'hey', 'yo', 'sup', 'greetings'], a: "Hey! I'm Pranav's end-crystal sidekick (the chest-cart works too). Ask me about his work, projects, what he's after, or how to reach him." },
+      { k: ['hello', 'hi', 'hey', 'yo', 'sup', 'greetings'], a: "Hey! I'm Pranav's end-crystal sidekick. Ask me about his work, projects, what he's after, or how to reach him." },
       { k: ['who', 'about', 'yourself', 'introduce', 'summary', 'who is', 'tell me about'], a: "Pranav Soma is a CS master's student at UC San Diego (4.00 GPA) who builds AI and ships it — agentic systems, multimodal health models, and large-scale ML. He turns research into things people actually use." },
       { k: ['work', 'experience', 'job', 'servicenow', 'intern', 'company', 'employ', 'worked'], a: "He's been a software engineer at ServiceNow (shipping voice agents), worked at UCSD's Qualcomm Institute, and leads engineering in the Innovate Research Group. He also built and runs an AI tutor used by ~8,000 students." },
       { k: ['research', 'paper', 'study', 'agentic', 'lab', 'aila'], a: "His research spans agentic AI platforms, an AI tutor with real eval pipelines, AILA, and multimodal health models — he likes problems where the model has to be both capable and trustworthy." },
@@ -919,7 +845,7 @@
       { k: ['school', 'degree', 'gpa', 'ucsd', 'university', 'college', 'grade', 'education'], a: "He's doing his CS master's at UC San Diego with a 4.00 GPA." },
       { k: ['contact', 'email', 'reach', 'connect', 'linkedin', 'github', 'message'], a: "Easiest is email: <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>. His LinkedIn, GitHub, and résumé are all linked at the bottom of the page — and he reads everything." },
       { k: ['hire', 'hiring', 'looking', 'seeking', 'role', 'opportunity', 'available', 'relocate', 'location', 'based', 'where'], a: "He's after roles at top AI companies — software, ML, or forward-deployed. He's based in San Diego and happy to relocate anywhere in the SF Bay Area." },
-      { k: ['robot', 'golem', 'dog', 'mascot', 'crystal', 'minecart', 'chest', 'fun', 'animation'], a: "Ha — every creature here is hand-built SVG + canvas. The green guy is his golem guide; I'm the end-crystal (and chest-cart) it carries around. It's his way of showing, not telling." },
+      { k: ['robot', 'golem', 'dog', 'mascot', 'crystal', 'fun', 'animation'], a: "Ha — every creature here is hand-built SVG + canvas. The green guy is his golem guide; I'm the end-crystal that orbits it. It's his way of showing, not telling." },
       { k: ['thanks', 'thank', 'nice', 'awesome', 'great', 'love', 'amazing'], a: "Anytime! If you like what you see, his résumé and email are at the bottom of the page." },
     ];
     const FALLBACK = "Good question — I keep it to the highlights: his work, research, projects, skills, what he's looking for, and how to reach him. Try one of those, or email him at <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>.";
@@ -955,9 +881,8 @@
       setTimeout(() => input.focus(), 320);
     };
     const close = () => { panel.classList.add('closing'); document.body.classList.remove('chat-open'); setTimeout(() => { panel.hidden = true; panel.classList.remove('closing'); }, 240); };
-    const orb = $('#askOrb'), cart = $('#askCart'), fab = $('#askFab'), x = $('#askClose');
+    const orb = $('#askOrb'), fab = $('#askFab'), x = $('#askClose');
     if (orb) orb.addEventListener('click', open);
-    if (cart) cart.addEventListener('click', open);
     if (fab) fab.addEventListener('click', open);
     if (x) x.addEventListener('click', close);
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) close(); });
