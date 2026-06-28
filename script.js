@@ -834,11 +834,94 @@
     let t1, t2;
     dog.addEventListener('click', () => {
       dog.classList.remove('barking'); void dog.offsetWidth;        // restart the bark burst on every click
-      dog.classList.add('awake', 'sit', 'barking');
+      dog.classList.add('sit', 'barking');
       clearTimeout(t1); clearTimeout(t2);
       t1 = setTimeout(() => dog.classList.remove('barking'), 820);
-      t2 = setTimeout(() => dog.classList.remove('awake', 'sit'), 2600);
+      t2 = setTimeout(() => dog.classList.remove('sit'), 2600);
     });
+  })();
+
+  /* detail modals: click a project, a gallery photo, or a leadership card for the full story */
+  (() => {
+    const modal = $('#infoModal'); if (!modal) return;
+    const elTitle = $('#imTitle'), elMeta = $('#imMeta'), elBody = $('#imBody'), elFig = $('#imFig'), elImg = $('#imImg'), card = modal.querySelector('.im-card');
+    const PROJECTS = [
+      { meta: 'Best Project, SDTC (1 of 30 from 200+), SAIRS 2025', title: 'ORCA', body: [
+        "ORCA (Orchestration and Recognition for Composition and Arrangement) is a two-way bridge between sheet music and sound. Point it at a printed score and it plays the piece back; hand it a recording and it writes the score. OpenCV reads the page and segments the notation, a stack of neural nets separates the individual instruments, and a CNN transcribes it all into a clean, readable score.",
+        "It lands at 98% accuracy, verified four different ways, including a blind check by real musicians. ORCA won Best Project at the San Diego Undergrad Tech Conference, picked as 1 of 30 from 200+ submissions, and was shown at SAIRS 2025. Built with OpenCV, CNNs, Flask, Docker, and React."] },
+      { meta: 'Engineering manager, team of 11, raised $75K', title: 'Spay.LA', body: [
+        "Spay.LA is a fundraising and advocacy platform built for a real nonprofit client. Pranav led it as engineering manager of a team of 11, owning the whole arc from scoping the requirements with the client to shipping the product.",
+        "It raised $75K for the cause. Beyond the code, the project was about running a team and a client relationship at the same time: turning a fuzzy brief into a concrete build, keeping eleven people pointed the same direction, and making sure the thing actually shipped. <a href=\"https://www.spay.la/\" target=\"_blank\" rel=\"noopener\">spay.la</a>"] },
+      { meta: 'Innovate Research Group', title: 'AIDE', body: [
+        "AIDE (AI Integrated Developer Environment) is an intent-based, zero-touch IDE: you describe what you want in plain language and it produces working code. Under the hood it runs multi-layer intent classification to figure out what you actually mean, slot-filling to gather the missing details, and direct code injection into your project.",
+        "What makes it more than a code generator is the runtime correctness loop: AIDE wires generated code into CI/CD and checks it against real execution context, so it can catch and fix its own mistakes instead of handing you something that looks right but does not run."] },
+      { meta: 'Innovate Research Group', title: 'AgentSpace', body: [
+        "AgentSpace is a two-way marketplace for expertise. On one side, professionals pour their personality and toolset into a hireable virtual agent; on the other, users hire that agent and put it to work. The goal is to let someone's way of thinking and working scale past their own hours.",
+        "It runs on two-way GraphRAG over both skill and personality embeddings (in the spirit of Gemini Gems and Claude Skills), and the agents are exposed over MCP and A2A so they can share context and delegate to one another. That makes it less a single chatbot and more a network of specialists that collaborate."] },
+      { meta: 'AI for scientific rigor', title: 'BioVeritas', body: [
+        "BioVeritas reads a piece of biology research and judges how sound and honest it actually is. Instead of just summarizing a paper, it interrogates it: checking claims, flagging weak or overstated results, and surfacing where the evidence does and does not hold up.",
+        "Every flag is backed by retrieval, so the tool points to the supporting or contradicting literature rather than asking you to trust it blindly. It is Pranav's take on using AI to defend scientific rigor instead of flooding the world with more unchecked text."] },
+      { meta: 'Software developer', title: 'Union Station Housing', body: [
+        "A listing platform built for the main housing provider in greater Los Angeles. It handles photo and video upload for each listing, validates the forms staff fill out, and supports bulk data exports so the team can pull everything they need at once.",
+        "The brief was unglamorous but real: make it fast and reliable for the people who manage housing at scale, with the kind of media handling and data tooling an internal team actually uses day to day."] },
+      { meta: 'Innovate Research Group', title: 'Skin Lesion Detector', body: [
+        "An image classifier that spots skin lesions from a photo, built specifically to run on small, on-device hardware rather than a big server. The constraint shaped the whole design: the model has to be accurate enough to be useful and light enough to run where there is no GPU or reliable connection.",
+        "It is part of a recurring theme in Pranav's work: taking a capable model and getting it to run somewhere it can actually reach the person who needs it."] },
+      { meta: 'Innovate Research Group', title: 'Virtual Trial Room', body: [
+        "A 3D virtual fitting room that uses deep learning and computer vision to show how clothes look on you without physically trying them on. It reconstructs the garment and the wearer in 3D so the fit and the drape read as believable rather than a flat overlay.",
+        "The aim is the part of online shopping that is still broken: giving people enough confidence in how something will actually look that they do not have to guess."] }
+    ];
+    const LEADS = [
+      { meta: 'Co-founder and president', title: 'Real World AI Network (RAIN)', body: [
+        "RAIN is a 7,000+ student organization Pranav co-founded that spans UC San Diego's engineering, data science, and business schools. It exists to push AI research, building, and startups across the whole university, not just inside one department.",
+        "Running something at that scale is its own engineering problem: programming, partnerships, and a community large enough that the crowd around a problem starts to matter as much as the problem. <a href=\"https://rain.ucsd.edu\" target=\"_blank\" rel=\"noopener\">rain.ucsd.edu</a>"] },
+      { meta: "Founding board, VP of external affairs, nation's largest", title: 'University AI Alliance', body: [
+        "The University AI Alliance is the largest student-led AI initiative in the country, with members from MIT, Stanford, Caltech, and Cornell. Pranav sits on its founding board as VP of external affairs.",
+        "That is the outward-facing role: he runs the relationships with VCs like the a16z speedrun and Techstars, and with people from Google and Meta, connecting a national student network to the institutions that can fund and hire from it."] },
+      { meta: 'President', title: 'CSE Society @ UCSD', body: [
+        "As president of UC San Diego's oldest computing organization (100+ members), Pranav runs career fairs, conferences, talks, and a research journal. The Society also partners with the Linux Foundation and Cisco on open source.",
+        "It is the institutional-backbone version of community building: keeping a decades-old org useful to current students while plugging it into the wider open-source and industry world. <a href=\"https://csesucsd.com\" target=\"_blank\" rel=\"noopener\">csesucsd.com</a>"] },
+      { meta: 'Founder', title: 'Innovate Research Group', body: [
+        "Pranav founded the Innovate Research Group to bring AI into other fields, working across UCLA, UCSB, and UCSC. He ran 30+ people across ORCA and several other projects.",
+        "It is where a lot of his cross-disciplinary work starts: AIDE, AgentSpace, the Skin Lesion Detector, and the Virtual Trial Room all came out of it. A group built specifically to point AI at problems that live outside computer science."] }
+    ];
+    const GALLERY = [
+      "Receiving the ServiceNow Technical Skills Award at UCSD's Summer Internship Symposium, given to the top intern out of 800+.",
+      "The student-org crew. A lot of the work here is really about the people who show up to build alongside you.",
+      "Graduating with a B.S. in Computer Science from UC San Diego, cum laude with department honors, in two years.",
+      "Class of 2025. Undergrad finished in two years, with the master's a year and a quarter behind it.",
+      "Mid-hackathon. Most of the projects on this site started as a long night and a whiteboard.",
+      "The collaborators and friends behind RAIN, the University AI Alliance, and CSE Society.",
+      "The ORCA team with the Best Project award at the San Diego Undergrad Tech Conference.",
+      "Demoing ORCA live: sheet music into audio, and audio back into a score.",
+      "The CSE Society crew at SanDHacks."
+    ];
+    const open = (d) => {
+      elMeta.textContent = d.meta || '';
+      elTitle.textContent = d.title || '';
+      elBody.innerHTML = '';
+      (d.body || []).forEach((p) => { const el = document.createElement('p'); el.innerHTML = p; elBody.appendChild(el); });
+      if (d.img) { elImg.src = d.img; elImg.alt = d.alt || ''; elFig.hidden = false; } else { elFig.hidden = true; }
+      modal.hidden = false; modal.classList.remove('closing'); if (card) card.scrollTop = 0;
+      setTimeout(() => modal.querySelector('.im-x')?.focus(), 60);
+    };
+    const close = () => { modal.classList.add('closing'); setTimeout(() => { modal.hidden = true; modal.classList.remove('closing'); }, 200); };
+    const wire = (els, arr, gallery) => els.forEach((el, i) => {
+      if (!gallery && !arr[i]) return;
+      el.classList.add('im-trigger'); el.tabIndex = 0; el.setAttribute('role', 'button');
+      const go = (e) => {
+        if (e.target.closest && e.target.closest('a')) return;        // let inner links do their thing
+        if (gallery) { const im = el.querySelector('img'), cap = el.querySelector('figcaption'); open({ title: cap ? cap.textContent : '', img: im.src, alt: im.alt, body: [arr[i] || ''] }); }
+        else open(arr[i]);
+      };
+      el.addEventListener('click', go);
+      el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(e); } });
+    });
+    wire($$('#projects .card'), PROJECTS, false);
+    wire($$('#leadership .lead'), LEADS, false);
+    wire($$('#gallery figure'), GALLERY, true);
+    modal.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', close));
+    addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) close(); });
   })();
 
   /* the end-crystal and the chest-minecart both open a little chatbot about Pranav */
