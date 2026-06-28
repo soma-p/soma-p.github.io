@@ -606,7 +606,7 @@
     if (reduce || innerWidth < 900) { buddy.style.display = 'none'; if (orb) orb.style.display = 'none'; return; }
     const bubble = $('#buddyBubble');
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-    const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.32;    // big, perched on its base at the top
+    const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.12;    // perched on its base at the top (kept clear of the nav)
     const heroActive = () => scrollY < HERO_TH && base && base.getBoundingClientRect().width > 0;
     const aboutBase = $('#contactBase'), ABOUT_SCALE = 0.84;         // settles onto its podium in the contact green, among the lineup
     const aboutActive = () => { if (!aboutBase) return false; const r = aboutBase.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight * 0.84 && r.bottom > innerHeight * 0.18; };
