@@ -345,7 +345,7 @@
     host.addEventListener('mouseleave', () => { hov = false; });
     cv.addEventListener('mousemove', (e) => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; follow = true; });   // it ambles over to the cursor
     cv.addEventListener('mouseleave', () => { follow = false; mx = -1e4; });
-    cv.addEventListener('click', () => { if (phase === 'write' || phase === 'hold') { phase = 'erase'; prog = 0; } });
+    host.addEventListener('click', () => { if (phase !== 'erase') { phase = 'erase'; prog = 0; } });   // click anywhere on the card → next lesson
     const rr = (x, y, w, h, r) => { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); };
     const drawTutor = (fx, fy, walk, point) => {                     // a lean purple teaching bot
       c.save(); c.translate(fx, fy); c.lineJoin = 'round';
@@ -385,12 +385,10 @@
         const step = 2.2;                                           // steady walking pace — no teleporting to the cursor
         if (Math.abs(rtx - gx) > step) gx += Math.sign(rtx - gx) * step; else gx = rtx;
         const moving = Math.abs(rtx - gx) > 0.5, atBoard = !moving && gx > home - 7;
-        if (atBoard) {                                              // only teaches while standing at the board
-          if (phase === 'walk') { phase = 'write'; prog = 0; }
-          else if (phase === 'write') { prog += 0.006 * sp; if (prog >= 1) { prog = 1; phase = 'hold'; holdT = 0; } }
-          else if (phase === 'hold') { if (++holdT > (hov ? 60 : 120)) { phase = 'erase'; prog = 0; } }
-          else if (phase === 'erase') { prog += 0.02 * sp; if (prog >= 1) { idx = (idx + 1) % lessons.length; phase = 'write'; prog = 0; } }
-        }
+        if (phase === 'walk') { phase = 'write'; prog = 0; }        // board keeps teaching wherever the bot wanders
+        else if (phase === 'write') { prog += 0.006 * sp; if (prog >= 1) { prog = 1; phase = 'hold'; holdT = 0; } }
+        else if (phase === 'hold') { if (++holdT > (hov ? 60 : 120)) { phase = 'erase'; prog = 0; } }
+        else if (phase === 'erase') { prog += 0.02 * sp; if (prog >= 1) { idx = (idx + 1) % lessons.length; phase = 'write'; prog = 0; } }
         const f = lessons[idx];
         const fontFor = (sz) => f.mono ? `600 ${sz}px "SF Mono", Menlo, Consolas, monospace` : `600 ${sz}px Georgia, "Times New Roman", serif`;
         let fs = f.mono ? 16 : 19; c.font = fontFor(fs);
