@@ -589,7 +589,7 @@
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
     const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.32;    // big, perched on its base at the top
     const heroActive = () => scrollY < HERO_TH && base && base.getBoundingClientRect().width > 0;
-    const aboutBase = $('#contactBase'), ABOUT_SCALE = 1.05;         // settles onto its podium in the contact green, among the lineup
+    const aboutBase = $('#contactBase'), ABOUT_SCALE = 0.88;         // settles onto its podium in the contact green, among the lineup
     const aboutActive = () => { if (!aboutBase) return false; const r = aboutBase.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight * 0.84 && r.bottom > innerHeight * 0.18; };
     if (aboutBase) new IntersectionObserver(es => aboutBase.classList.toggle('in', es[0].isIntersecting), { threshold: 0 }).observe(aboutBase);
     const sections = [
@@ -639,9 +639,10 @@
     onScroll(); cx = tx; cy = ty; bubble.classList.add('show'); onStop();
     buddy.querySelector('.buddy-bot')?.addEventListener('click', () => {   // click it: it falls to pieces, then rebuilds
       if (buddy.classList.contains('shatter')) return;
-      const prev = curMsg; buddy.classList.remove('present'); buddy.classList.add('shatter'); setMsg('...oof.');
-      setTimeout(() => setMsg('good as new!'), 1500);
-      setTimeout(() => { buddy.classList.remove('shatter'); setMsg(prev); }, 2100);
+      const prev = curMsg; buddy.classList.remove('present'); buddy.classList.add('shatter'); setMsg('...uh oh.');
+      setTimeout(() => setMsg('...still here.'), 1400);
+      setTimeout(() => setMsg('good as new!'), 2500);
+      setTimeout(() => { buddy.classList.remove('shatter'); setMsg(prev); }, 3050);
     });
 
     const loop = () => {

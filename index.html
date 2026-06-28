@@ -196,7 +196,7 @@
         <div>
           <h3>Smart Learning Hub &amp; a deployed AI tutor</h3>
           <div class="venue">Lab for Emerging Intelligence &middot; LLM reasoning &amp; fine-tuning</div>
-          <p>I lead development and testing for the Python AI Tutor and the Smart Learning Hub: educational virtual agents built on LLM reasoning, fine-tuned with LoRA/SFT/RLHF and reinforcement-learning frameworks, with Bayesian knowledge tracing to model what each student actually knows. To keep it trustworthy at scale I built a <b>two-layer evaluation pipeline</b>: a lower layer that monitors tutor outputs live, and a long-running eval layer above it that runs an <b>LLM panel of judges</b>, composing and storing each student's learning and personality metrics so the teaching keeps adapting to them. It runs for <b>8,000 students</b> across UCSD, SDSU, and Cal Poly Pomona; in an A/B test it cut TA hours <b>64%</b> and lifted engagement <b>87%</b>.</p>
+          <p>A deployed AI tutor and the platform behind it. To keep it reliable at scale, I built a <b>two-layer evaluation pipeline</b>: one layer monitors tutor outputs live; an <b>LLM panel-of-judges</b> above it composes and stores each student's learning and personality metrics so the teaching adapts. Running for <b>8,000 students</b> across UCSD, SDSU, and Cal Poly Pomona &mdash; <b>64%</b> fewer TA hours and <b>87%</b> higher engagement (A/B tested).</p>
           <div class="whiteboard" aria-hidden="true">
             <canvas id="tutorBoard" aria-label="An AI tutor writing on a whiteboard"></canvas>
           </div>
@@ -447,45 +447,40 @@
       <figure class="reveal"><img src="imgs/web/hackathon2.jpg" alt="The CSE Society crew at SanDHacks" loading="lazy" /><figcaption>SanDHacks, the whole crew</figcaption></figure>
       <!-- a patronus, curled up in the corner -->
       <div class="patronus" aria-hidden="true">
-        <svg viewBox="0 0 230 185" width="230" height="185">
+        <svg viewBox="0 0 240 170" width="240" height="170">
           <defs>
-            <radialGradient id="patBody" cx="46%" cy="40%" r="70%">
-              <stop offset="0" stop-color="#f4fcff"/><stop offset="44%" stop-color="#c2e8ff"/><stop offset="100%" stop-color="#5ea9ef"/>
-            </radialGradient>
-            <linearGradient id="patWisp" x1="0" y1="1" x2="0.2" y2="0">
-              <stop offset="0" stop-color="#9fd4ff" stop-opacity="0"/><stop offset="1" stop-color="#e8f6ff" stop-opacity=".95"/>
+            <linearGradient id="patB" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f3fbff"/><stop offset="48%" stop-color="#c8ebff"/><stop offset="100%" stop-color="#6fb2ef"/>
             </linearGradient>
+            <linearGradient id="patWisp" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#bfe4ff" stop-opacity="0"/><stop offset="1" stop-color="#eaf6ff" stop-opacity=".9"/></linearGradient>
+            <filter id="patSoft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation=".9"/></filter>
             <filter id="patGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
-            <filter id="patSoft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.1"/></filter>
           </defs>
-          <ellipse cx="120" cy="110" rx="98" ry="58" fill="#7cc0ff" opacity=".15" filter="url(#patGlow)"/>
-          <path filter="url(#patSoft)" fill="url(#patBody)" opacity=".7" d="M176 110 C204 102 220 118 215 144 C212 162 195 168 185 158 C200 156 207 140 200 126 C194 114 181 112 171 120 Z"/>
-          <g stroke="url(#patWisp)" fill="none" stroke-linecap="round" opacity=".85">
-            <path d="M203 134 C217 126 224 138 220 152" stroke-width="2.2"/><path d="M194 152 C208 152 215 164 211 176" stroke-width="1.8"/>
+          <ellipse cx="120" cy="100" rx="104" ry="56" fill="#7cc0ff" opacity=".13" filter="url(#patGlow)"/>
+          <path filter="url(#patSoft)" fill="url(#patB)" opacity=".82" d="M188 84 C210 78 228 92 228 116 C228 132 218 140 209 134 C218 124 215 108 203 99 C195 93 189 92 184 97 Z"/>
+          <path stroke="url(#patWisp)" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7" d="M222 118 C232 112 235 124 231 134"/>
+          <g fill="url(#patB)" opacity=".6" filter="url(#patSoft)">
+            <path d="M113 104 C111 124 113 142 111 156 C110 163 113 165 117 163 C119 150 119 124 119 104 Z"/>
+            <path d="M181 104 C182 118 187 130 185 144 C184 156 188 161 192 159 C193 146 188 130 189 104 Z"/>
           </g>
-          <g filter="url(#patSoft)" fill="url(#patBody)" opacity=".72">
-            <path d="M96 142 C96 158 104 166 112 162 C108 154 106 148 104 140 Z"/><path d="M120 146 C120 162 128 170 136 166 C132 158 130 152 128 144 Z"/><path d="M150 142 C152 158 160 164 167 159 C162 152 159 146 158 140 Z"/>
+          <path filter="url(#patSoft)" fill="url(#patB)" opacity=".9" d="M84 92 C82 78 96 71 116 71 C150 69 178 71 190 82 C198 90 195 102 182 106 C158 112 120 112 102 107 C92 104 86 100 84 92 Z"/>
+          <path filter="url(#patSoft)" fill="url(#patB)" opacity=".92" d="M19 72 C16 65 24 60 35 60 C43 50 56 48 64 54 C72 49 80 51 84 59 C90 68 94 80 98 94 C99 100 95 102 89 99 C85 92 81 85 77 81 C71 77 64 78 58 80 C50 82 43 82 37 80 C29 79 21 77 19 72 Z"/>
+          <path filter="url(#patSoft)" fill="url(#patB)" d="M58 55 L53 37 L68 50 Z"/>
+          <path filter="url(#patSoft)" fill="url(#patB)" d="M68 52 L76 35 L84 51 Z"/>
+          <path fill="#dff1ff" opacity=".45" d="M60 53 L57 41 L67 50 Z"/>
+          <g fill="url(#patB)" opacity=".93" filter="url(#patSoft)">
+            <path d="M101 102 C99 124 101 144 99 160 C98 168 103 170 108 167 C110 152 109 124 110 103 Z"/>
+            <path d="M169 102 C171 118 177 130 174 146 C172 160 178 165 183 162 C184 148 178 130 181 103 Z"/>
           </g>
-          <path filter="url(#patSoft)" fill="url(#patBody)" opacity=".86" d="M84 92 C104 70 150 68 176 92 C198 112 194 142 170 152 C146 162 108 160 90 150 C74 142 68 124 74 110 C77 102 80 97 84 92 Z"/>
-          <path filter="url(#patSoft)" fill="url(#patBody)" opacity=".85" d="M86 96 C76 80 66 70 60 60 C70 60 86 72 96 90 Z"/>
-          <path filter="url(#patSoft)" fill="url(#patBody)" opacity=".9" d="M28 64 C26 55 35 46 48 44 C53 35 68 35 74 46 C80 56 76 71 65 75 C57 79 45 77 39 71 C33 70 30 67 28 64 Z"/>
-          <g stroke="url(#patWisp)" fill="none" stroke-linecap="round">
-            <path d="M96 78 C96 58 90 46 96 32" stroke-width="3"/><path d="M112 72 C114 54 108 42 114 28" stroke-width="2.6"/><path d="M128 70 C132 54 128 42 136 32" stroke-width="2.4"/><path d="M84 86 C80 70 72 60 76 46" stroke-width="2.3"/><path d="M146 74 C152 60 150 48 160 42" stroke-width="2"/><path d="M162 82 C170 70 172 58 182 54" stroke-width="1.7"/>
+          <ellipse cx="44" cy="66" rx="3.6" ry="3" fill="#0a2c48"/><ellipse cx="43.4" cy="65.6" rx="2" ry="1.7" fill="#bdecff"/><circle cx="43" cy="65" r=".7" fill="#fff"/>
+          <circle cx="19" cy="71" r="2.6" fill="#2f6fab"/>
+          <path d="M24 76 q5 2 10 0" fill="none" stroke="#3a7fbf" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+          <path d="M40 60 C58 49 96 50 130 51 C160 52 182 56 195 66" fill="none" stroke="#f3fbff" stroke-width="1.4" opacity=".5" filter="url(#patSoft)"/>
+          <g stroke="url(#patWisp)" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".55">
+            <path d="M96 60 C98 48 94 40 99 32"/><path d="M120 56 C122 44 118 38 124 30"/><path d="M150 56 C154 46 152 40 160 36"/>
           </g>
-          <g stroke="#dff1ff" fill="none" stroke-linecap="round" opacity=".72">
-            <path d="M104 38 C94 28 98 16 110 16 C120 16 122 26 114 28 C108 29 108 22 112 22" stroke-width="2"/><path d="M134 36 C128 24 136 12 148 16 C156 19 154 30 146 28" stroke-width="1.7"/><path d="M78 48 C68 40 70 28 80 28" stroke-width="1.5"/>
-          </g>
-          <path d="M48 44 L42 22 L62 38 Z" fill="url(#patBody)"/><path d="M64 42 L72 20 L84 40 Z" fill="url(#patBody)"/><path d="M50 42 L46 27 L58 38 Z" fill="#dff1ff" opacity=".5"/>
-          <g stroke="#4f9fe6" fill="none" stroke-linecap="round" opacity=".85">
-            <path d="M52 50 C52 44 56 42 56 48 C56 54 52 54 52 48" stroke-width="1.3"/><path d="M56 47 L56 60" stroke-width="1.1"/><path d="M52 56 C48 58 46 62 48 66" stroke-width="1"/><path d="M60 56 C64 58 66 62 64 66" stroke-width="1"/>
-          </g>
-          <ellipse cx="45" cy="58" rx="3.3" ry="4" fill="#0a2a44"/><ellipse cx="45" cy="58" rx="1.9" ry="3" fill="#bdecff"/><circle cx="45" cy="57" r="1" fill="#fff"/>
-          <ellipse cx="60" cy="57" rx="3.3" ry="4" fill="#0a2a44"/><ellipse cx="60" cy="57" rx="1.9" ry="3" fill="#bdecff"/><circle cx="60" cy="56" r="1" fill="#fff"/>
-          <circle cx="27" cy="64" r="2.8" fill="#2f6fab"/><path d="M32 70 q5 3 11 1" fill="none" stroke="#3a7fbf" stroke-width="1" stroke-linecap="round" opacity=".55"/>
-          <ellipse cx="120" cy="104" rx="20" ry="13" fill="#f4fcff" opacity=".4" filter="url(#patSoft)"/>
           <g fill="#eaf7ff">
-            <circle class="mote m1" cx="112" cy="14" r="1.6"/><circle class="spark s1" cx="150" cy="28" r="1.3"/><circle class="mote m2" cx="86" cy="24" r="1.2"/>
-            <circle class="spark s2" cx="212" cy="126" r="1.4"/><circle class="spark s3" cx="40" cy="44" r="1.1"/><circle class="mote m3" cx="190" cy="158" r="1.3"/><circle class="spark s1" cx="70" cy="100" r="1"/>
+            <circle class="mote m1" cx="110" cy="20" r="1.5"/><circle class="spark s1" cx="150" cy="26" r="1.2"/><circle class="spark s2" cx="210" cy="98" r="1.3"/><circle class="mote m2" cx="30" cy="48" r="1.1"/><circle class="spark s3" cx="124" cy="30" r="1"/>
           </g>
         </svg>
       </div>
