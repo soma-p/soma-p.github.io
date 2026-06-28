@@ -381,9 +381,10 @@
         c.fillStyle = '#aeb9b3'; c.fillRect(bx + 14, by + bh, bw - 28, 5);
         c.fillStyle = '#1f6f4f'; c.fillRect(bx + bw - 54, by + bh + 1, 14, 3); c.fillStyle = '#2456c8'; c.fillRect(bx + bw - 36, by + bh + 1, 14, 3);
         const sp = hov ? 1.6 : 1, home = bx - 20;
-        const rtx = (follow && mx > -1e3) ? Math.min(W - 26, Math.max(8, mx - 4)) : home;   // amble toward the cursor, else back to the board
-        gx += (rtx - gx) * 0.09;
-        const moving = Math.abs(rtx - gx) > 0.9, atBoard = !moving && gx > home - 7;
+        const rtx = (follow && mx > -1e3) ? Math.min(W - 26, Math.max(8, mx - 4)) : home;   // walks toward the cursor, else back to the board
+        const step = 2.2;                                           // steady walking pace — no teleporting to the cursor
+        if (Math.abs(rtx - gx) > step) gx += Math.sign(rtx - gx) * step; else gx = rtx;
+        const moving = Math.abs(rtx - gx) > 0.5, atBoard = !moving && gx > home - 7;
         if (atBoard) {                                              // only teaches while standing at the board
           if (phase === 'walk') { phase = 'write'; prog = 0; }
           else if (phase === 'write') { prog += 0.006 * sp; if (prog >= 1) { prog = 1; phase = 'hold'; holdT = 0; } }
