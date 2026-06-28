@@ -18,12 +18,21 @@
   toggle?.addEventListener('click', () => links.classList.toggle('open'));
   $$('#navLinks a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
 
-  /* scroll progress bar */
-  const prog = $('#progress');
+  /* scroll progress bar + the robot pup that trots along it */
+  const prog = $('#progress'), pdog = $('#progDog');
+  let pLast = -1, pdogStop = 0;
   const onProg = () => {
     const h = document.documentElement;
     const p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
     if (prog) prog.style.width = (p * 100) + '%';
+    if (pdog) {
+      pdog.style.left = Math.min(innerWidth - 28, Math.max(28, p * innerWidth)).toFixed(1) + 'px';   // stay clear of the edges (html has overflow-x:hidden)
+      if (pLast >= 0 && Math.abs(p - pLast) > 0.0003) pdog.classList.toggle('rev', p < pLast);   // face the way it's heading
+      pdog.classList.add('running'); pdog.classList.remove('sitting');
+      clearTimeout(pdogStop);
+      pdogStop = setTimeout(() => { pdog.classList.remove('running'); pdog.classList.add('sitting'); }, 200);   // sits when you stop
+      pLast = p;
+    }
   };
   onProg(); addEventListener('scroll', onProg, { passive: true });
 
@@ -587,7 +596,7 @@
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
     const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.32;    // big, perched on its base at the top
     const heroActive = () => scrollY < HERO_TH && base && base.getBoundingClientRect().width > 0;
-    const aboutBase = $('#contactBase'), ABOUT_SCALE = 0.88;         // settles onto its podium in the contact green, among the lineup
+    const aboutBase = $('#contactBase'), ABOUT_SCALE = 0.84;         // settles onto its podium in the contact green, among the lineup
     const aboutActive = () => { if (!aboutBase) return false; const r = aboutBase.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight * 0.84 && r.bottom > innerHeight * 0.18; };
     if (aboutBase) new IntersectionObserver(es => aboutBase.classList.toggle('in', es[0].isIntersecting), { threshold: 0 }).observe(aboutBase);
     const sections = [

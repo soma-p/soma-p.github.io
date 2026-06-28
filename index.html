@@ -23,6 +23,44 @@
 </head>
 <body>
 <div class="progress" id="progress"></div>
+<!-- a robot pup that trots along the progress bar and sits when you stop -->
+<div class="prog-dog sitting" id="progDog" aria-hidden="true">
+  <svg class="dog-run" viewBox="0 0 98 62">
+    <path d="M16 30 C4 28 2 14 9 9 C13 6 18 9 16 14 C12 15 11 20 15 24 C18 27 22 27 25 25 Z" fill="#E9A23B"/>
+    <circle cx="8" cy="8" r="6" fill="#3B4A5E"/>
+    <g class="leg a"><rect x="22" y="34" width="9" height="22" rx="4.5" fill="#D8902E"/><ellipse cx="26.5" cy="57" rx="7" ry="4" fill="#2E3C4E"/></g>
+    <g class="leg b"><rect x="30" y="34" width="9" height="22" rx="4.5" fill="#E9A23B"/><ellipse cx="34.5" cy="57" rx="7" ry="4" fill="#3B4A5E"/></g>
+    <g class="leg b"><rect x="54" y="34" width="9" height="22" rx="4.5" fill="#D8902E"/><ellipse cx="58.5" cy="57" rx="7" ry="4" fill="#2E3C4E"/></g>
+    <g class="leg a"><rect x="62" y="34" width="9" height="22" rx="4.5" fill="#E9A23B"/><ellipse cx="66.5" cy="57" rx="7" ry="4" fill="#3B4A5E"/></g>
+    <ellipse cx="44" cy="28" rx="29" ry="16" fill="#E9A23B"/>
+    <circle cx="32" cy="32" r="5.5" fill="#3B4A5E"/>
+    <path d="M66 20 C72 17 79 19 81 25 L75 29 C72 24 67 24 63 26 Z" fill="#3B4A5E"/>
+    <path d="M64 26 C60 12 70 3 83 5 C95 7 96 22 88 30 C81 36 70 33 64 26 Z" fill="#E9A23B"/>
+    <path d="M74 7 C67 4 63 11 66 19 C68 25 74 26 78 22 C73 17 72 11 74 7 Z" fill="#3B4A5E"/>
+    <path d="M88 17 C96 16 100 20 99 26 C98 30 91 30 87 27 C84 24 84 19 88 17 Z" fill="#E9A23B"/>
+    <path d="M90 25 C95 25 98 26 99 28 C97 32 91 32 87 28 Z" fill="#3B4A5E"/>
+    <circle cx="97" cy="26" r="2.4" fill="#2B3848"/><ellipse cx="82" cy="17" rx="3.3" ry="3.8" fill="#2B3848"/>
+  </svg>
+  <svg class="dog-sit" viewBox="0 0 104 100">
+    <path class="dog-tail" d="M24 60 C9 58 5 41 13 32 C17 28 24 30 22 37 C16 38 14 46 20 51 C23 54 29 55 32 52 Z" fill="#E9A23B"/>
+    <circle cx="12" cy="30" r="7" fill="#3B4A5E"/>
+    <ellipse cx="34" cy="68" rx="24" ry="26" fill="#E9A23B"/>
+    <circle cx="35" cy="62" r="8" fill="#3B4A5E"/>
+    <ellipse cx="36" cy="92" rx="16" ry="7" fill="#3B4A5E"/>
+    <rect x="50" y="54" width="11" height="36" rx="5.5" fill="#D8902E"/>
+    <ellipse cx="55" cy="91" rx="9" ry="5.5" fill="#2E3C4E"/>
+    <path d="M30 56 C32 32 58 25 73 34 C86 42 84 64 70 70 C53 76 34 70 30 58 Z" fill="#E9A23B"/>
+    <rect x="61" y="52" width="12" height="40" rx="6" fill="#E9A23B"/>
+    <circle cx="67" cy="70" r="4.6" fill="#3B4A5E"/>
+    <ellipse cx="67" cy="92" rx="9.5" ry="6" fill="#3B4A5E"/>
+    <path d="M66 35 C75 31 84 34 86 41 L79 47 C76 41 69 41 64 43 Z" fill="#3B4A5E"/>
+    <path d="M63 44 C58 22 68 7 84 9 C99 11 101 30 92 40 C84 48 71 50 63 44 Z" fill="#E9A23B"/>
+    <path d="M77 12 C69 7 63 15 66 25 C68 33 75 34 80 29 C74 23 73 17 77 12 Z" fill="#3B4A5E"/>
+    <path d="M91 24 C100 23 105 27 104 34 C103 39 95 39 90 36 C87 33 87 26 91 24 Z" fill="#E9A23B"/>
+    <path d="M93 33 C99 33 103 34 104 36 C102 41 95 41 90 37 Z" fill="#3B4A5E"/>
+    <circle cx="102" cy="34" r="2.8" fill="#2B3848"/><ellipse cx="86" cy="24" rx="3.8" ry="4.4" fill="#2B3848"/>
+  </svg>
+</div>
 
 <header class="nav" id="nav">
   <div class="nav-inner">
@@ -586,6 +624,20 @@
         <rect x="19" y="30" width="112" height="10" fill="#0E4630"/>
         <ellipse cx="75" cy="30" rx="56" ry="13" fill="#13573C"/>
         <ellipse cx="75" cy="30" rx="56" ry="13" fill="none" stroke="#5FD89B" stroke-width="1.6" opacity=".6"/>
+      </svg>
+      <svg class="lying-dog" viewBox="0 0 110 54" aria-hidden="true">
+        <path d="M20 40 C8 42 3 36 5 29 C6 25 11 25 12 30 C12 35 16 38 22 36 Z" fill="#E9A23B"/>
+        <circle cx="6" cy="27" r="5.5" fill="#3B4A5E"/>
+        <ellipse cx="58" cy="46" rx="12" ry="5" fill="#3B4A5E"/><ellipse cx="80" cy="46" rx="12" ry="5" fill="#3B4A5E"/>
+        <rect x="50" y="34" width="38" height="12" rx="6" fill="#D8902E"/>
+        <ellipse cx="44" cy="32" rx="34" ry="16" fill="#E9A23B"/>
+        <circle cx="40" cy="34" r="5" fill="#3B4A5E"/>
+        <path d="M74 24 C80 22 86 24 88 29 L82 33 C79 28 74 28 70 30 Z" fill="#3B4A5E"/>
+        <path d="M72 30 C70 16 80 8 92 11 C103 14 103 28 95 34 C88 39 78 37 72 30 Z" fill="#E9A23B"/>
+        <path d="M82 12 C75 9 71 16 74 24 C76 30 82 30 86 26 C81 21 80 16 82 12 Z" fill="#3B4A5E"/>
+        <path d="M95 24 C103 24 107 28 106 33 C104 37 98 37 94 34 Z" fill="#E9A23B"/>
+        <path d="M97 31 C102 31 105 32 106 34 C104 38 98 38 95 35 Z" fill="#3B4A5E"/>
+        <circle cx="104" cy="33" r="2.4" fill="#2B3848"/><ellipse cx="88" cy="24" rx="3.2" ry="3" fill="#2B3848"/>
       </svg>
     </div>
     <div class="mb-wrap"><svg class="mini-bot" viewBox="0 0 44 62" width="45" height="63">
