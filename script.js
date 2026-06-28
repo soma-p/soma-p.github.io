@@ -10,6 +10,17 @@
     if (um) { const m = $('main') || document.body; m.style.transform = 'translateY(-' + um[1] + 'px)'; }
   }
 
+  /* dark-mode lever: flips + persists the theme (initial theme is set inline in <head> to avoid a flash) */
+  (() => {
+    const root = document.documentElement, btn = $('#themeToggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const dark = root.getAttribute('data-theme') === 'dark';
+      if (dark) root.removeAttribute('data-theme'); else root.setAttribute('data-theme', 'dark');
+      try { localStorage.setItem('theme', dark ? 'light' : 'dark'); } catch (e) { /* storage may be blocked */ }
+    });
+  })();
+
   /* nav: shadow + mobile menu */
   const nav = $('#nav');
   const onScroll = () => nav.classList.toggle('scrolled', scrollY > 8);
@@ -817,14 +828,16 @@
     }).catch(() => { location.href = 'mailto:' + el.dataset.email; });
   });
 
-  /* podium pup naps; a click wakes it (eyes open) before it dozes off again */
+  /* podium pup naps; a click makes it sit up, open its eyes, and bark before it settles back down */
   (() => {
     const dog = $('.lying-dog'); if (!dog) return;
-    let t;
+    let t1, t2;
     dog.addEventListener('click', () => {
-      dog.classList.add('awake');
-      clearTimeout(t);
-      t = setTimeout(() => dog.classList.remove('awake'), 2600);
+      dog.classList.remove('barking'); void dog.offsetWidth;        // restart the bark burst on every click
+      dog.classList.add('awake', 'sit', 'barking');
+      clearTimeout(t1); clearTimeout(t2);
+      t1 = setTimeout(() => dog.classList.remove('barking'), 820);
+      t2 = setTimeout(() => dog.classList.remove('awake', 'sit'), 2600);
     });
   })();
 
@@ -832,38 +845,57 @@
   (() => {
     const panel = $('#askPanel'); if (!panel) return;
     const log = $('#askLog'), chipsBox = $('#askChips'), form = $('#askForm'), input = $('#askIn');
+    // A broad knowledge base: each topic carries regex patterns (strong signal) + keywords (backup),
+    // scored and ranked per query so the best single answer wins. The chips below show only the primary ones.
     const KB = [
-      { k: ['hello', 'hi', 'hey', 'yo', 'sup', 'greetings'], a: "Hey! I'm Pranav's end-crystal sidekick. Ask me about his work, projects, what he's after, or how to reach him." },
-      { k: ['who', 'about', 'yourself', 'introduce', 'summary', 'who is', 'tell me about'], a: "Pranav Soma is a CS master's student at UC San Diego (4.00 GPA) who builds AI and ships it: agentic systems, multimodal health models, and large-scale ML. He turns research into things people actually use." },
-      { k: ['work', 'experience', 'job', 'servicenow', 'intern', 'company', 'employ', 'worked'], a: "He's been a software engineer at ServiceNow (shipping voice agents), worked at UCSD's Qualcomm Institute, and leads engineering in the Innovate Research Group. He also built and runs an AI tutor used by ~8,000 students." },
-      { k: ['research', 'paper', 'study', 'agentic', 'lab', 'aila'], a: "His research spans agentic AI platforms, an AI tutor with real eval pipelines, AILA, and multimodal health models. He likes problems where the model has to be both capable and trustworthy." },
-      { k: ['project', 'build', 'built', 'portfolio', 'made', 'favorite', 'best', 'cool', 'show'], a: "Highlights: ORCA (an award-winning sheet-music to audio AI), AIDE (an intent-based IDE), AgentSpace (two-way expert agents over MCP + A2A), and BioVeritas (checks scientific rigor with retrieval). They're all in the projects section, animated." },
-      { k: ['orca', 'music', 'sheet', 'audio', 'song'], a: "ORCA reads sheet music into audio and turns audio back into a score: OpenCV + neural nets + a CNN, at 98% accuracy (verified four ways, including by real musicians). It won Best Project at SAIRS 2025." },
-      { k: ['tutor', 'teach', 'student', '8000', 'learning'], a: "He built an AI tutor running for ~8,000 students, with multi-layer eval pipelines so the feedback is actually correct, not just fluent." },
-      { k: ['agent', 'agentspace', 'aide', 'mcp', 'a2a', 'rag', 'graphrag'], a: "He's deep in agentic systems: AIDE (intent classification, code injection, runtime correctness loops) and AgentSpace (two-way GraphRAG over skill + personality embeddings, exposed over MCP and A2A for multi-agent delegation)." },
-      { k: ['skill', 'tech', 'stack', 'language', 'tool', 'know', 'expertise'], a: "Python and ML at the core: agentic frameworks, RAG/GraphRAG, OpenCV, CNNs, multimodal models, and the ship-it stack (React, Flask, Docker). He's product-minded, not just a model-tinkerer." },
-      { k: ['school', 'degree', 'gpa', 'ucsd', 'university', 'college', 'grade', 'education'], a: "He's doing his CS master's at UC San Diego with a 4.00 GPA." },
-      { k: ['contact', 'email', 'reach', 'connect', 'linkedin', 'github', 'message'], a: "Easiest is email: <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>. His LinkedIn, GitHub, and résumé are all linked at the bottom of the page, and he reads everything." },
-      { k: ['hire', 'hiring', 'looking', 'seeking', 'role', 'opportunity', 'available', 'relocate', 'location', 'based', 'where'], a: "He's after roles at top AI companies: software, ML, or forward-deployed. He's based in San Diego and happy to relocate anywhere in the SF Bay Area." },
-      { k: ['robot', 'golem', 'dog', 'mascot', 'crystal', 'fun', 'animation'], a: "Ha, every creature here is hand-built SVG + canvas. The green guy is his golem guide; I'm the end-crystal that orbits it. It's his way of showing, not telling." },
-      { k: ['thanks', 'thank', 'nice', 'awesome', 'great', 'love', 'amazing'], a: "Anytime! If you like what you see, his résumé and email are at the bottom of the page." },
+      { re: [/\b(hi+|hey+|hello+|yo+|sup|howdy|greetings|good (morning|afternoon|evening)|what'?s up)\b/], kw: ['hello', 'hi', 'hey'], a: "Hey! I'm Pranav's end-crystal sidekick. Ask me anything about his work, research, projects, skills, education, what he's looking for, or how to reach him." },
+      { re: [/\b(who'?s|who (is|are)|about (him|pranav|himself)|tell me about|introduce|summar(y|ize|ise)|overview|in (a nutshell|short)|tl;?dr|describe (him|pranav)|elevator|what (does|do).{0,12}\bdo\b)\b/], kw: ['who', 'about', 'summary', 'overview', 'introduce', 'bio'], a: "Pranav Soma is a CS master's student at UC San Diego (4.00 GPA) who builds AI and ships it. He's a software engineer at ServiceNow, leads a university-wide agentic AI platform used by 7,000+ people, trains multimodal health models on a supercomputer, and has an AI tutor running for 8,000 students. The constant is carrying a problem from the math all the way to the deploy button." },
+      { re: [/\b(why (should|would|do|i'?d|we'?d)?\s*.{0,14}(hire|pick|choose|want|consider)|why (him|pranav|you)|hire him|stand ?out|set him apart|what makes him|his (strength|edge)|best (fit|candidate|hire)|sell me|convince|the pitch|impressive|special about)\b/], kw: ['why', 'hire', 'strengths', 'standout', 'pitch'], a: "Short version: he's rare in how wide he goes and how far he ships. He's taken AI from research into production at ServiceNow, a tutor for 8,000 students, and health models for emergency care, all while leading 7,000+ person communities. He moved fast (undergrad in two years, master's in one and a quarter, 4.00 GPA) and was the top intern of 800+ at ServiceNow. He'd rather own a problem from the theory to the deploy button than stop at either end." },
+      { w: 4, re: [/\b(work(s|ed)?( on| at| for)?|experience|jobs?|career|employ|professional|companies|internship)\b/], kw: ['work', 'experience', 'job', 'intern', 'career', 'company'], a: "Four very different teams: Software Engineer at ServiceNow (AI voice agents, in production), AI Research Fellow & Agentic Systems Lead at the Lab for Emerging Intelligence (a platform for 7,000+ people plus an AI tutor for 8,000 students), Graduate Researcher at UCSD's Qualcomm Institute (multimodal health AI), and intern lead at Work4Flow (GenAI tooling). Ask about any one of them." },
+      { re: [/\bservice ?now\b|voice agent|aws lex|\blex\b|return offer|top intern/], kw: ['servicenow', 'voice', 'lex', 'latency'], a: "At ServiceNow he works on the AI Voice Agents platform. He migrated it off a soon-to-be-killed AWS Lex version ahead of schedule and into production (tested live with customers before the internship ended), and rebuilt the language-understanding pipeline across 8 intents, cutting voice-agent latency by 45%. He earned a return offer and the Technical Skills Award (top of 800+ interns), and he's back there again this summer." },
+      { re: [/\b(lab for emerging intelligence|\blei\b|agentic (platform|system|ai)|workflow (engine|executor)|mcp server|enterprise agent|7,?000)\b/], kw: ['agentic', 'platform', 'mcp', 'workflow', 'enterprise'], a: "At the Lab for Emerging Intelligence (Teradata-funded) he leads an enterprise agentic-AI platform used by 7,000+ UCSD students, faculty, and staff: custom MCP servers over the university's APIs, research into automated skill generation and optimization, and a workflow executor he built to stay intelligent, deterministic, and graceful when a task goes sideways." },
+      { re: [/\b(tutor|teaching (bot|assistant)|smart learning|8,?000 student|panel.?of.?judges|eval(uation)? pipeline|knowledge tracing)\b/], kw: ['tutor', 'teach', 'student', 'learning', 'eval', 'education-tech'], a: "He built and shipped an AI tutor now running for 8,000 students across UCSD, SDSU, and Cal Poly Pomona. To keep it reliable he built a two-layer evaluation pipeline: one layer monitors tutor outputs live, and an LLM panel-of-judges above it stores each student's learning and personality metrics so the teaching adapts. A/B tested: 64% fewer TA hours and 87% higher engagement." },
+      { re: [/\b(life ?saver|aila|qualcomm|hxi|calit2|multimodal|health(care)?|supercomputer|umls|emergency|rural|clinic|medical|first responder|sensor)\b/], kw: ['health', 'lifesaver', 'aila', 'multimodal', 'medical', 'qualcomm', 'supercomputer'], a: "At UCSD's Qualcomm Institute (HXI Lab) he works on LifeSaver / AILA, an assistant that turns messy real-world signals (sensors, audio, video) into structured answers a clinician or first responder can use, for emergency services, the elderly, and rural care. He trained multimodal models (Qwen SFT) on the San Diego Supercomputer Center and grounded them with GraphRAG over the UMLS medical ontology so answers are accurate and fast enough for emergencies. He's first author on the lab's poster and wired up the robotics that drives the hardware." },
+      { re: [/\bwork ?4 ?flow\b|genai observer|smartsheet\b/], kw: ['work4flow', 'observer', 'smartsheet'], a: "At Work4Flow he led a team of 6 interns and shipped GenAI Observer, a tool that scores the prompts engineers write and suggests improvements, plus a ServiceNow-to-Smartsheet integration with LLM categorization. Both got the PM's green light to go to customers." },
+      { w: 4, re: [/\b(research|researching|papers?|publication|thesis|academ(ic|ia)|stud(y|ies)|scholar)\b/], kw: ['research', 'paper', 'thesis', 'study', 'publication'], a: "Four research threads: computational redistricting (his CSE honors thesis, applying to ACM CHI 2026), university-wide agentic systems at LEI, the Smart Learning Hub plus AI tutor, and AILA/LifeSaver multimodal health AI. He likes problems where the model has to be both capable and trustworthy. The research section is interactive, go poke at any of them." },
+      { re: [/\b(redistrict|gerrymander|congress|district|fairness|honors thesis|efficiency gap|voting rights|census|chi 2026|exploratorium|\bmaps?\b)\b/], kw: ['redistricting', 'gerrymandering', 'districts', 'thesis', 'census'], a: "His honors thesis draws and scores U.S. congressional maps over Census data (158K to 5.5M blocks per state). He built three map generators (a greedy heuristic, a Monte Carlo sampler, and an XGBoost model with graph partitioning) and wrote the fairness metrics that grade them, like the efficiency gap and Voting Rights Act compliance. It reproduces the real district counts for Alabama, California, and Texas. He's applying to ACM CHI 2026 and presenting at the SF Exploratorium." },
+      { w: 4, re: [/\b(projects?|portfolio|built|build|made|cool (stuff|things)|side project|favou?rite|best (project|work)|show me)\b/], kw: ['project', 'build', 'portfolio', 'made', 'favorite'], a: "Highlights: ORCA (award-winning sheet-music to audio AI), AIDE (an intent-based zero-touch IDE), AgentSpace (two-way expert agents over MCP + A2A), BioVeritas (checks scientific rigor with retrieval), and Spay.LA (a fundraising platform that raised $75K). Plus a skin-lesion detector, a virtual trial room, and a housing platform. Ask about any of them." },
+      { re: [/\borca\b|sheet music|score.{0,8}audio|audio.{0,8}score/], kw: ['orca', 'music', 'sheet', 'audio', 'song'], a: "ORCA (Orchestration and Recognition for Composition and Arrangement) turns sheet music into audio and audio back into a score: OpenCV reads the page, neural nets split the instruments, and a CNN writes the score, at 98% accuracy verified four ways including by real musicians. It won Best Project at the SD Undergrad Tech Conference (1 of 30 from 200+) and was shown at SAIRS 2025." },
+      { re: [/\baide\b|zero.?touch|intent.?based ide|integrated developer/], kw: ['aide', 'ide'], a: "AIDE (AI Integrated Developer Environment) is an intent-based, zero-touch IDE that turns what you describe into working code: multi-layer intent classification, slot-filling, code injection, and runtime correctness loops for CI/CD. It's one of his Innovate Research Group projects." },
+      { re: [/\bagent ?space\b|two.?way (marketplace|agent|graphrag)|\ba2a\b|hireable agent/], kw: ['agentspace', 'a2a', 'marketplace'], a: "AgentSpace is a two-way marketplace where professionals pour their personality and toolset into a hireable virtual agent that others can use. It runs on two-way GraphRAG over skill and personality embeddings (think Gemini Gems and Claude Skills), exposed over MCP + A2A for multi-agent context-sharing and delegation." },
+      { re: [/\bbio ?veritas\b|scientific rigor|research integrity|biology research/], kw: ['bioveritas', 'rigor'], a: "BioVeritas checks how sound and honest a piece of biology research is, using retrieval to back up everything it flags. It's his take on AI for scientific rigor." },
+      { re: [/\bspay\b|fundrais|advocacy|75k|nonprofit|non-profit/], kw: ['spay', 'fundraising', 'nonprofit'], a: "Spay.LA is a fundraising and advocacy platform he led for a real client as engineering manager of a team of 11. He owned everything from scoping with the client to shipping, and it raised $75K." },
+      { re: [/\b(union station|housing|listing platform|skin lesion|lesion|dermatolog|trial room|fitting room|virtual try|try.?on)\b/], kw: ['housing', 'lesion', 'trial', 'fitting'], a: "A few more: Union Station Housing (a listing platform for greater LA's main housing provider, with media upload and bulk exports), a Skin Lesion Detector (an on-device image classifier), and a Virtual Trial Room (a 3D fitting room using deep learning and computer vision). Most are from his Innovate Research Group." },
+      { w: 4, re: [/\b(skills?|tech ?stack|technolog|languages?|tools?|frameworks?|proficient|expertise|\bstack\b|what.{0,10}(know|use))\b/], kw: ['skill', 'tech', 'stack', 'language', 'tool', 'expertise'], a: "Python and ML at the core: agentic frameworks, MCP, RAG/GraphRAG, fine-tuning (LoRA/SFT/RLHF), multimodal LLMs, OpenCV, CNNs, XGBoost. Plus the ship-it stack: React, FastAPI/Flask, Docker, PostgreSQL, MongoDB, and AWS (Lambda, Lex). He's product-minded, not just a model-tinkerer." },
+      { re: [/\b(machine learning|deep learning|\bml\b|\bai\b|fine.?tun|lora|rlhf|\bsft\b|\brag\b|graphrag|\bllm\b|neural net|train(ing|ed)? (a )?model|embeddings?)\b/], kw: ['ml', 'ai', 'machine', 'learning', 'finetuning', 'rag', 'llm', 'training'], a: "On the ML side he does fine-tuning (LoRA, SFT, RLHF), RAG and GraphRAG, multimodal LLMs (Qwen), agentic systems over MCP, plus classic vision (CNNs, OpenCV) and ML (XGBoost). He's trained models on the San Diego Supercomputer Center and shipped them into production tools people actually use." },
+      { re: [/\b(education|degree|gpa|grades?|major|school|college|university|ucsd|uc san diego|master'?s|bachelor|undergrad|graduat|cum laude|4\.0)\b/], kw: ['education', 'degree', 'gpa', 'ucsd', 'school', 'masters'], a: "He's finishing his CS master's at UC San Diego with a 4.00 GPA, after a B.S. in Computer Science there, cum laude with CSE Department Honors and Provost Honors every quarter. He moves fast: undergrad in two years, master's in a year and a quarter." },
+      { re: [/\b(honou?rs?|awards?|recognition|achievement|accolade|proud|won|win|prize|\byc\b|y combinator|national merit|usaco|olympiad)\b/], kw: ['honors', 'award', 'recognition', 'won', 'achievement'], a: "A few: picked for Y Combinator's Startup School 2026; the ServiceNow Technical Skills Award as top intern of 800+; Best Project at the SD Undergrad Tech Conference for ORCA; cum laude plus CSE Department Honors at UCSD; National Merit Finalist and AP Scholar with Distinction; and USACO Silver." },
+      { re: [/\b(leadership|communit|clubs?|organization|founded|co.?found|president|started|\brain\b|university ai alliance|cse society|alliance|innovate research)\b/], kw: ['leadership', 'community', 'founded', 'president', 'club'], a: "He tends to start things. He co-founded RAIN (Real World AI Network), a 7,000+ student group across UCSD's engineering, data science, and business schools; sits on the founding board of the University AI Alliance (the nation's largest student-led AI initiative, with MIT, Stanford, Caltech, Cornell) as VP of external affairs; is president of UCSD's CSE Society (100+ members); and founded the Innovate Research Group (30+ people across UCLA, UCSB, UCSC)." },
+      { re: [/\b(contact|e?mail|reach|connect|get in touch|linked ?in|git ?hub|message|\bdm\b|talk to)\b/], kw: ['contact', 'email', 'reach', 'linkedin', 'github'], a: "Easiest is email: <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>. His <a href=\"https://www.linkedin.com/in/pranav-kumar-soma/\" target=\"_blank\" rel=\"noopener\">LinkedIn</a>, <a href=\"https://github.com/soma-p\" target=\"_blank\" rel=\"noopener\">GitHub</a>, and résumé are all at the bottom of the page, and he reads everything." },
+      { re: [/\b(hir(e|ing)|looking for|seeking|open to|availab|opportunit|roles?|positions?|recruit|relocat|locat(ion|ed)|based|bay area|san francisco|sf\b|start date|when can he start)\b/], kw: ['hire', 'looking', 'available', 'relocate', 'location', 'role'], a: "He's after roles at top AI companies, software, ML, or forward-deployed engineering, ideally where the models are biggest and the stakes are real. He's based in San Diego and happy to relocate anywhere in the SF Bay Area." },
+      { re: [/\b(r[eé]sum[eé]|\bcv\b|curriculum vitae)\b/], kw: ['resume', 'cv'], a: "His résumé is linked at the bottom of the page, with targeted versions for Software, Machine Learning, and Forward-Deployed roles. Or just email him: <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>." },
+      { re: [/\b(from|grew up|cupertino|hometown|personal|hobb(y|ies)|outside.{0,12}work|robotics|robots?|debate|as a person|life story)\b/], kw: ['from', 'cupertino', 'hobbies', 'robotics', 'debate', 'personal'], a: "He's from Cupertino, grew up building robots, and came up through competitive robotics and speech and debate (and a USACO Silver), where you only get credit for the thing that works on the day. He runs wide on purpose: systems, ML, theory, full-stack, robotics. Outside the research he builds communities: RAIN, the University AI Alliance, CSE Society." },
+      { re: [/\b(golem|crystal|mascot|robots?|animation|\bdog\b|baymax|svg|canvas|cute|creature|who are you|what are you)\b/], kw: ['golem', 'crystal', 'mascot', 'animation', 'site'], a: "Ha, every creature here is hand-built SVG and canvas. The green guy is his copper-golem guide; I'm the end-crystal that orbits it, and each project has its own little animation. It's his way of showing, not telling." },
+      { re: [/\bhow.{0,16}(site|website|page|this).{0,16}(built|made|work)|built this|made this|tech behind|vanilla|no framework/], kw: ['website', 'built'], a: "The whole site is hand-built: vanilla HTML, CSS, and JavaScript, with SVG and canvas for every animation, no framework. Even this chatbot runs on pattern-matching right here in your browser." },
+      { re: [/\b(are you (an? )?(ai|bot|robot|real|human|chat ?gpt|llm|gpt)|is this (an? )?(ai|bot)|you'?re (a )?bot)\b/], kw: ['bot', 'real'], a: "I'm a little pattern-matching bot Pranav built, not an LLM, running entirely in your browser. So I keep to what I actually know about him: work, research, projects, skills, what he's after, and how to reach him." },
+      { re: [/\b(fun fact|something interesting|surprise me|tell me something|interesting about|cool fact)\b/], kw: ['fun', 'interesting', 'random'], a: "Fun one: he finished undergrad in two years and his master's in a year and a quarter, at a 4.00 GPA the whole way. He was also the top intern of 800+ at ServiceNow, and his sheet-music AI ORCA was verified by real musicians." },
+      { re: [/\b(thanks|thank you|thx|\bty\b|nice|awesome|great|love it|amazing|appreciate|helpful)\b/], kw: ['thanks', 'thank', 'awesome', 'great'], a: "Anytime! If you like what you see, his résumé and email are at the bottom of the page, and he reads everything." },
     ];
-    const FALLBACK = "Good question. I keep it to the highlights: his work, research, projects, skills, what he's looking for, and how to reach him. Try one of those, or email him at <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>.";
-    const STOP = new Set(['the', 'a', 'an', 'is', 'are', 'of', 'to', 'and', 'or', 'do', 'does', 'what', 'whats', 'how', 'about', 'tell', 'me', 'you', 'your', 'his', 'him', 'he', 'for', 'in', 'on', 'at', 'with', 'can', 'i', 'pranav', 'soma']);
+    const FALLBACK = "Good question. I stick to the highlights: his work and experience, research, projects, skills, education, honors, leadership, what he's looking for, and how to reach him. Try one of those, or email him at <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>.";
+    const STOP = new Set(['the', 'a', 'an', 'is', 'are', 'of', 'to', 'and', 'or', 'do', 'does', 'what', 'whats', 'how', 'about', 'tell', 'me', 'you', 'your', 'his', 'him', 'he', 'she', 'they', 'for', 'in', 'on', 'at', 'with', 'can', 'i', 'pranav', 'soma', 'his']);
     const norm = (s) => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((w) => w && !STOP.has(w));
-    const reply = (q) => {
+    const reply = (q) => {                                            // regex hits dominate; keywords break ties; best-ranked answer wins
       const ql = q.toLowerCase(), words = norm(q);
-      let best = null, score = 0;
-      for (const e of KB) {
+      const ranked = KB.map((e) => {
         let s = 0;
-        for (const k of e.k) {
-          if (k.includes(' ')) { if (ql.includes(k)) s += 4; }
-          else if (words.includes(k)) s += 2;
+        for (const r of e.re) if (r.test(ql)) s += (e.w || 6);   // broad overviews carry less weight than specific topics
+        for (const k of e.kw) {
+          if (words.includes(k)) s += 2;
           else if (words.some((w) => (w.length > 3 && k.startsWith(w)) || (k.length > 3 && w.startsWith(k)))) s += 1;
         }
-        if (s > score) { score = s; best = e; }
-      }
-      return score >= 1 ? best.a : FALLBACK;
+        return { a: e.a, s };
+      }).sort((m, n) => n.s - m.s);
+      return ranked[0].s >= 3 ? ranked[0].a : FALLBACK;
     };
     const addBot = (html) => { const d = document.createElement('div'); d.className = 'ask-msg bot'; d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; return d; };
     const addMe = (txt) => { const d = document.createElement('div'); d.className = 'ask-msg me'; d.textContent = txt; log.appendChild(d); log.scrollTop = log.scrollHeight; };

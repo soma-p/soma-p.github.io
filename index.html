@@ -24,6 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script>try{var _t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('theme');if(_t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -226,6 +227,7 @@
                 <linearGradient id="bmArm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBFDFC"/><stop offset="1" stop-color="#D6DFDB"/></linearGradient>
                 <radialGradient id="bmPort" cx="40%" cy="34%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#DCE4E0"/></radialGradient>
                 <linearGradient id="bmRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ED4636"/><stop offset="1" stop-color="#BC281E"/></linearGradient>
+                <clipPath id="bmClip"><ellipse cx="80" cy="40" rx="23" ry="19"/><ellipse cx="80" cy="98" rx="48" ry="53"/></clipPath>
               </defs>
               <!-- open case mouth (behind Baymax) -->
               <ellipse class="bm-open" cx="80" cy="152" rx="52" ry="11" fill="#7E1A14"/>
@@ -249,8 +251,11 @@
                 <circle cx="67.4" cy="40.3" r="1.5" fill="#fff" opacity=".6"/><circle cx="89.4" cy="40.3" r="1.5" fill="#fff" opacity=".6"/>
                 <circle cx="80" cy="102" r="16" fill="url(#bmPort)" stroke="#B4BFB9" stroke-width="1.7"/>
                 <circle cx="80" cy="102" r="11" fill="none" stroke="#D2DBD7" stroke-width="1.1"/>
-                <path d="M76 94 h8 v7 h7 v8 h-7 v7 h-8 v-7 h-7 v-8 h7 z" fill="#0E7A53"/>
-                <path d="M76 94 h8 v7 h7 v3 h-7 v7 h-8 z" fill="#34D399" opacity=".5"/>
+                <g class="bm-cross">
+                  <path d="M76 94 h8 v7 h7 v8 h-7 v7 h-8 v-7 h-7 v-8 h7 z" fill="#0E7A53"/>
+                  <path d="M76 94 h8 v7 h7 v3 h-7 v7 h-8 z" fill="#34D399" opacity=".5"/>
+                </g>
+                <g clip-path="url(#bmClip)"><rect class="bm-scan" x="28" y="0" width="104" height="3" fill="#34D399"/></g>
               </g>
               <!-- red carrying case (front, hides his lower half at the start) -->
               <g class="bm-box">
@@ -406,6 +411,10 @@
             <circle class="ptc q2" cx="21" cy="17" r="1.8" fill="#34D399"/>
             <circle class="ptc q3" cx="21" cy="17" r="2" fill="#0E7A53"/>
             <circle class="ptc q4" cx="21" cy="17" r="1.6" fill="#34D399"/>
+            <circle class="ptc px q5" cx="21" cy="17" r="2.1" fill="#0E7A53"/>
+            <circle class="ptc px q6" cx="21" cy="17" r="1.7" fill="#34D399"/>
+            <circle class="ptc px q7" cx="21" cy="17" r="2.3" fill="#0E7A53"/>
+            <circle class="ptc px q8" cx="21" cy="17" r="1.6" fill="#34D399"/>
             <line x1="80" y1="3" x2="80" y2="10" stroke="#0E7A53" stroke-width="2"/>
             <circle class="ant-tip" cx="80" cy="2.5" r="2.8" fill="#0E7A53"/>
             <rect x="69" y="10" width="22" height="14" rx="3" fill="rgba(14,122,83,.1)" stroke="#0E7A53" stroke-width="2"/>
@@ -637,7 +646,7 @@
       </svg>
       <svg class="lying-dog" viewBox="-12 -28 150 86" aria-hidden="true">
         <text class="z z1" x="24" y="-10">z</text><text class="z z2" x="16" y="-15">z</text><text class="z z3" x="8" y="-20">z</text>
-        <g class="dog-core" stroke="#222C3A" stroke-linejoin="round">
+        <g class="dog-rise"><g class="dog-core" stroke="#222C3A" stroke-linejoin="round">
           <g class="d-tail">
             <path d="M101 34 C120 33 128 13 113 5 C106 1 99 7 102 13" fill="none" stroke="#222C3A" stroke-width="11" stroke-linecap="round"/>
             <path d="M101 34 C120 33 128 13 113 5 C106 1 99 7 102 13" fill="none" stroke="#E9A23B" stroke-width="6.6" stroke-linecap="round"/>
@@ -674,7 +683,10 @@
           <path d="M14 21 C19 18.5 26 19 30 22" fill="none" stroke="#C8842B" stroke-width="2" stroke-linecap="round" opacity=".5"/>
           <path class="eye-closed" d="M16 26 q5 3 10 0.2" fill="none" stroke="#2E3C4E" stroke-width="2.3" stroke-linecap="round"/>
           <g class="eye-open"><ellipse cx="22" cy="25" rx="4" ry="4.6" fill="#1A2330"/><circle cx="23.4" cy="23.2" r="1.4" fill="#EAF4FF"/></g>
-        </g>
+          <g class="dog-bark" stroke="#2E3C4E" stroke-width="2.4" stroke-linecap="round" fill="none">
+            <path d="M-6 27 l-10 -5"/><path d="M-8 34 l-11 -1.5"/><path d="M-6 41 l-10 5"/>
+          </g>
+        </g></g>
       </svg>
     </div>
     <div class="mb-wrap"><svg class="mini-bot" viewBox="0 0 44 62" width="45" height="63">
@@ -750,6 +762,39 @@
   </svg>
 </div>
 
+<!-- dark-mode toggle: a Minecraft lever with a pixel lightbulb; flip it to kill the lights -->
+<button class="lever-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+  <svg viewBox="0 0 44 72" aria-hidden="true">
+    <defs>
+      <radialGradient id="bulbGlow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFE27A" stop-opacity=".85"/><stop offset="1" stop-color="#FFE27A" stop-opacity="0"/></radialGradient>
+    </defs>
+    <!-- cobblestone base block on the wall -->
+    <rect x="8" y="46" width="28" height="22" fill="#8b9099"/>
+    <rect x="11" y="49" width="7" height="5" fill="#6e747c"/>
+    <rect x="22" y="48" width="9" height="6" fill="#a6abb3"/>
+    <rect x="9" y="57" width="6" height="6" fill="#a6abb3"/>
+    <rect x="18" y="58" width="9" height="6" fill="#6e747c"/>
+    <rect x="29" y="56" width="6" height="9" fill="#777d85"/>
+    <rect x="11" y="63" width="8" height="4" fill="#6e747c"/>
+    <rect x="8" y="46" width="28" height="22" fill="none" stroke="#3a3e44" stroke-width="2"/>
+    <rect x="18" y="43" width="8" height="6" fill="#3a3e44"/>
+    <!-- the lever arm + lightbulb (rotates when flipped) -->
+    <g class="lv-arm">
+      <circle class="lv-glow" cx="22" cy="9" r="16" fill="url(#bulbGlow)"/>
+      <rect x="20" y="19" width="4" height="27" fill="#565d66"/>
+      <rect x="20" y="19" width="1.6" height="27" fill="#767e88"/>
+      <rect x="18" y="15" width="8" height="3" fill="#9aa2ac"/>
+      <rect x="19" y="18" width="6" height="2" fill="#787f89"/>
+      <rect class="lv-bulb-glass" x="19" y="3" width="6" height="2" fill="#FFE680"/>
+      <rect class="lv-bulb-glass" x="17" y="5" width="10" height="2" fill="#FFE680"/>
+      <rect class="lv-bulb-glass" x="15" y="7" width="14" height="4" fill="#FFD24D"/>
+      <rect class="lv-bulb-glass" x="17" y="11" width="10" height="4" fill="#FFC32E"/>
+      <rect class="lv-fila" x="21" y="8" width="2" height="5" fill="#FF9E2C"/>
+      <rect class="lv-bulb-hi" x="18" y="6" width="2.4" height="5" fill="#FFFFFF" opacity=".75"/>
+    </g>
+  </svg>
+</button>
+
 <!-- end-crystal sidekick: swirls around the golem; click to ask about Pranav -->
 <button class="ask-orb" id="askOrb" type="button" aria-label="Ask about Pranav" title="Ask me about Pranav">
   <svg viewBox="0 0 48 52" aria-hidden="true">
@@ -806,7 +851,7 @@
     <div class="ask-h-txt"><b>Ask about Pranav</b><span>his end-crystal sidekick</span></div>
     <button class="ask-x" id="askClose" type="button" aria-label="Close">&times;</button>
   </div>
-  <div class="ask-log" id="askLog"></div>
+  <div class="ask-log" id="askLog" data-lenis-prevent></div>
   <div class="ask-chips" id="askChips"></div>
   <form class="ask-form" id="askForm" autocomplete="off">
     <input class="ask-in" id="askIn" type="text" placeholder="Ask me anything about Pranav&hellip;" aria-label="Your question"/>
