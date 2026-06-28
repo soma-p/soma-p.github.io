@@ -1,0 +1,112 @@
+
+<!-- RESEARCH (dark) -->
+<section class="section dark" id="research">
+  <div class="container">
+    <div class="s-head reveal">
+      <div><span class="eyebrow">Research</span><h2>What I'm researching</h2></div>
+      <p>Four problems I haven't been able to put down. Each one is interactive below, go ahead and poke at it.</p>
+    </div>
+    <div class="papers">
+      <div class="paper reveal">
+        <div class="pno">01</div>
+        <div>
+          <h3>Computational redistricting: fairness in congressional maps</h3>
+          <div class="venue"><span class="star">&#9733;</span> Applying to ACM CHI 2026 &middot; presenting at the SF Exploratorium, Dec 2026 &middot; UCSD CSE honors thesis</div>
+          <p>My honors thesis. It draws and scores U.S. congressional maps over Census data, anywhere from 158K to 5.5 million blocks per state. I built three different map generators (a greedy heuristic, a Monte Carlo sampler, and an XGBoost model with graph partitioning) and wrote the fairness metrics that grade them, things like the efficiency gap and Voting Rights Act compliance. It reproduces the real district counts for Alabama, California, and Texas.</p>
+          <div class="redistrict">
+            <canvas id="mapCanvas" aria-label="Interactive districting map"></canvas>
+            <div class="redistrict-bar">
+              <span class="redistrict-cap" id="mapCap">8 districts &middot; click the map to redraw</span>
+            </div>
+          </div>
+          <div class="chips"><span class="chip">XGBoost</span><span class="chip">pymetis</span><span class="chip">Monte Carlo</span><span class="chip">GeoPandas</span><span class="chip">Census data</span></div>
+        </div>
+      </div>
+      <div class="paper reveal flow-around" id="agenticCard">
+        <canvas id="agenticFlow" class="agentic-flow"></canvas>
+        <div class="pno">02</div>
+        <div>
+          <h3>Agentic systems for the whole university</h3>
+          <div class="venue">Lab for Emerging Intelligence &middot; Teradata-funded</div>
+          <p>I lead the Agentic Systems project at LEI (under Dr. Ramamohan Paturi, Matthew Clegg, and Dr. Elizabeth Lyons): enterprise, workflow-driven agentic AI for 7,000+ UCSD staff, faculty, and students. Custom MCP servers over the university's APIs, research into automated skill-generation and optimization, and a novel workflow executor I built to stay intelligent, deterministic, and graceful when a task goes sideways.</p>
+          <div class="chips"><span class="chip">MCP servers</span><span class="chip">Workflow executor</span><span class="chip">Skill optimization</span><span class="chip">FastAPI</span></div>
+        </div>
+      </div>
+      <div class="paper reveal" id="tutorCard">
+        <div class="pno">03</div>
+        <div>
+          <h3>Smart Learning Hub &amp; a deployed AI tutor</h3>
+          <div class="venue">Lab for Emerging Intelligence &middot; LLM reasoning &amp; fine-tuning</div>
+          <p>A deployed AI tutor and the platform behind it. To keep it reliable at scale, I built a <b>two-layer evaluation pipeline</b>: one layer monitors tutor outputs live; an <b>LLM panel-of-judges</b> above it composes and stores each student's learning and personality metrics so the teaching adapts. Running for <b>8,000 students</b> across UCSD, SDSU, and Cal Poly Pomona, with <b>64%</b> fewer TA hours and <b>87%</b> higher engagement (A/B tested).</p>
+          <div class="whiteboard" aria-hidden="true">
+            <canvas id="tutorBoard" aria-label="An AI tutor writing on a whiteboard"></canvas>
+          </div>
+          <div class="chips"><span class="chip">LLM reasoning</span><span class="chip">LoRA / SFT / RLHF</span><span class="chip">LLM panel-of-judges evals</span><span class="chip">Live output monitoring</span><span class="chip">Bayesian knowledge tracing</span><span class="chip">Learner &amp; personality modeling</span><span class="chip">Python</span></div>
+        </div>
+      </div>
+      <div class="paper reveal" id="lifeCard">
+        <div class="life-grid">
+          <div class="pno">04</div>
+          <div>
+            <h3>AILA: an AI living assistant for emergency &amp; rural care</h3>
+            <div class="venue">LifeSaver &middot; Qualcomm Institute / Calit2 &middot; HXI Lab</div>
+            <p>An assistant that turns messy real-world signals (sensors, audio, video) into structured answers a clinician or first responder can use. I trained the models on a supercomputer and grounded them with GraphRAG over a medical ontology so the answers are both right and fast enough to matter in an emergency. I also wired up the robotics side that drives the actual hardware.</p>
+            <div class="chips"><span class="chip">Multimodal LLMs</span><span class="chip">Qwen SFT</span><span class="chip">GraphRAG</span><span class="chip">UMLS</span><span class="chip">Supercomputer</span></div>
+          </div>
+          <div class="baymax" aria-hidden="true">
+            <svg viewBox="0 0 160 210" width="146" height="192">
+              <defs>
+                <radialGradient id="bmBody" cx="36%" cy="24%" r="86%">
+                  <stop offset="0%" stop-color="#ffffff"/><stop offset="58%" stop-color="#EFF4F1"/><stop offset="100%" stop-color="#D2DBD7"/>
+                </radialGradient>
+                <linearGradient id="bmArm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBFDFC"/><stop offset="1" stop-color="#D6DFDB"/></linearGradient>
+                <radialGradient id="bmPort" cx="40%" cy="34%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#DCE4E0"/></radialGradient>
+                <linearGradient id="bmRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ED4636"/><stop offset="1" stop-color="#BC281E"/></linearGradient>
+                <clipPath id="bmClip"><ellipse cx="80" cy="40" rx="23" ry="19"/><ellipse cx="80" cy="98" rx="48" ry="53"/></clipPath>
+              </defs>
+              <!-- open case mouth (behind Baymax) -->
+              <ellipse class="bm-open" cx="80" cy="152" rx="52" ry="11" fill="#7E1A14"/>
+              <!-- Baymax (rises on scroll) -->
+              <g class="bm-rise">
+                <ellipse cx="64" cy="151" rx="15" ry="12" fill="url(#bmBody)" stroke="#A6B3AC" stroke-width="1.8"/>
+                <ellipse cx="96" cy="151" rx="15" ry="12" fill="url(#bmBody)" stroke="#A6B3AC" stroke-width="1.8"/>
+                <path d="M44 84 q-25 -7 -30 -35 q-3 -14 10 -16 q12 -1 15.5 12 q4 21 13.5 31 z" fill="url(#bmArm)" stroke="#A6B3AC" stroke-width="1.8"/>
+                <path d="M37 80 q-16 -6 -22 -27" fill="none" stroke="#C7D1CC" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>
+                <g class="baymax-arm">
+                  <path d="M116 84 q25 -7 30 -35 q3 -14 -10 -16 q-12 -1 -15.5 12 q-4 21 -13.5 31 z" fill="url(#bmArm)" stroke="#A6B3AC" stroke-width="1.8"/>
+                  <path d="M123 80 q16 -6 22 -27" fill="none" stroke="#C7D1CC" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>
+                </g>
+                <ellipse cx="80" cy="98" rx="48" ry="53" fill="url(#bmBody)" stroke="#A6B3AC" stroke-width="1.8"/>
+                <path d="M104 60 a48 53 0 0 1 -16 86 q26 -28 16 -86 z" fill="#BBC6C0" opacity=".35"/>
+                <ellipse cx="60" cy="74" rx="17" ry="22" fill="#fff" opacity=".5"/>
+                <path d="M80 47 Q87 100 80 150" fill="none" stroke="#C6D0CB" stroke-width="1.5" opacity=".6"/>
+                <ellipse cx="80" cy="40" rx="23" ry="19" fill="url(#bmBody)" stroke="#A6B3AC" stroke-width="1.8"/>
+                <line x1="69" y1="42" x2="91" y2="42" stroke="#1A1A1A" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="69" cy="42" r="5.4" fill="#1A1A1A"/><circle cx="91" cy="42" r="5.4" fill="#1A1A1A"/>
+                <circle cx="67.4" cy="40.3" r="1.5" fill="#fff" opacity=".6"/><circle cx="89.4" cy="40.3" r="1.5" fill="#fff" opacity=".6"/>
+                <circle cx="80" cy="102" r="16" fill="url(#bmPort)" stroke="#B4BFB9" stroke-width="1.7"/>
+                <circle cx="80" cy="102" r="11" fill="none" stroke="#D2DBD7" stroke-width="1.1"/>
+                <g class="bm-cross">
+                  <path d="M76 94 h8 v7 h7 v8 h-7 v7 h-8 v-7 h-7 v-8 h7 z" fill="#0E7A53"/>
+                  <path d="M76 94 h8 v7 h7 v3 h-7 v7 h-8 z" fill="#34D399" opacity=".5"/>
+                </g>
+                <g clip-path="url(#bmClip)"><rect class="bm-scan" x="28" y="0" width="104" height="3" fill="#34D399"/></g>
+              </g>
+              <!-- red carrying case (front, hides his lower half at the start) -->
+              <g class="bm-box">
+                <rect x="20" y="150" width="120" height="58" rx="13" fill="url(#bmRed)" stroke="#8E1F18" stroke-width="2.6"/>
+                <line x1="30" y1="165" x2="130" y2="165" stroke="#9E241B" stroke-width="2" opacity=".55"/>
+                <line x1="30" y1="178" x2="130" y2="178" stroke="#9E241B" stroke-width="2" opacity=".55"/>
+                <line x1="30" y1="191" x2="130" y2="191" stroke="#9E241B" stroke-width="2" opacity=".55"/>
+                <rect x="42" y="156" width="11" height="6" rx="2" fill="#8E1F18"/><rect x="107" y="156" width="11" height="6" rx="2" fill="#8E1F18"/>
+                <line x1="71" y1="183" x2="89" y2="183" stroke="#2A1714" stroke-width="2.4" stroke-linecap="round"/>
+                <circle cx="71" cy="183" r="3.2" fill="#2A1714"/><circle cx="89" cy="183" r="3.2" fill="#2A1714"/>
+                <rect x="40" y="206" width="17" height="6" rx="3" fill="#5E140F"/><rect x="103" y="206" width="17" height="6" rx="3" fill="#5E140F"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

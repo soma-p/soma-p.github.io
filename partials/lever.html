@@ -1,0 +1,33 @@
+
+<!-- dark-mode toggle: a Minecraft lever with a pixel lightbulb; flip it to kill the lights -->
+<button class="lever-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+  <svg viewBox="0 0 44 72" aria-hidden="true">
+    <defs>
+      <radialGradient id="bulbGlow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFE27A" stop-opacity=".85"/><stop offset="1" stop-color="#FFE27A" stop-opacity="0"/></radialGradient>
+    </defs>
+    <!-- mossy copper-stone base block, carved from the same green as the golem -->
+    <rect x="8" y="46" width="28" height="22" fill="#2E8C5E"/>
+    <rect x="11" y="49" width="7" height="5" fill="#176243"/>
+    <rect x="22" y="48" width="9" height="6" fill="#4FBF8B"/>
+    <rect x="9" y="57" width="6" height="6" fill="#4FBF8B"/>
+    <rect x="18" y="58" width="9" height="6" fill="#176243"/>
+    <rect x="29" y="56" width="6" height="9" fill="#1E6B45"/>
+    <rect x="11" y="63" width="8" height="4" fill="#176243"/>
+    <rect x="8" y="46" width="28" height="22" fill="none" stroke="#08321E" stroke-width="2"/>
+    <rect x="18" y="43" width="8" height="6" fill="#08321E"/>
+    <!-- the lever arm + lightbulb (rotates when flipped) -->
+    <g class="lv-arm">
+      <circle class="lv-glow" cx="22" cy="9" r="16" fill="url(#bulbGlow)"/>
+      <rect x="20" y="19" width="4" height="27" fill="#176243"/>
+      <rect x="20" y="19" width="1.6" height="27" fill="#4FBF8B"/>
+      <rect x="18" y="15" width="8" height="3" fill="#9aa2ac"/>
+      <rect x="19" y="18" width="6" height="2" fill="#787f89"/>
+      <rect class="lv-bulb-glass" x="19" y="3" width="6" height="2" fill="#FFE680"/>
+      <rect class="lv-bulb-glass" x="17" y="5" width="10" height="2" fill="#FFE680"/>
+      <rect class="lv-bulb-glass" x="15" y="7" width="14" height="4" fill="#FFD24D"/>
+      <rect class="lv-bulb-glass" x="17" y="11" width="10" height="4" fill="#FFC32E"/>
+      <rect class="lv-fila" x="21" y="8" width="2" height="5" fill="#FF9E2C"/>
+      <rect class="lv-bulb-hi" x="18" y="6" width="2.4" height="5" fill="#FFFFFF" opacity=".75"/>
+    </g>
+  </svg>
+</button>

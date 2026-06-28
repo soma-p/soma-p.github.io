@@ -1,0 +1,37 @@
+
+<!-- chatbot the crystal / chest opens into -->
+<div class="ask-panel" id="askPanel" role="dialog" aria-label="Ask about Pranav" hidden>
+  <div class="ask-head">
+    <svg class="ask-mini" viewBox="0 0 48 52" aria-hidden="true">
+      <defs>
+        <linearGradient id="mTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E58FE6"/><stop offset="1" stop-color="#C45EC9"/></linearGradient>
+        <linearGradient id="mLeft" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ED8FE8"/><stop offset="1" stop-color="#B954BE"/></linearGradient>
+        <linearGradient id="mRight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A552D6"/><stop offset="1" stop-color="#742FAA"/></linearGradient>
+        <radialGradient id="mQ" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      </defs>
+      <g class="o-purple">
+        <path d="M24 5 L40 14 L24 23 L8 14 Z" fill="url(#mTop)"/>
+        <path d="M8 14 L24 23 L24 41 L8 32 Z" fill="url(#mLeft)"/>
+        <path d="M40 14 L24 23 L24 41 L40 32 Z" fill="url(#mRight)"/>
+        <path d="M24 5 L40 14 L40 32 L24 41 L8 32 L8 14 Z M24 5 L24 23 M8 14 L24 23 M40 14 L24 23 M24 23 L24 41" fill="none" stroke="#7A36A6" stroke-width="1.2" stroke-linejoin="round" opacity=".55"/>
+      </g>
+      <g class="o-qm">
+        <ellipse cx="24" cy="29" rx="8.5" ry="9.5" fill="url(#mQ)"/>
+        <text x="24" y="34" text-anchor="middle" font-family="Georgia,serif" font-size="20" font-weight="700" fill="#fff">?</text>
+      </g>
+      <g class="o-cyan">
+        <path d="M24 4 L41 13.5 L41 32.5 L24 42 L7 32.5 L7 13.5 Z" fill="none" stroke="#B6EDF8" stroke-width="2.8" stroke-linejoin="round" opacity=".8"/>
+        <path d="M24 4 L41 13.5 L41 32.5 L24 42 L7 32.5 L7 13.5 Z" fill="none" stroke="#ECFCFF" stroke-width="1.1" stroke-linejoin="round" opacity=".9"/>
+        <path d="M24 4 L24 23 M7 13.5 L24 23 M41 13.5 L24 23 M24 23 L24 42" fill="none" stroke="#CFF6FD" stroke-width="1.5" opacity=".7"/>
+      </g>
+    </svg>
+    <div class="ask-h-txt"><b>Ask about Pranav</b><span>his end-crystal sidekick</span></div>
+    <button class="ask-x" id="askClose" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div class="ask-log" id="askLog" data-lenis-prevent></div>
+  <div class="ask-chips" id="askChips"></div>
+  <form class="ask-form" id="askForm" autocomplete="off">
+    <input class="ask-in" id="askIn" type="text" placeholder="Ask me anything about Pranav&hellip;" aria-label="Your question"/>
+    <button class="ask-send" type="submit" aria-label="Send">&rarr;</button>
+  </form>
+</div>
