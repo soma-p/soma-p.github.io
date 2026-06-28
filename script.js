@@ -18,21 +18,21 @@
   toggle?.addEventListener('click', () => links.classList.toggle('open'));
   $$('#navLinks a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
 
-  /* scroll progress bar + the robot pup that trots along it */
-  const prog = $('#progress'), pdog = $('#progDog');
-  let pLast = -1, pdogStop = 0;
+  /* nav: highlight the section you're currently in */
+  const secLinks = $$('#navLinks a[href^="#"]').map(a => ({ a, sec: $(a.getAttribute('href')) })).filter(x => x.sec);
+  const onActive = () => {
+    const mid = scrollY + innerHeight * 0.34; let cur = null;
+    for (const m of secLinks) if (m.sec.getBoundingClientRect().top + scrollY <= mid) cur = m;
+    secLinks.forEach(m => m.a.classList.toggle('active', m === cur));
+  };
+  if (secLinks.length) { onActive(); addEventListener('scroll', onActive, { passive: true }); }
+
+  /* scroll progress bar */
+  const prog = $('#progress');
   const onProg = () => {
     const h = document.documentElement;
     const p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
     if (prog) prog.style.width = (p * 100) + '%';
-    if (pdog) {
-      pdog.style.left = Math.min(innerWidth - 28, Math.max(28, p * innerWidth)).toFixed(1) + 'px';   // stay clear of the edges (html has overflow-x:hidden)
-      if (pLast >= 0 && Math.abs(p - pLast) > 0.0003) pdog.classList.toggle('rev', p < pLast);   // face the way it's heading
-      pdog.classList.add('running'); pdog.classList.remove('sitting');
-      clearTimeout(pdogStop);
-      pdogStop = setTimeout(() => { pdog.classList.remove('running'); pdog.classList.add('sitting'); }, 200);   // sits when you stop
-      pLast = p;
-    }
   };
   onProg(); addEventListener('scroll', onProg, { passive: true });
 
