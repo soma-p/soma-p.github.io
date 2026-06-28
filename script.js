@@ -631,13 +631,34 @@
       setMsg(cur().msg);
       clearTimeout(stopT); stopT = setTimeout(onStop, 260);
     };
+    // if the dock spot sits over text, find the nearest clear vertical band so it glides up/down to it
+    const TEXTSEL = 'h1,h2,h3,h4,p,li,a.link,.chip,.meta,blockquote,figcaption';
+    const clearDockY = (left, preferredY, h) => {
+      const right = left + BW, vh = innerHeight, lo = 84, hi = vh - 150, py = clamp(preferredY, lo, hi);
+      const rects = [];
+      $$(TEXTSEL).forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (!r.width || r.bottom < -30 || r.top > vh + 30) return;        // off-screen
+        if (r.right < left - 8 || r.left > right + 8) return;             // not in the buddy's column
+        if (!el.textContent.trim()) return;
+        rects.push(r);
+      });
+      const hits = (y) => rects.some(r => y < r.bottom + 10 && y + h > r.top - 10);
+      if (!rects.length || !hits(py)) return py;
+      for (let d = 14; d <= vh; d += 14) {                               // scan outward for a gap
+        const up = preferredY - d, dn = preferredY + d;
+        if (up >= lo && !hits(up)) return up;
+        if (dn <= hi && !hits(dn)) return dn;
+      }
+      return py;
+    };
     const onStop = () => {                                          // dock to whichever side is closer (keeps off the text)
       if (heroActive() || aboutActive()) return;
       scrolling = false; const s = cur();
       const side = (cx + BW / 2) < innerWidth / 2 ? 'L' : 'R';
       buddy.classList.toggle('dock-r', side === 'R'); buddy.classList.toggle('dock-l', side === 'L');
       tx = side === 'L' ? 16 : innerWidth - BW - 16;
-      ty = clamp(s.y * innerHeight, 84, innerHeight - 150);
+      ty = clearDockY(tx, clamp(s.y * innerHeight, 84, innerHeight - 150), 112);
       setMsg(s.msg);
       setTimeout(() => { if (!scrolling) { buddy.classList.add('present'); scheduleEmote(); } }, 440);
     };
