@@ -50,13 +50,17 @@
   <div class="container hero-inner">
 
     <div class="hero-base" id="heroBase" aria-hidden="true">
-      <svg viewBox="0 0 150 56" width="142" height="53">
+      <svg viewBox="0 0 150 56" width="142" height="53" style="overflow:visible">
         <ellipse cx="75" cy="49" rx="60" ry="7.5" fill="rgba(8,38,26,.16)"/>
         <ellipse cx="75" cy="40" rx="55" ry="13" fill="#123726"/>
         <rect x="20" y="30" width="110" height="10" fill="#15402E"/>
         <ellipse cx="75" cy="30" rx="55" ry="13" fill="#1F5A40"/>
         <ellipse cx="75" cy="30" rx="55" ry="13" fill="none" stroke="#34D399" stroke-width="1.6" opacity=".55"/>
         <ellipse cx="75" cy="28" rx="38" ry="7.5" fill="#27684B" opacity=".55"/>
+        <!-- the chest-cart's siding: a recessed groove + buffer stops set into the podium -->
+        <path d="M30 33.5 Q75 37 120 33.5 Q75 39.2 30 33.5 Z" fill="#0A2A1C" opacity=".45"/>
+        <g><rect x="24" y="24.5" width="3" height="8" rx="1" fill="#0C2E1F"/><rect x="21.5" y="23" width="8" height="3.2" rx="1.3" fill="#4d5a64" stroke="#16201A" stroke-width=".9"/></g>
+        <g><rect x="123" y="24.5" width="3" height="8" rx="1" fill="#0C2E1F"/><rect x="120.5" y="23" width="8" height="3.2" rx="1.3" fill="#4d5a64" stroke="#16201A" stroke-width=".9"/></g>
       </svg>
     </div>
 
@@ -628,12 +632,16 @@
       <rect x="16.5" y="6" width="4.5" height="4.5" rx="1" fill="#FFD24D" stroke="#08321E" stroke-width=".8"/><rect x="23" y="6" width="4.5" height="4.5" rx="1" fill="#FFD24D" stroke="#08321E" stroke-width=".8"/>
     </svg></div>
     <div class="contact-base" id="contactBase">
-      <svg viewBox="0 0 150 56" width="132" height="50">
+      <svg viewBox="0 0 150 56" width="132" height="50" style="overflow:visible">
         <ellipse cx="75" cy="49" rx="62" ry="7.5" fill="rgba(2,20,12,.28)"/>
         <ellipse cx="75" cy="40" rx="56" ry="13" fill="#0B3826"/>
         <rect x="19" y="30" width="112" height="10" fill="#0E4630"/>
         <ellipse cx="75" cy="30" rx="56" ry="13" fill="#13573C"/>
         <ellipse cx="75" cy="30" rx="56" ry="13" fill="none" stroke="#5FD89B" stroke-width="1.6" opacity=".6"/>
+        <!-- cart siding: a recessed groove + buffer stops so the chest-cart has a place to rest -->
+        <path d="M30 33.5 Q75 37 120 33.5 Q75 39.2 30 33.5 Z" fill="#06241A" opacity=".5"/>
+        <g><rect x="24" y="24.5" width="3" height="8" rx="1" fill="#0A3325"/><rect x="21.5" y="23" width="8" height="3.2" rx="1.3" fill="#4d5a64" stroke="#16201A" stroke-width=".9"/></g>
+        <g><rect x="123" y="24.5" width="3" height="8" rx="1" fill="#0A3325"/><rect x="120.5" y="23" width="8" height="3.2" rx="1.3" fill="#4d5a64" stroke="#16201A" stroke-width=".9"/></g>
       </svg>
       <svg class="lying-dog" viewBox="-12 -28 150 86" aria-hidden="true">
         <text class="z z1" x="24" y="-10">z</text><text class="z z2" x="16" y="-15">z</text><text class="z z3" x="8" y="-20">z</text>
@@ -707,6 +715,9 @@
 </section>
 
 <footer class="footer">© 2026 Pranav Soma &middot; San Diego, CA</footer>
+
+<!-- dynamic curved rail the chest-cart rides; segments rebuilt each frame from the path it has travelled -->
+<svg class="buddy-rail" id="buddyRail" aria-hidden="true"><path id="railTie"/><path id="railBack"/><path id="railFront"/></svg>
 
 <!-- scroll companion -->
 <div class="buddy" id="buddy" aria-hidden="true">
@@ -788,21 +799,54 @@
 
 <!-- chest-minecart the copper golem tows; click to ask about Pranav -->
 <button class="ask-cart" id="askCart" type="button" aria-label="Ask about Pranav" title="Ask me about Pranav">
-  <svg viewBox="0 0 112 80" aria-hidden="true">
-    <g stroke="#5b6470" stroke-width="2.6" stroke-linecap="round"><line x1="4" y1="70" x2="108" y2="70"/><line x1="4" y1="75" x2="108" y2="75"/></g>
-    <g stroke="#7A5436" stroke-width="3.6" stroke-linecap="round"><line x1="12" y1="67" x2="12" y2="78"/><line x1="30" y1="67" x2="30" y2="78"/><line x1="48" y1="67" x2="48" y2="78"/><line x1="66" y1="67" x2="66" y2="78"/><line x1="84" y1="67" x2="84" y2="78"/><line x1="102" y1="67" x2="102" y2="78"/></g>
-    <g class="cart-body" transform="translate(28,0)">
-      <circle class="w" cx="14" cy="62" r="7.5" fill="#3a4048" stroke="#23272d" stroke-width="2"/><circle cx="14" cy="62" r="2.4" fill="#9aa3ad"/>
-      <circle class="w" cx="42" cy="62" r="7.5" fill="#3a4048" stroke="#23272d" stroke-width="2"/><circle cx="42" cy="62" r="2.4" fill="#9aa3ad"/>
-      <path d="M2 44 L54 44 L49 60 L7 60 Z" fill="#8b939d" stroke="#3a4048" stroke-width="2.6" stroke-linejoin="round"/>
-      <path d="M2 44 L54 44 L52 49 L4 49 Z" fill="#aab2bb"/>
-      <rect x="9" y="16" width="38" height="30" rx="2" fill="#9C6B3F" stroke="#46301c" stroke-width="2.4"/>
-      <rect x="9" y="16" width="38" height="9" rx="2" fill="#A9794B"/>
-      <line x1="9" y1="25" x2="47" y2="25" stroke="#46301c" stroke-width="1.8"/>
-      <rect x="11" y="17" width="4" height="28" fill="#6E7782" opacity=".8"/><rect x="41" y="17" width="4" height="28" fill="#6E7782" opacity=".8"/>
-      <rect x="22" y="22" width="12" height="13" rx="1.5" fill="#C9D2DC" stroke="#46301c" stroke-width="1.8"/>
-      <text class="cart-qm" x="28" y="33" text-anchor="middle" font-family="Georgia,serif" font-size="11" font-weight="700" fill="#6b3fa0">?</text>
+  <svg viewBox="0 0 96 66" aria-hidden="true">
+    <defs>
+      <linearGradient id="cMetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B7BFC8"/><stop offset=".5" stop-color="#8b939d"/><stop offset="1" stop-color="#5d6571"/></linearGradient>
+      <linearGradient id="cMetalSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#79818c"/><stop offset="1" stop-color="#454c56"/></linearGradient>
+      <linearGradient id="cMetalRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D5DBE2"/><stop offset="1" stop-color="#9aa2ac"/></linearGradient>
+      <linearGradient id="copTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7FD0B6"/><stop offset="1" stop-color="#5BB89B"/></linearGradient>
+      <linearGradient id="copSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3E9079"/><stop offset="1" stop-color="#2C6F5D"/></linearGradient>
+    </defs>
+    <g class="cart-bob">
+      <!-- cart-face mirrors (scaleX) to face travel direction; the "?" sibling stays upright -->
+      <g class="cart-face">
+        <!-- far wheels (depth) -->
+        <circle cx="36" cy="58" r="6.6" fill="#262b31" stroke="#15191e" stroke-width="1.5"/>
+        <circle cx="60" cy="58" r="6.6" fill="#262b31" stroke="#15191e" stroke-width="1.5"/>
+        <!-- ===== oxidised copper chest (matches the copper golem) ===== -->
+        <path d="M68 9 L77 3.5 L77 40 L68 45.5 Z" fill="url(#copSide)" stroke="#1C5042" stroke-width="2.1" stroke-linejoin="round"/>
+        <path d="M28 9 L68 9 L77 3.5 L37 3.5 Z" fill="url(#copTop)" stroke="#1C5042" stroke-width="2.1" stroke-linejoin="round"/>
+        <path d="M37 3.5 L68 9 M28 9 L77 3.5" stroke="#2C6F5D" stroke-width="1" opacity=".5"/>
+        <rect x="28" y="9" width="40" height="36.5" fill="#3C8B75" stroke="#1C5042" stroke-width="2.4"/>
+        <path d="M48 11 L64.5 27.2 L48 43.5 L31.5 27.2 Z" fill="#5FBE9F" stroke="#1C5042" stroke-width="1.7" stroke-linejoin="round"/>
+        <path d="M48 11 L31.5 27.2" stroke="#94DEC4" stroke-width="1.3" opacity=".8"/>
+        <path d="M48 11 L64.5 27.2" stroke="#94DEC4" stroke-width="1" opacity=".5"/>
+        <path d="M48 19 L56.5 27.2 L48 35.5 L39.5 27.2 Z" fill="#4DA386" stroke="#1C5042" stroke-width="1.2" stroke-linejoin="round"/>
+        <rect x="31" y="12" width="34" height="30.5" fill="none" stroke="#2C6F5D" stroke-width="1" opacity=".7"/>
+        <line x1="28" y1="20" x2="68" y2="20" stroke="#1C5042" stroke-width="1.6"/>
+        <rect x="34" y="15" width="1.6" height="1.6" fill="#2C6F5D"/><rect x="61" y="38" width="1.6" height="1.6" fill="#2C6F5D"/>
+        <rect x="60" y="14" width="1.4" height="1.4" fill="#8AD8C0"/><rect x="35" y="39" width="1.4" height="1.4" fill="#2C6F5D"/>
+        <rect x="43.5" y="21.5" width="9" height="12" rx="1.4" fill="url(#cMetalRim)" stroke="#1C5042" stroke-width="1.5"/>
+        <!-- ===== minecart base ===== -->
+        <path d="M72 45 L80 41 L75 53 L67 57 Z" fill="url(#cMetalSide)" stroke="#3a4048" stroke-width="2.1" stroke-linejoin="round"/>
+        <path d="M24 45 L72 45 L67 57 L29 57 Z" fill="url(#cMetal)" stroke="#3a4048" stroke-width="2.4" stroke-linejoin="round"/>
+        <path d="M24 45 L72 45 L80 41 L32 41 Z" fill="url(#cMetalRim)" stroke="#3a4048" stroke-width="2.1" stroke-linejoin="round"/>
+        <circle cx="30" cy="50" r="1.4" fill="#6f7884"/><circle cx="66" cy="50" r="1.4" fill="#6f7884"/>
+        <!-- near wheels (spin while rolling) -->
+        <g class="w"><circle cx="34" cy="60" r="8" fill="#333a42" stroke="#1b1f24" stroke-width="2.1"/><circle cx="34" cy="60" r="2.8" fill="#9aa3ad"/><rect x="33" y="53.5" width="2" height="13" fill="#5a626c"/><rect x="27.5" y="59" width="13" height="2" fill="#5a626c"/></g>
+        <g class="w"><circle cx="62" cy="60" r="8" fill="#333a42" stroke="#1b1f24" stroke-width="2.1"/><circle cx="62" cy="60" r="2.8" fill="#9aa3ad"/><rect x="61" y="53.5" width="2" height="13" fill="#5a626c"/><rect x="55.5" y="59" width="13" height="2" fill="#5a626c"/></g>
+      </g>
+      <text class="cart-qm" x="48" y="30.4" text-anchor="middle" font-family="Georgia,serif" font-size="10" font-weight="700" fill="#6b3fa0">?</text>
     </g>
+  </svg>
+</button>
+
+<!-- mobile ask button: the golem/crystal/cart are desktop-only, so phones get a tap target -->
+<button class="ask-fab" id="askFab" type="button" aria-label="Ask about Pranav" title="Ask about Pranav">
+  <svg viewBox="0 0 48 48" aria-hidden="true">
+    <path d="M24 6 L39 14 L24 22 L9 14 Z" fill="#E58FE6"/><path d="M9 14 L24 22 L24 40 L9 31 Z" fill="#ED8FE8"/><path d="M39 14 L24 22 L24 40 L39 31 Z" fill="#A552D6"/>
+    <path d="M24 6 L39 14 L39 31 L24 40 L9 31 L9 14 Z M24 6 L24 22 M9 14 L24 22 M39 14 L24 22 M24 22 L24 40" fill="none" stroke="#ECFCFF" stroke-width="1.4" stroke-linejoin="round" opacity=".85"/>
+    <text x="24" y="29" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="700" fill="#fff">?</text>
   </svg>
 </button>
 

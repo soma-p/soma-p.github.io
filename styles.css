@@ -562,6 +562,8 @@ a{color:inherit;text-decoration:none}
 .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
 .reveal.in{opacity:1;transform:none}
 .shotmode .reveal{opacity:1!important;transform:none!important}
+.shotmode .ask-orb,.shotmode .ask-cart{opacity:1!important}
+.shotmode .buddy-rail{opacity:.94!important}
 .shotmode .hero{padding-top:120px}
 
 /* ---------- responsive ---------- */
@@ -623,14 +625,28 @@ a{color:inherit;text-decoration:none}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}html{scroll-behavior:auto}}
 
 /* ===== ask sidekicks: end-crystal orb + chest minecart, and the chatbot they open ===== */
+.buddy-rail{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:83;pointer-events:none;overflow:visible;opacity:0;transition:opacity .5s}
+.buddy-rail.live{opacity:.94}
+#railTie{fill:none;stroke:#6b4a2e;stroke-width:3.6;stroke-linecap:round}
+#railBack{fill:none;stroke:#566069;stroke-width:3;stroke-linecap:round}
+#railFront{fill:none;stroke:#9aa3ad;stroke-width:3.2;stroke-linecap:round}
+body.chat-open .buddy-rail{opacity:0}
+@media(max-width:900px){.buddy-rail{display:none}}
+@media(prefers-reduced-motion:reduce){.buddy-rail{display:none}}
 .ask-orb,.ask-cart{position:fixed;left:0;top:0;border:0;background:none;padding:0;cursor:pointer;will-change:transform;opacity:0;transition:opacity .45s}
 .ask-orb.live,.ask-cart.live{opacity:1}
 .ask-orb{width:56px;height:62px;z-index:88;filter:drop-shadow(0 4px 10px rgba(123,44,191,.5))}
-.ask-cart{width:96px;height:68px;z-index:87;filter:drop-shadow(0 6px 8px rgba(2,18,10,.35))}
+.ask-cart{width:88px;height:60px;z-index:87;transform-origin:50% 72%;filter:drop-shadow(0 6px 7px rgba(2,18,10,.4))}
 .ask-orb svg,.ask-cart svg{width:100%;height:100%;overflow:visible;display:block}
 .ask-orb:focus-visible{outline:2px solid #C77DFF;outline-offset:4px;border-radius:10px}
 .ask-cart:focus-visible{outline:2px solid #C9D2DC;outline-offset:3px;border-radius:8px}
 body.chat-open .ask-orb,body.chat-open .ask-cart{opacity:0!important;pointer-events:none}
+.ask-fab{position:fixed;right:16px;bottom:16px;z-index:140;width:56px;height:56px;border:0;border-radius:50%;background:linear-gradient(135deg,#7B2CBF,#9D4EDD);box-shadow:0 8px 22px -6px rgba(123,44,191,.7);cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;animation:fabPulse 2.8s ease-in-out infinite}
+.ask-fab svg{width:38px;height:38px;display:block}
+.ask-fab:active{transform:scale(.93)}
+@keyframes fabPulse{0%,100%{box-shadow:0 8px 22px -6px rgba(123,44,191,.7)}50%{box-shadow:0 8px 30px -4px rgba(123,44,191,.95)}}
+@media(max-width:900px){.ask-fab{display:flex}}
+body.chat-open .ask-fab{display:none}
 .o-bob{transform-box:fill-box;transform-origin:50% 50%;animation:oBob 3.4s ease-in-out infinite}
 @keyframes oBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .o-purple{transform-box:fill-box;transform-origin:50% 50%;animation:oSpinP 9s linear infinite}
@@ -643,7 +659,7 @@ body.chat-open .ask-orb,body.chat-open .ask-cart{opacity:0!important;pointer-eve
 @keyframes oGlow{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:.72;transform:scale(1.1)}}
 .o-spark{animation:oSpark 2.1s ease-in-out infinite}.o-spark2{animation-delay:1.05s}
 @keyframes oSpark{0%,100%{opacity:0}50%{opacity:1}}
-.ask-cart .cart-body{transform-box:fill-box;transform-origin:50% 100%;animation:cartBounce 1.7s ease-in-out infinite}
+.ask-cart .cart-bob{transform-box:fill-box;transform-origin:50% 100%;animation:cartBounce 1.7s ease-in-out infinite}
 @keyframes cartBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.2px)}}
 .ask-cart .w{transform-box:fill-box;transform-origin:50% 50%}
 .ask-cart.rolling .w{animation:cartSpin .7s linear infinite}
@@ -680,4 +696,4 @@ body.chat-open .ask-orb,body.chat-open .ask-cart{opacity:0!important;pointer-eve
 .ask-typing i:nth-child(2){animation-delay:.16s}.ask-typing i:nth-child(3){animation-delay:.32s}
 @keyframes askDot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
 @media(max-width:560px){.ask-panel{right:8px;bottom:8px;left:8px;width:auto}}
-@media(prefers-reduced-motion:reduce){.o-bob,.o-purple,.o-cyan,.o-qm,.o-glow,.o-spark,.ask-cart .cart-body,.ask-cart .cart-qm,.ask-cart.rolling .w{animation:none}.ask-panel{animation:none}}
+@media(prefers-reduced-motion:reduce){.o-bob,.o-purple,.o-cyan,.o-qm,.o-glow,.o-spark,.ask-cart .cart-bob,.ask-cart .cart-qm,.ask-cart.rolling .w{animation:none}.ask-panel{animation:none}}

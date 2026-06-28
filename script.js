@@ -591,8 +591,9 @@
   /* 8) scroll companion: copper-golem buddy — trail, side-docking, presenting, emotes */
   (() => {
     const buddy = $('#buddy'); if (!buddy) return;
-    const orb = $('#askOrb'), cart = $('#askCart');
-    if (reduce || innerWidth < 900) { buddy.style.display = 'none'; if (orb) orb.style.display = 'none'; if (cart) cart.style.display = 'none'; return; }
+    const orb = $('#askOrb'), cart = $('#askCart'), rail = $('#buddyRail');
+    const cartFace = cart && cart.querySelector('.cart-face'), tieEl = $('#railTie'), backEl = $('#railBack'), frontEl = $('#railFront');
+    if (reduce || innerWidth < 900) { buddy.style.display = 'none'; [orb, cart, rail].forEach(el => { if (el) el.style.display = 'none'; }); return; }
     const bubble = $('#buddyBubble');
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
     const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.32;    // big, perched on its base at the top
@@ -614,8 +615,33 @@
     if (!sections.length) { buddy.style.display = 'none'; return; }
     let tx = innerWidth * 0.8, ty = innerHeight * 0.3, cx = tx, cy = ty, curMsg = '', scrolling = false, stopT = 0, emoteT = 0, lastY = -1;
     let pcx = cx, pcy = cy, scl = 1;
-    let oang = 0, ocx = tx, ocy = ty, orbHover = false, orbReady = false, mcx = tx, mcy = ty + 120, pmx = mcx, cartReady = false;
+    let oang = 0, ocx = tx, ocy = ty, orbHover = false, orbReady = false;
+    let mcx = tx, mcy = ty + 120, pmx = mcx, pmy = mcy, cartReady = false, railLive = false, cartAng = 0, faceDir = 1, cartSide = 1, parkedF = 0;
+    const railPts = [], WHEEL = 62;
     if (orb) { orb.addEventListener('mouseenter', () => { orbHover = true; }); orb.addEventListener('mouseleave', () => { orbHover = false; }); }
+    // rebuild the curved rail from the path the cart has travelled (segmented ties + two offset rails)
+    const drawRail = () => {
+      if (railPts.length < 2 || !backEl) return;
+      const pts = railPts.slice(), n = pts.length, h = pts[n - 1], hb = pts[Math.max(0, n - 3)];
+      let tX = h.x - hb.x, tY = h.y - hb.y; const tl = Math.hypot(tX, tY) || 1; tX /= tl; tY /= tl;
+      pts.push({ x: h.x + tX * 56, y: h.y + tY * 56 });                 // a little track ahead of the cart
+      const t0 = pts[0], t1 = pts[1]; let bX = t0.x - t1.x, bY = t0.y - t1.y; const bl = Math.hypot(bX, bY) || 1;
+      pts.unshift({ x: t0.x + bX / bl * 14, y: t0.y + bY / bl * 14 });  // and a touch behind
+      const g = 3.4, back = [], front = [], ties = []; let acc = 0;
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i], pa = pts[Math.max(0, i - 1)], pb = pts[Math.min(pts.length - 1, i + 1)];
+        let dx = pb.x - pa.x, dy = pb.y - pa.y; const dl = Math.hypot(dx, dy) || 1; dx /= dl; dy /= dl;
+        const nx = -dy, ny = dx;                                        // perpendicular to the track
+        back.push(`${(p.x + nx * -g).toFixed(1)} ${(p.y + ny * -g).toFixed(1)}`);
+        front.push(`${(p.x + nx * g).toFixed(1)} ${(p.y + ny * g).toFixed(1)}`);
+        if (i > 0) acc += Math.hypot(p.x - pts[i - 1].x, p.y - pts[i - 1].y);
+        if (i > 0 && acc >= 14) { acc = 0; ties.push(`M${(p.x + nx * (-g - 2.6)).toFixed(1)} ${(p.y + ny * (-g - 2.6)).toFixed(1)} L${(p.x + nx * (g + 2.6)).toFixed(1)} ${(p.y + ny * (g + 2.6)).toFixed(1)}`); }
+      }
+      backEl.setAttribute('d', 'M' + back.join(' L'));
+      frontEl.setAttribute('d', 'M' + front.join(' L'));
+      tieEl.setAttribute('d', ties.join(' '));
+      if (!railLive) { rail.classList.add('live'); railLive = true; }
+    };
     const cur = () => { const mid = scrollY + innerHeight * 0.5; let b = sections[0]; for (const s of sections) if (s.el.getBoundingClientRect().top + scrollY <= mid) b = s; return b; };
     const setMsg = (m) => { if (m !== curMsg) { curMsg = m; bubble.textContent = m; } };
     const playEmote = (cls, ms) => { buddy.classList.add(cls); setTimeout(() => buddy.classList.remove(cls), ms); };
@@ -700,19 +726,46 @@
       buddy.classList.toggle('bub-l', ccx < 132);
       const vel = Math.hypot(cx - pcx, cy - pcy); pcx = cx; pcy = cy;
       buddy.classList.toggle('walking', !hero && !about && vel > 0.5);  // step the legs while moving
-      if (orb) {                                                        // end-crystal swirls the head; freezes + grows on hover so it's easy to click
+      if (orb) {                                                        // end-crystal swirls the head — crossing in front of and ducking behind the golem
         if (!orbHover) oang += scrolling ? 0.013 : 0.022;
-        const R = scrolling ? 26 : 44, hcx = cx + BW / 2, hcy = cy + 16 * scl;
-        const otx = hcx + Math.cos(oang) * R - 28, oty = hcy + Math.sin(oang) * R * 0.55 - 31;
-        ocx += (otx - ocx) * 0.13; ocy += (oty - ocy) * 0.13;
-        orb.style.transform = `translate(${ocx.toFixed(1)}px,${ocy.toFixed(1)}px) scale(${orbHover ? 1.22 : 1})`;
+        const R = scrolling ? 26 : 46, hcx = cx + BW / 2, hcy = cy + 16 * scl, sn = Math.sin(oang);
+        const otx = hcx + Math.cos(oang) * R - 28, oty = hcy + sn * R * 0.5 - 31;
+        ocx += (otx - ocx) * 0.16; ocy += (oty - ocy) * 0.16;
+        const depth = (sn + 1) / 2;                                     // 0 = far side (behind), 1 = near side (front)
+        orb.style.zIndex = sn > 0 ? 90 : 84;                           // pop above / tuck below the golem (z 85)
+        orb.style.transform = `translate(${ocx.toFixed(1)}px,${ocy.toFixed(1)}px) scale(${(orbHover ? 1.24 : 0.74 + depth * 0.34).toFixed(3)})`;
+        orb.style.filter = `drop-shadow(0 4px 10px rgba(123,44,191,.5)) brightness(${(0.82 + depth * 0.18).toFixed(2)})`;
         if (!orbReady) { orb.classList.add('live'); orbReady = true; }
       }
-      if (cart) {                                                       // chest-cart trails below, towed by the golem
-        const ctgx = clamp(cx + BW / 2 - 48, 4, innerWidth - 100), ctgy = cy + 86 * scl - 12;
-        mcx += (ctgx - mcx) * 0.05; mcy += (ctgy - mcy) * 0.09;
-        cart.classList.toggle('rolling', Math.abs(mcx - pmx) > 0.35); pmx = mcx;
-        cart.style.transform = `translate(${mcx.toFixed(1)}px,${mcy.toFixed(1)}px)`;
+      if (cart) {                                                       // chest-cart rolls on a rail at the golem's foot line, beside it, towards the page centre
+        const br = buddy.getBoundingClientRect(), gcx = cx + BW / 2, footY = br.bottom - 5;   // exact foot line at any scale
+        if (gcx > innerWidth / 2 + 50) cartSide = -1; else if (gcx < innerWidth / 2 - 50) cartSide = 1;
+        const OFF = (hero || about) ? br.width * 0.34 + 36 : br.width * 0.42 + 46;   // tuck onto the podium siding when docked, else sit clear beside it
+        const ctgx = clamp(gcx + cartSide * OFF - 44, 6, innerWidth - 92), ctgy = footY - WHEEL;
+        mcx += (ctgx - mcx) * 0.06; mcy += (ctgy - mcy) * 0.10;
+        const vx = mcx - pmx, vy = mcy - pmy, spd = Math.hypot(vx, vy); pmx = mcx; pmy = mcy;
+        cart.classList.toggle('rolling', spd > 0.35);
+        if (vx > 0.3) faceDir = 1; else if (vx < -0.3) faceDir = -1;    // mirror to face the way it travels
+        if (cartFace) cartFace.setAttribute('transform', faceDir < 0 ? 'translate(96,0) scale(-1,1)' : '');
+        const gpx = mcx + 44, gpy = mcy + WHEEL;                        // wheel-contact point feeds the rail
+        if (Math.abs(vx) < 0.5) parkedF++; else parkedF = 0;
+        if (parkedF > 6) {                                              // parked: a clean, level siding under the cart
+          railPts.length = 0; railPts.push({ x: gpx - 74, y: gpy }, { x: gpx - 34, y: gpy }, { x: gpx + 6, y: gpy });
+        } else {                                                        // travelling: lay curved track along the path it takes
+          const last = railPts[railPts.length - 1];
+          if (!last || Math.abs(gpx - last.x) > 5) railPts.push({ x: gpx, y: gpy });
+          let len = 0;
+          for (let i = railPts.length - 1; i > 0; i--) { len += Math.hypot(railPts[i].x - railPts[i - 1].x, railPts[i].y - railPts[i - 1].y); if (len > 150) { railPts.splice(0, i); break; } }
+        }
+        drawRail();
+        let ang = 0;                                                    // tilt to the slope of the rail beneath it
+        if (railPts.length > 1) {
+          const a = railPts[Math.max(0, railPts.length - 4)], b = railPts[railPts.length - 1];
+          let dx = b.x - a.x, dy = b.y - a.y; if (dx < 0) { dx = -dx; dy = -dy; }
+          if (Math.hypot(dx, dy) > 3) ang = clamp(Math.atan2(dy, dx) * 180 / Math.PI, -17, 17);
+        }
+        cartAng += (ang - cartAng) * 0.12;
+        cart.style.transform = `translate(${mcx.toFixed(1)}px,${mcy.toFixed(1)}px) rotate(${cartAng.toFixed(2)}deg)`;
         if (!cartReady) { cart.classList.add('live'); cartReady = true; }
       }
       requestAnimationFrame(loop);
@@ -884,9 +937,10 @@
       setTimeout(() => input.focus(), 320);
     };
     const close = () => { panel.classList.add('closing'); document.body.classList.remove('chat-open'); setTimeout(() => { panel.hidden = true; panel.classList.remove('closing'); }, 240); };
-    const orb = $('#askOrb'), cart = $('#askCart'), x = $('#askClose');
+    const orb = $('#askOrb'), cart = $('#askCart'), fab = $('#askFab'), x = $('#askClose');
     if (orb) orb.addEventListener('click', open);
     if (cart) cart.addEventListener('click', open);
+    if (fab) fab.addEventListener('click', open);
     if (x) x.addEventListener('click', close);
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) close(); });
   })();
