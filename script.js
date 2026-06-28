@@ -591,7 +591,8 @@
   /* 8) scroll companion: copper-golem buddy — trail, side-docking, presenting, emotes */
   (() => {
     const buddy = $('#buddy'); if (!buddy) return;
-    if (reduce || innerWidth < 900) { buddy.style.display = 'none'; return; }
+    const orb = $('#askOrb'), cart = $('#askCart');
+    if (reduce || innerWidth < 900) { buddy.style.display = 'none'; if (orb) orb.style.display = 'none'; if (cart) cart.style.display = 'none'; return; }
     const bubble = $('#buddyBubble');
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
     const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.32;    // big, perched on its base at the top
@@ -613,6 +614,8 @@
     if (!sections.length) { buddy.style.display = 'none'; return; }
     let tx = innerWidth * 0.8, ty = innerHeight * 0.3, cx = tx, cy = ty, curMsg = '', scrolling = false, stopT = 0, emoteT = 0, lastY = -1;
     let pcx = cx, pcy = cy, scl = 1;
+    let oang = 0, ocx = tx, ocy = ty, orbHover = false, orbReady = false, mcx = tx, mcy = ty + 120, pmx = mcx, cartReady = false;
+    if (orb) { orb.addEventListener('mouseenter', () => { orbHover = true; }); orb.addEventListener('mouseleave', () => { orbHover = false; }); }
     const cur = () => { const mid = scrollY + innerHeight * 0.5; let b = sections[0]; for (const s of sections) if (s.el.getBoundingClientRect().top + scrollY <= mid) b = s; return b; };
     const setMsg = (m) => { if (m !== curMsg) { curMsg = m; bubble.textContent = m; } };
     const playEmote = (cls, ms) => { buddy.classList.add(cls); setTimeout(() => buddy.classList.remove(cls), ms); };
@@ -697,6 +700,21 @@
       buddy.classList.toggle('bub-l', ccx < 132);
       const vel = Math.hypot(cx - pcx, cy - pcy); pcx = cx; pcy = cy;
       buddy.classList.toggle('walking', !hero && !about && vel > 0.5);  // step the legs while moving
+      if (orb) {                                                        // end-crystal swirls the head; freezes + grows on hover so it's easy to click
+        if (!orbHover) oang += scrolling ? 0.013 : 0.022;
+        const R = scrolling ? 26 : 44, hcx = cx + BW / 2, hcy = cy + 16 * scl;
+        const otx = hcx + Math.cos(oang) * R - 28, oty = hcy + Math.sin(oang) * R * 0.55 - 31;
+        ocx += (otx - ocx) * 0.13; ocy += (oty - ocy) * 0.13;
+        orb.style.transform = `translate(${ocx.toFixed(1)}px,${ocy.toFixed(1)}px) scale(${orbHover ? 1.22 : 1})`;
+        if (!orbReady) { orb.classList.add('live'); orbReady = true; }
+      }
+      if (cart) {                                                       // chest-cart trails below, towed by the golem
+        const ctgx = clamp(cx + BW / 2 - 48, 4, innerWidth - 100), ctgy = cy + 86 * scl - 12;
+        mcx += (ctgx - mcx) * 0.05; mcy += (ctgy - mcy) * 0.09;
+        cart.classList.toggle('rolling', Math.abs(mcx - pmx) > 0.35); pmx = mcx;
+        cart.style.transform = `translate(${mcx.toFixed(1)}px,${mcy.toFixed(1)}px)`;
+        if (!cartReady) { cart.classList.add('live'); cartReady = true; }
+      }
       requestAnimationFrame(loop);
     };
     loop();
@@ -811,5 +829,65 @@
       clearTimeout(t);
       t = setTimeout(() => dog.classList.remove('awake'), 2600);
     });
+  })();
+
+  /* the end-crystal and the chest-minecart both open a little chatbot about Pranav */
+  (() => {
+    const panel = $('#askPanel'); if (!panel) return;
+    const log = $('#askLog'), chipsBox = $('#askChips'), form = $('#askForm'), input = $('#askIn');
+    const KB = [
+      { k: ['hello', 'hi', 'hey', 'yo', 'sup', 'greetings'], a: "Hey! I'm Pranav's end-crystal sidekick (the chest-cart works too). Ask me about his work, projects, what he's after, or how to reach him." },
+      { k: ['who', 'about', 'yourself', 'introduce', 'summary', 'who is', 'tell me about'], a: "Pranav Soma is a CS master's student at UC San Diego (4.00 GPA) who builds AI and ships it — agentic systems, multimodal health models, and large-scale ML. He turns research into things people actually use." },
+      { k: ['work', 'experience', 'job', 'servicenow', 'intern', 'company', 'employ', 'worked'], a: "He's been a software engineer at ServiceNow (shipping voice agents), worked at UCSD's Qualcomm Institute, and leads engineering in the Innovate Research Group. He also built and runs an AI tutor used by ~8,000 students." },
+      { k: ['research', 'paper', 'study', 'agentic', 'lab', 'aila'], a: "His research spans agentic AI platforms, an AI tutor with real eval pipelines, AILA, and multimodal health models — he likes problems where the model has to be both capable and trustworthy." },
+      { k: ['project', 'build', 'built', 'portfolio', 'made', 'favorite', 'best', 'cool', 'show'], a: "Highlights: ORCA (an award-winning sheet-music to audio AI), AIDE (an intent-based IDE), AgentSpace (two-way expert agents over MCP + A2A), and BioVeritas (checks scientific rigor with retrieval). They're all in the projects section, animated." },
+      { k: ['orca', 'music', 'sheet', 'audio', 'song'], a: "ORCA reads sheet music into audio and turns audio back into a score — OpenCV + neural nets + a CNN, at 98% accuracy (verified four ways, including by real musicians). It won Best Project at SAIRS 2025." },
+      { k: ['tutor', 'teach', 'student', '8000', 'learning'], a: "He built an AI tutor running for ~8,000 students, with multi-layer eval pipelines so the feedback is actually correct — not just fluent." },
+      { k: ['agent', 'agentspace', 'aide', 'mcp', 'a2a', 'rag', 'graphrag'], a: "He's deep in agentic systems: AIDE (intent classification, code injection, runtime correctness loops) and AgentSpace (two-way GraphRAG over skill + personality embeddings, exposed over MCP and A2A for multi-agent delegation)." },
+      { k: ['skill', 'tech', 'stack', 'language', 'tool', 'know', 'expertise'], a: "Python and ML at the core — agentic frameworks, RAG/GraphRAG, OpenCV, CNNs, multimodal models — plus the ship-it stack (React, Flask, Docker). He's product-minded, not just a model-tinkerer." },
+      { k: ['school', 'degree', 'gpa', 'ucsd', 'university', 'college', 'grade', 'education'], a: "He's doing his CS master's at UC San Diego with a 4.00 GPA." },
+      { k: ['contact', 'email', 'reach', 'connect', 'linkedin', 'github', 'message'], a: "Easiest is email: <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>. His LinkedIn, GitHub, and résumé are all linked at the bottom of the page — and he reads everything." },
+      { k: ['hire', 'hiring', 'looking', 'seeking', 'role', 'opportunity', 'available', 'relocate', 'location', 'based', 'where'], a: "He's after roles at top AI companies — software, ML, or forward-deployed. He's based in San Diego and happy to relocate anywhere in the SF Bay Area." },
+      { k: ['robot', 'golem', 'dog', 'mascot', 'crystal', 'minecart', 'chest', 'fun', 'animation'], a: "Ha — every creature here is hand-built SVG + canvas. The green guy is his golem guide; I'm the end-crystal (and chest-cart) it carries around. It's his way of showing, not telling." },
+      { k: ['thanks', 'thank', 'nice', 'awesome', 'great', 'love', 'amazing'], a: "Anytime! If you like what you see, his résumé and email are at the bottom of the page." },
+    ];
+    const FALLBACK = "Good question — I keep it to the highlights: his work, research, projects, skills, what he's looking for, and how to reach him. Try one of those, or email him at <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>.";
+    const STOP = new Set(['the', 'a', 'an', 'is', 'are', 'of', 'to', 'and', 'or', 'do', 'does', 'what', 'whats', 'how', 'about', 'tell', 'me', 'you', 'your', 'his', 'him', 'he', 'for', 'in', 'on', 'at', 'with', 'can', 'i', 'pranav', 'soma']);
+    const norm = (s) => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((w) => w && !STOP.has(w));
+    const reply = (q) => {
+      const ql = q.toLowerCase(), words = norm(q);
+      let best = null, score = 0;
+      for (const e of KB) {
+        let s = 0;
+        for (const k of e.k) {
+          if (k.includes(' ')) { if (ql.includes(k)) s += 4; }
+          else if (words.includes(k)) s += 2;
+          else if (words.some((w) => (w.length > 3 && k.startsWith(w)) || (k.length > 3 && w.startsWith(k)))) s += 1;
+        }
+        if (s > score) { score = s; best = e; }
+      }
+      return score >= 1 ? best.a : FALLBACK;
+    };
+    const addBot = (html) => { const d = document.createElement('div'); d.className = 'ask-msg bot'; d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; return d; };
+    const addMe = (txt) => { const d = document.createElement('div'); d.className = 'ask-msg me'; d.textContent = txt; log.appendChild(d); log.scrollTop = log.scrollHeight; };
+    const respond = (q) => { const t = addBot('<span class="ask-typing"><i></i><i></i><i></i></span>'); setTimeout(() => { t.innerHTML = reply(q); log.scrollTop = log.scrollHeight; }, 360 + Math.random() * 360); };
+    const send = (q) => { q = (q || '').trim(); if (!q) return; addMe(q); input.value = ''; respond(q); };
+    form.addEventListener('submit', (e) => { e.preventDefault(); send(input.value); });
+    ['What does he work on?', 'Best projects?', "What's he looking for?", 'How do I reach him?'].forEach((c) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'ask-chip'; b.textContent = c;
+      b.addEventListener('click', () => send(c)); chipsBox.appendChild(b);
+    });
+    let greeted = false;
+    const open = () => {
+      panel.hidden = false; panel.classList.remove('closing'); document.body.classList.add('chat-open');
+      if (!greeted) { greeted = true; setTimeout(() => addBot("Hey — I'm Pranav's sidekick. Ask me about his work, projects, what he's after, or how to reach him; or tap a chip below."), 240); }
+      setTimeout(() => input.focus(), 320);
+    };
+    const close = () => { panel.classList.add('closing'); document.body.classList.remove('chat-open'); setTimeout(() => { panel.hidden = true; panel.classList.remove('closing'); }, 240); };
+    const orb = $('#askOrb'), cart = $('#askCart'), x = $('#askClose');
+    if (orb) orb.addEventListener('click', open);
+    if (cart) cart.addEventListener('click', open);
+    if (x) x.addEventListener('click', close);
+    addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) close(); });
   })();
 })();
