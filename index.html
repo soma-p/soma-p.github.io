@@ -23,7 +23,7 @@
 <meta name="theme-color" content="#0E7A53" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <script>try{var _t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('theme');if(_t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
 <link rel="stylesheet" href="styles.css" />
 </head>
@@ -32,13 +32,13 @@
 
 <header class="nav" id="nav">
   <div class="nav-inner">
-    <a href="#top" class="brand">Pranav Soma<b>.</b></a>
+    <a href="#top" class="brand">Pranav Soma</a>
     <nav class="nav-links" id="navLinks" aria-label="Primary">
-      <a href="#work">Work</a>
-      <a href="#research">Research</a>
-      <a href="#projects">Projects</a>
-      <a href="#leadership">Leadership</a>
-      <a href="#about">About</a>
+      <a href="#work"><i>01</i> Work</a>
+      <a href="#research"><i>02</i> Research</a>
+      <a href="#projects"><i>03</i> Projects</a>
+      <a href="#leadership"><i>04</i> Leadership</a>
+      <a href="#about"><i>05</i> About</a>
       <a href="resumes/Pranav_Soma_Resume.pdf" class="nav-cta" target="_blank" rel="noopener">Résumé</a>
     </nav>
     <button class="nav-toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -50,29 +50,17 @@
   <canvas class="hero-bg" id="heroBg"></canvas>
   <div class="container hero-inner">
 
-    <div class="hero-base" id="heroBase" aria-hidden="true">
-      <svg viewBox="0 0 150 56" width="142" height="53">
-        <ellipse cx="75" cy="49" rx="60" ry="7.5" fill="rgba(8,38,26,.16)"/>
-        <ellipse cx="75" cy="40" rx="55" ry="13" fill="#123726"/>
-        <rect x="20" y="30" width="110" height="10" fill="#15402E"/>
-        <ellipse cx="75" cy="30" rx="55" ry="13" fill="#1F5A40"/>
-        <ellipse cx="75" cy="30" rx="55" ry="13" fill="none" stroke="#34D399" stroke-width="1.6" opacity=".55"/>
-        <ellipse cx="75" cy="28" rx="38" ry="7.5" fill="#27684B" opacity=".55"/>
-      </svg>
+    <div class="hero-kicker reveal">
+      <span class="hk-l">AI Researcher &amp; Engineer <em>/ UC San Diego</em></span>
+      <span class="hk-r"><i class="live-dot"></i> Interning at <b>ServiceNow</b> &middot; Summer '26</span>
     </div>
 
-    <div class="hero-top reveal">
-      <span class="eyebrow">AI Researcher &amp; Engineer &middot; UC San Diego</span>
-      <span class="hero-status"><i class="live-dot"></i> Interning at <b>ServiceNow</b> &middot; Summer '26</span>
-    </div>
-
-    <h1 class="hero-name reveal" aria-label="Pranav Soma">
-      <span class="nm-row"><span class="scramble" data-text="PRANAV">PRANAV</span></span>
-      <span class="nm-row nm-2">SOMA<span class="accent">.</span></span>
-    </h1>
-
-    <div class="hero-body">
-      <div class="hero-copy">
+    <div class="hero-main">
+      <div class="hero-headline">
+        <h1 class="hero-name reveal" aria-label="Pranav Soma">
+          <span class="nm-row"><span class="scramble" data-text="PRANAV">PRANAV</span></span>
+          <span class="nm-row nm-2">SOMA<span class="accent">.</span></span>
+        </h1>
         <p class="hero-rotator reveal">I&nbsp;<span class="rot-mask"><b id="heroRot" class="accent">build AI &amp; ship&nbsp;it.</b></span></p>
         <p class="hero-sub reveal">Finished my CS bachelor's at UCSD in <b>two years</b>, wrapping my master's in just over one (<b>4.00 GPA</b>). I lead an agentic AI platform for <b>7,000+</b> people, train multimodal health models on a supercomputer, and shipped voice agents to production at <b>ServiceNow</b>, tested live with customers, and I'm back there this summer.</p>
         <div class="hero-cta reveal">
@@ -82,12 +70,20 @@
         </div>
       </div>
 
-      <div class="hero-portrait reveal">
+      <figure class="hero-plate reveal">
+        <div class="hero-base" id="heroBase" aria-hidden="true">
+          <svg viewBox="0 0 150 56" width="142" height="53">
+            <ellipse cx="75" cy="49" rx="60" ry="7.5" fill="rgba(8,38,26,.16)"/>
+            <ellipse cx="75" cy="40" rx="55" ry="13" fill="#123726"/>
+            <rect x="20" y="30" width="110" height="10" fill="#15402E"/>
+            <ellipse cx="75" cy="30" rx="55" ry="13" fill="#1F5A40"/>
+            <ellipse cx="75" cy="30" rx="55" ry="13" fill="none" stroke="#34D399" stroke-width="1.6" opacity=".55"/>
+            <ellipse cx="75" cy="28" rx="38" ry="7.5" fill="#27684B" opacity=".55"/>
+          </svg>
+        </div>
         <div class="hp-frame"><img src="imgs/web/headshot.jpg" alt="Pranav Soma" width="600" height="750" /></div>
-        <span class="hp-chip ch1">8,000 students</span>
-        <span class="hp-chip ch2">$75K raised</span>
-        <span class="hp-chip ch3">Open to the Bay Area</span>
-      </div>
+        <figcaption><span>Pranav Soma</span><span>San Diego &middot; open to the Bay</span></figcaption>
+      </figure>
     </div>
 
     <div class="hero-ticker reveal">
