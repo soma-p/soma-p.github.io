@@ -780,4 +780,15 @@
       setTimeout(() => { el.textContent = old; }, 1500);
     }).catch(() => { location.href = 'mailto:' + el.dataset.email; });
   });
+
+  /* podium pup naps; a click wakes it — eyes open — before it dozes off again */
+  (() => {
+    const dog = $('.lying-dog'); if (!dog) return;
+    let t;
+    dog.addEventListener('click', () => {
+      dog.classList.add('awake');
+      clearTimeout(t);
+      t = setTimeout(() => dog.classList.remove('awake'), 2600);
+    });
+  })();
 })();
