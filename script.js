@@ -647,10 +647,11 @@
     };
     // if the dock spot sits over text, find the nearest clear vertical band so it glides up/down to it
     const TEXTSEL = 'h1,h2,h3,h4,p,li,a.link,.chip,.meta,blockquote,figcaption';
+    const CONTENTSEL = TEXTSEL + ',img,table,canvas,video';        // text + media the golem should never sit on top of
     const clearDockY = (left, preferredY, h) => {
       const right = left + BW, vh = innerHeight, lo = 84, hi = vh - 150, py = clamp(preferredY, lo, hi);
       const rects = [];
-      $$(TEXTSEL).forEach(el => {
+      $$(CONTENTSEL).forEach(el => {
         const r = el.getBoundingClientRect();
         if (!r.width || r.bottom < -30 || r.top > vh + 30) return;        // off-screen
         if (r.right < left - 8 || r.left > right + 8) return;             // not in the buddy's column
@@ -666,7 +667,7 @@
       }
       return py;
     };
-    const hitsText = (box) => $$(TEXTSEL).some(el => {             // does any visible text element overlap this box?
+    const hitsText = (box) => $$(CONTENTSEL).some(el => {          // does any visible text/media element overlap this box?
       const r = el.getBoundingClientRect();
       if (!r.width || r.bottom < -30 || r.top > innerHeight + 30 || !el.textContent.trim()) return false;
       return r.right > box.left - 6 && r.left < box.right + 6 && r.bottom > box.top - 6 && r.top < box.bottom + 6;
