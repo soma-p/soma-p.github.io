@@ -156,6 +156,8 @@
 
   /* ===== centerpieces ===== */
   const onView = (node, cb) => { new IntersectionObserver(es => cb(es[0].isIntersecting), { threshold: 0 }).observe(node); };
+  // run an rAF loop only while the node is on-screen; fully stops it off-screen to save CPU/battery
+  const visLoop = (node, fn) => { let id = 0; const tick = (t) => { id = requestAnimationFrame(tick); fn(t); }; onView(node, (v) => { if (v) { if (!id) id = requestAnimationFrame(tick); } else if (id) { cancelAnimationFrame(id); id = 0; } }); };
 
   /* 1) hero neural flow-field: drifting constellation with travelling data pulses */
   (() => {
@@ -207,8 +209,8 @@
       // nodes
       nodes.forEach(nd => { c.fillStyle = 'rgba(14,122,83,.85)'; c.beginPath(); c.arc(nd.x + px, nd.y + py, nd.r, 0, 7); c.fill(); });
     };
-    const frame = () => { if (run) { t += 16; if (Math.random() < 0.04) spawn(); draw(); } requestAnimationFrame(frame); };
-    if (reduce) { init(); draw(); } else { requestAnimationFrame(frame); onView(cv, v => { run = v; }); }
+    const frame = () => { if (run) { t += 16; if (Math.random() < 0.04) spawn(); draw(); } };
+    if (reduce) { init(); draw(); } else { visLoop(cv, frame); }
   })();
 
   /* 2) ORCA waveform (mirrored audio panel) */
@@ -235,8 +237,8 @@
         c.fillStyle = g; roundBar(x, mid - h, w, h * 2, w / 2);
       }
     };
-    const frame = (t) => { if (run) { amp += ((hover ? 0.95 : 0.55) - amp) * 0.06; draw(t); } requestAnimationFrame(frame); };
-    if (reduce) { size(); draw(0); } else { requestAnimationFrame(frame); onView(cv, v => run = v); }
+    const frame = (t) => { if (run) { amp += ((hover ? 0.95 : 0.55) - amp) * 0.06; draw(t); } };
+    if (reduce) { size(); draw(0); } else { visLoop(cv, frame); }
   })();
 
   /* 3) interactive redistricting */
@@ -334,8 +336,8 @@
         c.fillStyle = 'rgba(159,240,200,.92)'; c.fillText(labels[i], lx, ly);
       }
     };
-    const frame = () => { if (run) { pulse = (pulse + 0.0016) % 1; draw(); } requestAnimationFrame(frame); };
-    if (reduce) { size(); draw(); } else { requestAnimationFrame(frame); onView(cv, v => run = v); }
+    const frame = () => { if (run) { pulse = (pulse + 0.0016) % 1; draw(); } };
+    if (reduce) { size(); draw(); } else { visLoop(cv, frame); }
   })();
 
   /* 4b) AI Tutor card: a purple bot walks to a whiteboard and teaches math + code */
@@ -430,10 +432,9 @@
         if (phase !== 'walk') { c.fillStyle = 'rgba(110,120,115,.32)'; c.font = '12px Georgia, serif'; c.fillText(f.mono ? '# try it yourself' : 'worked example', txX + 2, txY + 28); }
         drawTutor(gx, groundY, moving, atBoard && (phase === 'write' || phase === 'hold'));
       }
-      requestAnimationFrame(draw);
     };
     if (reduce) { size(); phase = 'hold'; gx = Math.max(W * 0.30, 118) - 20; prog = 1; draw(); run = false; }
-    else { requestAnimationFrame(draw); onView(cv, v => run = v); }
+    else { visLoop(cv, draw); }
   })();
 
   /* 5) RAIN card: diagonal droplets + occasional lightning */
@@ -490,9 +491,8 @@
         }
         drawClouds(cloudOp);
       }
-      requestAnimationFrame(draw);
     };
-    if (reduce) { init(); } else { requestAnimationFrame(draw); onView(cv, v => run = v); }
+    if (reduce) { init(); } else { visLoop(cv, draw); }
   })();
 
   /* 6) AI Alliance card: a radar scope that lights up the member universities */
@@ -543,9 +543,8 @@
         });
         c.fillStyle = 'rgba(159,240,200,.9)'; c.shadowColor = '#34D399'; c.shadowBlur = 10; c.beginPath(); c.arc(cx, cy, 3.2, 0, 7); c.fill(); c.shadowBlur = 0;
       }
-      requestAnimationFrame(draw);
     };
-    if (reduce) { init(); draw(); run = false; } else { requestAnimationFrame(draw); onView(cv, v => run = v); }
+    if (reduce) { init(); draw(); run = false; } else { visLoop(cv, draw); }
   })();
 
   /* 6b) Innovate card: ideas drift up as sparks and ignite */
@@ -575,9 +574,8 @@
           if (p.ig > 0.3) { c.strokeStyle = `rgba(205,196,255,${p.ig * 0.7})`; c.lineWidth = 1.2; c.beginPath(); c.arc(p.x, p.y, (1 - p.ig) * 15 + 4, 0, 7); c.stroke(); }
         });
       }
-      requestAnimationFrame(draw);
     };
-    if (reduce) { init(); draw(); run = false; } else { requestAnimationFrame(draw); onView(cv, v => run = v); }
+    if (reduce) { init(); draw(); run = false; } else { visLoop(cv, draw); }
   })();
 
   /* 7) CSE card: pixel-art beach */
@@ -769,8 +767,8 @@
       }
       c.strokeStyle = 'rgba(140,240,190,.6)'; c.lineWidth = 1; c.beginPath(); c.moveTo(2, scanY); c.lineTo(W - 2, scanY); c.stroke();
     };
-    const frame = () => { if (run) { t += 0.04; draw(); } requestAnimationFrame(frame); };
-    if (reduce) { size(); draw(); } else { requestAnimationFrame(frame); onView(cv, v => run = v); }
+    const frame = () => { if (run) { t += 0.04; draw(); } };
+    if (reduce) { size(); draw(); } else { visLoop(cv, frame); }
   })();
 
   /* 10) Baymax steps out of his red carrying case as you scroll */
@@ -930,7 +928,7 @@
     // A broad knowledge base: each topic carries regex patterns (strong signal) + keywords (backup),
     // scored and ranked per query so the best single answer wins. The chips below show only the primary ones.
     const KB = [
-      { re: [/\b(hi+|hey+|hello+|yo+|sup|howdy|greetings|good (morning|afternoon|evening)|what'?s up)\b/], kw: ['hello', 'hi', 'hey'], a: "Hey! I'm Pranav's end-crystal sidekick. Ask me anything about his work, research, projects, skills, education, what he's looking for, or how to reach him." },
+      { re: [/\b(hi+|hey+|hello+|yo+|sup|howdy|greetings|good (morning|afternoon|evening)|what'?s up)\b/], kw: ['hello', 'hi', 'hey'], a: "Hey! I'm Pranav's end-crystal sidekick, a quick guide to the basics. I can cover his work, research, projects, skills, education, what he's looking for, and how to reach him." },
       { re: [/\b(who'?s|who (is|are)|about (him|pranav|himself)|tell me about|introduce|summar(y|ize|ise)|overview|in (a nutshell|short)|tl;?dr|describe (him|pranav)|elevator|what (does|do).{0,12}\bdo\b)\b/], kw: ['who', 'about', 'summary', 'overview', 'introduce', 'bio'], a: "Pranav Soma is a CS master's student at UC San Diego (4.00 GPA) who builds AI and ships it. He's a software engineer at ServiceNow, leads a university-wide agentic AI platform used by 7,000+ people, trains multimodal health models on a supercomputer, and has an AI tutor running for 8,000 students. The constant is carrying a problem from the math all the way to the deploy button." },
       { re: [/\b(why (should|would|do|i'?d|we'?d)?\s*.{0,14}(hire|pick|choose|want|consider)|why (him|pranav|you)|hire him|stand ?out|set him apart|what makes him|his (strength|edge)|best (fit|candidate|hire)|sell me|convince|the pitch|impressive|special about)\b/], kw: ['why', 'hire', 'strengths', 'standout', 'pitch'], a: "Short version: he's rare in how wide he goes and how far he ships. He's taken AI from research into production at ServiceNow, a tutor for 8,000 students, and health models for emergency care, all while leading 7,000+ person communities. He moved fast (undergrad in two years, master's in one and a quarter, 4.00 GPA) and was the top intern of 800+ at ServiceNow. He'd rather own a problem from the theory to the deploy button than stop at either end." },
       { w: 4, re: [/\b(work(s|ed)?( on| at| for)?|experience|jobs?|career|employ|professional|companies|internship)\b/], kw: ['work', 'experience', 'job', 'intern', 'career', 'company'], a: "Four very different teams: Software Engineer at ServiceNow (AI voice agents, in production), AI Research Fellow & Agentic Systems Lead at the Lab for Emerging Intelligence (a platform for 7,000+ people plus an AI tutor for 8,000 students), Graduate Researcher at UCSD's Qualcomm Institute (multimodal health AI), and intern lead at Work4Flow (GenAI tooling). Ask about any one of them." },
@@ -991,7 +989,7 @@
     let greeted = false;
     const open = () => {
       panel.hidden = false; panel.classList.remove('closing'); document.body.classList.add('chat-open');
-      if (!greeted) { greeted = true; setTimeout(() => addBot("Hey, I'm Pranav's sidekick. Ask me about his work, projects, what he's after, or how to reach him; or tap a chip below."), 240); }
+      if (!greeted) { greeted = true; setTimeout(() => addBot("Hey, I'm Pranav's end-crystal sidekick, a quick guide to the basics (not a full chatbot). Ask about his work, projects, what he's after, or how to reach him, or tap a chip below."), 240); }
       setTimeout(() => input.focus(), 320);
     };
     const close = () => { panel.classList.add('closing'); document.body.classList.remove('chat-open'); setTimeout(() => { panel.hidden = true; panel.classList.remove('closing'); }, 240); };
