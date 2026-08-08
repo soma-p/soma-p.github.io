@@ -237,7 +237,7 @@
   (() => {
     const rail = $('#projRail'), track = $('#projTrack');
     if (!rail || !track) return;
-    const pin = rail.querySelector('.rail-pin'), fill = $('#railFill');
+    const pin = rail.querySelector('.rail-scroll'), fill = $('#railFill');
     const counter = rail.querySelector('.rail-prog span'), cards = $$('.card', track);
     let span = 0, queued = false;
 
