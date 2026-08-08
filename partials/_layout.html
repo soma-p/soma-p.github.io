@@ -4,7 +4,10 @@
 <!--#include head.html-->
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <!--#include nav.html-->
+<!-- tabindex -1 so the skip link actually MOVES focus here, not just the scroll -->
+<main id="main" tabindex="-1">
 <!--#include hero.html-->
 <!--#include marquee.html-->
 <!--#include interlude-lesson.html-->
@@ -18,6 +21,7 @@
 <!--#include honors.html-->
 <!--#include about.html-->
 <!--#include contact.html-->
+</main>
 <!--#include footer.html-->
 <!--#include golem.html-->
 <!--#include lever.html-->

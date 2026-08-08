@@ -114,7 +114,7 @@
   /* hero rotating tagline */
   (() => {
     const el = $('#heroRot'); if (!el || reduce) return;
-    const phrases = ['build AI & ship it.', 'ship to 8,000 students.', 'lead a 7,000-person platform.', 'put voice agents in production.', 'train models on a supercomputer.'];
+    const phrases = ['build AI & ship it.', 'ship to 8,000 students.', 'lead a platform 7,000 people use.', 'put voice agents in production.', 'trained models on a supercomputer.', 'build the OS for autonomy.'];
     let i = 0;
     setInterval(() => {
       i = (i + 1) % phrases.length;
@@ -150,7 +150,16 @@
     document.documentElement.style.scrollBehavior = 'auto';
     $$('a[href^="#"]').forEach(a => a.addEventListener('click', (e) => {
       const id = a.getAttribute('href');
-      if (id.length > 1) { const t = $(id); if (t) { e.preventDefault(); lenis.scrollTo(t, { offset: -68 }); } }
+      if (id.length > 1) {
+        const t = $(id);
+        if (t) {
+          e.preventDefault(); lenis.scrollTo(t, { offset: -68 });
+          // preventDefault also cancels the focus move the browser would have done,
+          // which would leave the skip link scrolling the page but stranding the
+          // keyboard user back at the top of the tab order
+          if (t.hasAttribute('tabindex')) t.focus({ preventScroll: true });
+        }
+      }
     }));
   }
 
@@ -211,6 +220,151 @@
     };
     const frame = () => { if (run) { t += 16; if (Math.random() < 0.04) spawn(); draw(); } };
     if (reduce) { init(); draw(); } else { visLoop(cv, frame); }
+  })();
+
+  /* 1b) Dyson swarm on the incoming-role plate: collectors on three inclined
+     orbits, each beaming harvested power back down to the core.
+
+     Each shell is a real 3D circle: pick a unit normal n from a tilt/azimuth
+     pair, build an orthonormal basis (u, v) spanning the plane perpendicular
+     to it, and a drone at angle th sits at a*(cos th * u + sin th * v). The
+     z component of that is the depth, which drives draw order (behind the
+     core first), scale and alpha, so collectors visibly pass behind the star
+     and come back around in front of it. */
+  (() => {
+    const cv = $('#waSwarm'); if (!cv) return;
+    const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
+    let W = 0, H = 0, cx = 0, cy = 0, U = 0, core = null, speed = 0.6, hover = 0;
+
+    // three orbital shells: [radius x U, tilt, azimuth, angular speed, drones]
+    const SHELLS = [[0.40, 1.08, 0.31, 0.62, 6], [0.56, 1.24, 1.82, -0.44, 7], [0.72, 1.01, -0.91, 0.33, 8]];
+    // canvas blends gradient stops non-premultiplied, so fading a colour to
+    // "transparent" runs it through grey. Fade to the same hue at alpha 0.
+    const toRGBA = (col, a) => {
+      const h = (col || '').trim();
+      if (h[0] === '#') {
+        const p = h.length === 4 ? [h[1] + h[1], h[2] + h[2], h[3] + h[3]] : [h.slice(1, 3), h.slice(3, 5), h.slice(5, 7)];
+        return `rgba(${parseInt(p[0], 16)},${parseInt(p[1], 16)},${parseInt(p[2], 16)},${a})`;
+      }
+      const m = h.match(/[\d.]+/g);
+      return m ? `rgba(${m[0]},${m[1]},${m[2]},${a})` : h;
+    };
+    const pal = { line: '', dim: '', mid: '', hot: '', glow: '' };
+    const readPal = () => {
+      const s = getComputedStyle(cv.parentElement);
+      pal.line = s.getPropertyValue('--wa-line').trim(); pal.dim = s.getPropertyValue('--wa-dim').trim();
+      pal.mid = s.getPropertyValue('--wa-mid').trim(); pal.hot = s.getPropertyValue('--wa-hot').trim();
+      pal.glow = s.getPropertyValue('--wa-glow').trim();
+    };
+
+    const drones = [];
+    const build = () => {
+      drones.length = 0;
+      SHELLS.forEach(([k, tilt, az, w, n], si) => {
+        // plane normal, then any two unit vectors perpendicular to it
+        const nx = Math.sin(tilt) * Math.cos(az), ny = Math.sin(tilt) * Math.sin(az), nz = Math.cos(tilt);
+        let ux = -ny, uy = nx, uz = 0, ul = Math.hypot(ux, uy, uz);
+        if (ul < 1e-4) { ux = 1; uy = 0; uz = 0; ul = 1; }
+        ux /= ul; uy /= ul; uz /= ul;
+        const vx = ny * uz - nz * uy, vy = nz * ux - nx * uz, vz = nx * uy - ny * ux;
+        for (let i = 0; i < n; i++) {
+          drones.push({ si, k, w, u: [ux, uy, uz], v: [vx, vy, vz], th: (i / n) * Math.PI * 2 + si * 0.7, p: (i / n + si * 0.31) % 1 });
+        }
+      });
+    };
+
+    const size = () => {
+      const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
+      if (!W || !H) return;
+      cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cx = W / 2; cy = H / 2; U = Math.min(W, H) / 2;
+      core = c.createRadialGradient(cx, cy, 0, cx, cy, U * 0.34);
+      core.addColorStop(0, '#FFFFFF'); core.addColorStop(0.22, pal.hot);
+      core.addColorStop(0.55, pal.mid); core.addColorStop(1, toRGBA(pal.mid, 0));
+    };
+    readPal(); size();
+    build();
+    addEventListener('resize', () => { readPal(); size(); }, { passive: true });
+    // the lever swaps the CSS custom properties out from under us
+    new MutationObserver(() => { readPal(); size(); })
+      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    const host = cv.closest('.work-row');
+    host?.addEventListener('mouseenter', () => { hover = 1; });
+    host?.addEventListener('mouseleave', () => { hover = 0; });
+
+    const at = (d, th) => {                                   // orbital angle -> 3D point
+      const ct = Math.cos(th) * d.k * U, st = Math.sin(th) * d.k * U;
+      return [d.u[0] * ct + d.v[0] * st, d.u[1] * ct + d.v[1] * st, d.u[2] * ct + d.v[2] * st];
+    };
+    const orbit = (d, back) => {                              // one half of a shell's guide ellipse
+      c.beginPath();
+      for (let i = 0; i <= 44; i++) {
+        const th = (i / 44) * Math.PI * 2, p = at(d, th);
+        if (back ? p[2] > 0 : p[2] <= 0) { c.moveTo(cx + p[0], cy + p[1]); continue; }
+        c.lineTo(cx + p[0], cy + p[1]);
+      }
+      c.stroke();
+    };
+
+    const paint = (d, t) => {
+      const p = at(d, d.th), sx = cx + p[0], sy = cy + p[1];
+      const z = p[2] / (d.k * U);                             // -1 behind, +1 in front
+      const sc = 0.66 + 0.44 * (z + 1) / 2, al = 0.42 + 0.58 * (z + 1) / 2;
+      // harvest beam, brightest while this collector is charging
+      const chg = 0.5 + 0.5 * Math.sin(t * 0.0016 + d.th * 2 + d.si);
+      c.globalAlpha = Math.min(1, (0.1 + 0.3 * chg) * al);
+      c.strokeStyle = pal.hot; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(cx, cy); c.lineTo(sx, sy); c.stroke();
+      // a packet of power running the beam back down to the core
+      const px = sx + (cx - sx) * d.p, py = sy + (cy - sy) * d.p;
+      c.globalAlpha = Math.min(1, 0.85 * al);
+      c.fillStyle = pal.hot;
+      c.beginPath(); c.arc(px, py, 1.5 * sc, 0, 7); c.fill();
+      // the collector itself: a panel held square to its own orbit
+      const ah = at(d, d.th + 0.05), ang = Math.atan2(ah[1] - p[1], ah[0] - p[0]);
+      c.save(); c.translate(sx, sy); c.rotate(ang);
+      c.globalAlpha = Math.min(1, al);
+      c.fillStyle = pal.mid; c.fillRect(-3.1 * sc, -2.1 * sc, 6.2 * sc, 4.2 * sc);
+      c.fillStyle = pal.hot; c.fillRect(-3.1 * sc, -2.1 * sc, 6.2 * sc, 1.1 * sc);
+      c.restore();
+      c.globalAlpha = 1;
+    };
+
+    const draw = (t) => {
+      if (!W || !H) return;
+      c.clearRect(0, 0, W, H);
+      c.lineWidth = 1; c.strokeStyle = pal.line;
+      const first = [0, 6, 13].map(i => drones[i]).filter(Boolean);
+      first.forEach(d => orbit(d, true));                     // guide arcs behind the core
+      drones.filter(d => at(d, d.th)[2] <= 0).forEach(d => paint(d, t));
+      const g = 1 + 0.06 * Math.sin(t * 0.0021);              // the star, breathing
+      c.fillStyle = core;
+      c.beginPath(); c.arc(cx, cy, U * 0.34 * g, 0, 7); c.fill();
+      c.strokeStyle = pal.glow; c.lineWidth = 1.2;
+      c.beginPath(); c.arc(cx, cy, U * 0.15 * g, 0, 7); c.stroke();
+      c.lineWidth = 1; c.strokeStyle = pal.line;
+      first.forEach(d => orbit(d, false));                    // guide arcs in front
+      drones.filter(d => at(d, d.th)[2] > 0).forEach(d => paint(d, t));
+    };
+
+    // park the sibling SVG plates' CSS animations while the section is off screen
+    const sec = cv.closest('.section');
+    if (sec) new IntersectionObserver(es => sec.classList.toggle('wa-parked', !es[0].isIntersecting), { threshold: 0 }).observe(sec);
+
+    let last = 0;
+    const frame = (t) => {
+      if (!W || !H) size();                                   // first measure can land before layout
+      const dt = last ? Math.min(64, t - last) : 16; last = t;
+      speed += ((hover ? 1.7 : 0.6) - speed) * 0.05;
+      drones.forEach(d => {
+        d.th += d.w * speed * dt * 0.0016;
+        d.p += (0.24 + 0.1 * d.si) * speed * dt * 0.001;
+        if (d.p >= 1) d.p -= 1;
+      });
+      draw(t);
+    };
+    if (reduce) { draw(1200); } else { visLoop(cv, frame); }
   })();
 
   /* 2) ORCA waveform (mirrored audio panel) */
@@ -601,14 +755,18 @@
   (() => {
     const buddy = $('#buddy'); if (!buddy) return;
     const orb = $('#askOrb');
+    const aboutBase = $('#contactBase'), ABOUT_SCALE = 0.84;         // settles onto its podium in the contact green, among the lineup
+    // this reveal has to be wired up before the bail-out below, or the podium and
+    // the dog on it stay at opacity 0 forever for anyone who bails out
+    if (aboutBase) new IntersectionObserver(es => aboutBase.classList.toggle('in', es[0].isIntersecting), { threshold: 0 }).observe(aboutBase);
+    // no golem here, so no orbiting crystal either. The chat is still reachable:
+    // the mobile FAB is forced visible for both of these cases in styles.css.
     if (reduce || innerWidth < 900) { buddy.style.display = 'none'; if (orb) orb.style.display = 'none'; return; }
     const bubble = $('#buddyBubble');
     const BW = 78, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
     const base = $('#heroBase'), HERO_TH = 96, HERO_SCALE = 1.12;    // perched on its base at the top (kept clear of the nav)
     const heroActive = () => scrollY < HERO_TH && base && base.getBoundingClientRect().width > 0;
-    const aboutBase = $('#contactBase'), ABOUT_SCALE = 0.84;         // settles onto its podium in the contact green, among the lineup
     const aboutActive = () => { if (!aboutBase) return false; const r = aboutBase.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight * 0.84 && r.bottom > innerHeight * 0.18; };
-    if (aboutBase) new IntersectionObserver(es => aboutBase.classList.toggle('in', es[0].isIntersecting), { threshold: 0 }).observe(aboutBase);
     const sections = [
       { sel: '#top', side: 'R', y: 0.28, msg: "whoa, that's me!" },
       { sel: '#work', side: 'L', y: 0.44, msg: "here's where I've worked!" },
@@ -696,6 +854,10 @@
     });
 
     const loop = () => {
+      // measured before this frame writes buddy.style.transform below: reading it
+      // after the write forces a synchronous layout on every single frame. One
+      // frame of lag on the orbit ellipse is not visible; the reflow was.
+      const br = buddy.getBoundingClientRect();
       const hero = heroActive();
       const about = !hero && aboutActive();
       let targetScale;
@@ -721,7 +883,7 @@
       buddy.classList.toggle('walking', !hero && !about && vel > 0.5);  // step the legs while moving
       if (orb) {                                                        // end-crystal orbits the WHOLE golem (head + body), crossing in front and ducking behind
         if (!orbHover) oang += scrolling ? 0.016 : 0.024;
-        const br = buddy.getBoundingClientRect(), sn = Math.sin(oang);
+        const sn = Math.sin(oang);
         const f = scrolling ? 0.82 : 1, Rx = br.width * 0.64 * f, Ry = br.height * 0.5 * f;
         const otx = br.left + br.width / 2 + Math.cos(oang) * Rx - 28, oty = br.top + br.height / 2 + sn * Ry - 31;
         ocx += (otx - ocx) * 0.16; ocy += (oty - ocy) * 0.16;
@@ -877,7 +1039,7 @@
       { meta: "Founding board, VP of external affairs, nation's largest", title: 'University AI Alliance', body:
         "<h4>What it is</h4><p>The University AI Alliance is the largest student-led AI initiative in the country, with members from MIT, Stanford, Caltech, and Cornell.</p><h4>The role</h4><p>Pranav sits on its founding board as VP of external affairs, the outward-facing seat: he runs the relationships with VCs like the a16z speedrun and Techstars, and with people from Google and Meta, connecting a national student network to the institutions that fund and hire from it.</p>" },
       { meta: 'President', title: 'CSE Society @ UCSD', body:
-        "<h4>What it is</h4><p>UC San Diego's oldest computing organization. Its charter is simple: build a passionate, diverse society of computer scientists and engineers and get them real professional opportunities. 100+ members, with open-source partnerships with the Linux Foundation and Cisco.</p><h4>What it runs</h4><p>Quarterly career fairs, company-sponsored recruiting events, mentorship programs, technical workshops, conferences and talks, project teams, and a research journal: the full path from a first internship to published work.</p><h4>The role</h4><p>President. The institutional-backbone version of community building, keeping a decades-old org genuinely useful to current students while plugging it into the wider open-source and industry world. <a href=\"https://csesucsd.com\" target=\"_blank\" rel=\"noopener\">csesucsd.com</a></p>" },
+        "<h4>What it is</h4><p>UC San Diego's oldest computing organization. Its charter is simple: build a passionate, diverse society of computer scientists and engineers and get them real professional opportunities. 200+ members across 21+ projects, with open-source partnerships with the Linux Foundation and Cisco.</p><h4>What it runs</h4><p>Quarterly career fairs, company-sponsored recruiting events, mentorship programs, technical workshops, conferences and talks, project teams, and a research journal: the full path from a first internship to published work.</p><h4>The role</h4><p>President. The institutional-backbone version of community building, keeping a decades-old org genuinely useful to current students while plugging it into the wider open-source and industry world. <a href=\"https://csesucsd.com\" target=\"_blank\" rel=\"noopener\">csesucsd.com</a></p>" },
       { meta: 'Founder', title: 'Innovate Research Group', body:
         "<h4>What it is</h4><p>A research group Pranav founded to bring AI into other fields, working across UCLA, UCSB, and UCSC, with 30+ people across ORCA and several other projects.</p><h4>Why it matters</h4><p>It is where a lot of his cross-disciplinary work starts: AIDE, AgentSpace, the Skin Lesion Detector, and the Virtual Trial Room all came out of it. A group built specifically to point AI at problems that live outside computer science.</p>" }
     ];
@@ -898,7 +1060,13 @@
       elTitle.textContent = d.title || '';
       elBody.innerHTML = '';
       elBody.innerHTML = Array.isArray(d.body) ? d.body.map((p) => '<p>' + p + '</p>').join('') : (d.body || '');
-      if (d.img) { elImg.src = d.img; elImg.alt = d.alt || ''; elFig.hidden = false; } else { elFig.hidden = true; }
+      if (d.img) {
+        // carry the thumbnail's declared size over so the figure reserves its box
+        // before the full image decodes, instead of jolting the open modal
+        if (d.w && d.h) { elImg.setAttribute('width', d.w); elImg.setAttribute('height', d.h); }
+        else { elImg.removeAttribute('width'); elImg.removeAttribute('height'); }
+        elImg.src = d.img; elImg.alt = d.alt || ''; elFig.hidden = false;
+      } else { elFig.hidden = true; }
       modal.hidden = false; modal.classList.remove('closing'); if (card) card.scrollTop = 0;
       setTimeout(() => modal.querySelector('.im-x')?.focus(), 60);
     };
@@ -908,7 +1076,11 @@
       el.classList.add('im-trigger'); el.tabIndex = 0; el.setAttribute('role', 'button');
       const go = (e) => {
         if (e.target.closest && e.target.closest('a')) return;        // let inner links do their thing
-        if (gallery) { const im = el.querySelector('img'), cap = el.querySelector('figcaption'); open({ title: cap ? cap.textContent : '', img: im.src, alt: im.alt, body: [arr[i] || ''] }); }
+        if (gallery) {
+          const im = el.querySelector('img'), cap = el.querySelector('figcaption');
+          open({ title: cap ? cap.textContent : '', img: im.src, alt: im.alt, body: [arr[i] || ''],
+                 w: im.getAttribute('width'), h: im.getAttribute('height') });
+        }
         else open(arr[i]);
       };
       el.addEventListener('click', go);
@@ -929,36 +1101,38 @@
     // scored and ranked per query so the best single answer wins. The chips below show only the primary ones.
     const KB = [
       { re: [/\b(hi+|hey+|hello+|yo+|sup|howdy|greetings|good (morning|afternoon|evening)|what'?s up)\b/], kw: ['hello', 'hi', 'hey'], a: "Hey! I'm Pranav's end-crystal sidekick, a quick guide to the basics. I can cover his work, research, projects, skills, education, what he's looking for, and how to reach him." },
-      { re: [/\b(who'?s|who (is|are)|about (him|pranav|himself)|tell me about|introduce|summar(y|ize|ise)|overview|in (a nutshell|short)|tl;?dr|describe (him|pranav)|elevator|what (does|do).{0,12}\bdo\b)\b/], kw: ['who', 'about', 'summary', 'overview', 'introduce', 'bio'], a: "Pranav Soma is a CS master's student at UC San Diego (4.00 GPA) who builds AI and ships it. He's a software engineer at ServiceNow, leads a university-wide agentic AI platform used by 7,000+ people, trains multimodal health models on a supercomputer, and has an AI tutor running for 8,000 students. The constant is carrying a problem from the math all the way to the deploy button." },
-      { re: [/\b(why (should|would|do|i'?d|we'?d)?\s*.{0,14}(hire|pick|choose|want|consider)|why (him|pranav|you)|hire him|stand ?out|set him apart|what makes him|his (strength|edge)|best (fit|candidate|hire)|sell me|convince|the pitch|impressive|special about)\b/], kw: ['why', 'hire', 'strengths', 'standout', 'pitch'], a: "Short version: he's rare in how wide he goes and how far he ships. He's taken AI from research into production at ServiceNow, a tutor for 8,000 students, and health models for emergency care, all while leading 7,000+ person communities. He moved fast (undergrad in two years, master's in one and a quarter, 4.00 GPA) and was the top intern of 800+ at ServiceNow. He'd rather own a problem from the theory to the deploy button than stop at either end." },
-      { w: 4, re: [/\b(work(s|ed)?( on| at| for)?|experience|jobs?|career|employ|professional|companies|internship)\b/], kw: ['work', 'experience', 'job', 'intern', 'career', 'company'], a: "Four very different teams: Software Engineer at ServiceNow (AI voice agents, in production), AI Research Fellow & Agentic Systems Lead at the Lab for Emerging Intelligence (a platform for 7,000+ people plus an AI tutor for 8,000 students), Graduate Researcher at UCSD's Qualcomm Institute (multimodal health AI), and intern lead at Work4Flow (GenAI tooling). Ask about any one of them." },
-      { re: [/\bservice ?now\b|voice agent|aws lex|\blex\b|return offer|top intern/], kw: ['servicenow', 'voice', 'lex', 'latency'], a: "At ServiceNow he works on the AI Voice Agents platform. He migrated it off a soon-to-be-killed AWS Lex version ahead of schedule and into production (tested live with customers before the internship ended), and rebuilt the language-understanding pipeline across 8 intents, cutting voice-agent latency by 45%. He earned a return offer and the Technical Skills Award (top of 800+ interns), and he's back there again this summer." },
+      { re: [/\b(who'?s|who (is|are)|about (him|pranav|himself)|tell me about|introduce|summar(y|ize|ise)|overview|in (a nutshell|short)|tl;?dr|describe (him|pranav)|elevator|what (does|do).{0,12}\bdo\b)\b/], kw: ['who', 'about', 'summary', 'overview', 'introduce', 'bio'], a: "Pranav Soma is a CS master's student at UC San Diego (4.00 GPA) who builds AI and ships it. He's a software engineering intern at ServiceNow (two summers, plus a return offer), leads a university-wide agentic AI platform used by 7,000+ people, trained multimodal health models on a supercomputer, and has an AI tutor running for 8,000 students. This September he becomes the founding software engineer at a startup that's still in stealth, building the core software an autonomy stack runs on. The constant is carrying a problem from the math all the way to the deploy button." },
+      { re: [/\b(why (should|would|do|i'?d|we'?d)?\s*.{0,14}(hire|pick|choose|want|consider)|why (him|pranav|you)|hire him|stand ?out|set him apart|what makes him|his (strength|edge)|best (fit|candidate|hire)|sell me|convince|the pitch|impressive|special about)\b/], kw: ['why', 'hire', 'strengths', 'standout', 'pitch'], a: "Short version: he's rare in how wide he goes and how far he ships. He's taken AI from research into production at ServiceNow, a tutor for 8,000 students, and health models for emergency care, all while leading 7,000+ person communities. He moved fast (undergrad in two years, master's in one and a quarter, 4.00 GPA) and was the top intern of 800+ at UCSD's summer internship symposium. He'd rather own a problem from the theory to the deploy button than stop at either end." },
+      { w: 4, re: [/\b(work(s|ed)?( on| at| for)?|experience|jobs?|career|employ|professional|companies|internship)\b/], kw: ['work', 'experience', 'job', 'intern', 'career', 'company'], a: "Five very different teams. Starting September 2026 he's the founding software engineer at a stealth startup, building the core operating system an autonomy stack runs on. Before that: Software Engineer Intern at ServiceNow (AI voice agents, in production, two summers plus a return offer), AI Research Fellow & Agentic Systems Lead at the Lab for Emerging Intelligence (a platform for 7,000+ people plus an AI tutor for 8,000 students), Graduate Researcher at UCSD's Qualcomm Institute (multimodal health AI), and intern lead at Work4Flow (GenAI tooling). Ask about any one of them." },
+      { re: [/\b(autonom(y|ous)|hardware.?in.?the.?loop|command (and|&) control|\bc2\b|edge nodes?|degraded (network|environment)|trajector(y|ies)|telemetry|stealth|founding (software )?engineer|(the|his|which|that) (new )?startup|who.{0,14}(joining|going to work)|what'?s next|what'?s he (doing|up to)|next (role|job|move|step|thing)|(joining|starts?|starting) (in |a )?(sep|september|the fall))\b/], kw: ['autonomy', 'autonomous', 'next', 'stealth', 'telemetry', 'founding'], a: "Next up: in September 2026 he starts as founding software engineer at a startup that's still in stealth, so the name and the product stay off this site. What he can say is the engineering: building their core operating system from the ground up, hardware-agnostic and built to keep running when pieces of it don't. On top of that sits multi-agent autonomy (coordination, trajectory planning, splitting resources across distributed nodes), sensor fusion and real-time perception feeding one picture of what's happening, low-latency command-and-control dashboards for operators, networking that survives degraded links, and simulation plus hardware-in-the-loop testing on the physical systems. It hasn't started yet, so there's nothing shipped to point at. Ask him in a year." },
+      { re: [/\b(visa|sponsor(ship)?|work authoriz|h1b|h-1b|opt\b|cpt\b|citizen|green card|eligible to work)\b/], kw: ['visa', 'sponsorship', 'authorization', 'citizen'], a: "Best to ask him directly on that one: <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>. He answers fast." },
+      { re: [/\bservice ?now\b|voice agent|aws lex|\blex\b|return offer|top intern/], kw: ['servicenow', 'voice', 'lex', 'latency'], a: "At ServiceNow he works on the AI Voice Agents platform. He migrated it off a soon-to-be-killed AWS Lex version ahead of schedule and into production (tested live with customers before the internship ended), and rebuilt the language-understanding pipeline across 8 intents, cutting voice-agent latency by 45%. He earned a return offer and the Technical Skills Award (top intern of 800+ at UCSD's symposium), and he's back there again this summer." },
       { re: [/\b(lab for emerging intelligence|\blei\b|agentic (platform|system|ai)|workflow (engine|executor)|mcp server|enterprise agent|7,?000)\b/], kw: ['agentic', 'platform', 'mcp', 'workflow', 'enterprise'], a: "At the Lab for Emerging Intelligence (Teradata-funded) he leads an enterprise agentic-AI platform used by 7,000+ UCSD students, faculty, and staff: custom MCP servers over the university's APIs, research into automated skill generation and optimization, and a workflow executor he built to stay intelligent, deterministic, and graceful when a task goes sideways." },
       { re: [/\b(tutor|teaching (bot|assistant)|smart learning|8,?000 student|panel.?of.?judges|eval(uation)? pipeline|knowledge tracing)\b/], kw: ['tutor', 'teach', 'student', 'learning', 'eval', 'education-tech'], a: "He built and shipped an AI tutor now running for 8,000 students across UCSD, SDSU, and Cal Poly Pomona. To keep it reliable he built a two-layer evaluation pipeline: one layer monitors tutor outputs live, and an LLM panel-of-judges above it stores each student's learning and personality metrics so the teaching adapts. A/B tested: 64% fewer TA hours and 87% higher engagement." },
-      { re: [/\b(life ?saver|aila|qualcomm|hxi|calit2|multimodal|health(care)?|supercomputer|umls|emergency|rural|clinic|medical|first responder|sensor)\b/], kw: ['health', 'lifesaver', 'aila', 'multimodal', 'medical', 'qualcomm', 'supercomputer'], a: "At UCSD's Qualcomm Institute (HXI Lab) he works on LifeSaver / AILA, an assistant that turns messy real-world signals (sensors, audio, video) into structured answers a clinician or first responder can use, for emergency services, the elderly, and rural care. He trained multimodal models (Qwen SFT) on the San Diego Supercomputer Center and grounded them with GraphRAG over the UMLS medical ontology so answers are accurate and fast enough for emergencies. He's first author on the lab's poster and wired up the robotics that drives the hardware." },
+      { re: [/\b(life ?saver|aila|qualcomm|hxi|calit2|multimodal|health(care)?|supercomputer|umls|emergency|rural|clinic|medical|first responder|sensor)\b/], kw: ['health', 'lifesaver', 'aila', 'multimodal', 'medical', 'qualcomm', 'supercomputer'], a: "At UCSD's Qualcomm Institute (HXI Lab) he worked on LifeSaver / AILA, an assistant that turns messy real-world signals (sensors, audio, video) into structured answers a clinician or first responder can use, for emergency services, the elderly, and rural care. He trained multimodal models (Qwen SFT) on the San Diego Supercomputer Center and grounded them with GraphRAG over the UMLS medical ontology so answers are accurate and fast enough for emergencies. He's first author on the lab's poster and wired up the robotics that drives the hardware." },
       { re: [/\bwork ?4 ?flow\b|genai observer|smartsheet\b/], kw: ['work4flow', 'observer', 'smartsheet'], a: "At Work4Flow he led a team of 6 interns and shipped GenAI Observer, a tool that scores the prompts engineers write and suggests improvements, plus a ServiceNow-to-Smartsheet integration with LLM categorization. Both got the PM's green light to go to customers." },
-      { w: 4, re: [/\b(research|researching|papers?|publication|thesis|academ(ic|ia)|stud(y|ies)|scholar)\b/], kw: ['research', 'paper', 'thesis', 'study', 'publication'], a: "Four research threads: computational redistricting (his CSE honors thesis, applying to ACM CHI 2026), university-wide agentic systems at LEI, the Smart Learning Hub plus AI tutor, and AILA/LifeSaver multimodal health AI. He likes problems where the model has to be both capable and trustworthy. The research section is interactive, go poke at any of them." },
-      { re: [/\b(redistrict|gerrymander|congress|district|fairness|honors thesis|efficiency gap|voting rights|census|chi 2026|exploratorium|\bmaps?\b)\b/], kw: ['redistricting', 'gerrymandering', 'districts', 'thesis', 'census'], a: "His honors thesis draws and scores U.S. congressional maps over Census data (158K to 5.5M blocks per state). He built three map generators (a greedy heuristic, a Monte Carlo sampler, and an XGBoost model with graph partitioning) and wrote the fairness metrics that grade them, like the efficiency gap and Voting Rights Act compliance. It reproduces the real district counts for Alabama, California, and Texas. He's applying to ACM CHI 2026 and presenting at the SF Exploratorium." },
+      { w: 4, re: [/\b(research|researching|papers?|publication|thesis|academ(ic|ia)|stud(y|ies)|scholar)\b/], kw: ['research', 'paper', 'thesis', 'study', 'publication'], a: "Four research threads: computational redistricting (his CSE honors thesis), university-wide agentic systems at LEI, the Smart Learning Hub plus AI tutor, and AILA/LifeSaver multimodal health AI. He likes problems where the model has to be both capable and trustworthy. The research section is interactive, go poke at any of them." },
+      { re: [/\b(redistrict|gerrymander|congress|district|fairness|honors thesis|efficiency gap|voting rights|census|chi 2026|exploratorium|\bmaps?\b)\b/], kw: ['redistricting', 'gerrymandering', 'districts', 'thesis', 'census'], a: "His honors thesis draws and scores U.S. congressional maps over Census data (158K to 5.5M blocks per state). He built three map generators (a greedy heuristic, a Monte Carlo sampler, and an XGBoost model with graph partitioning) and wrote the fairness metrics that grade them, like the efficiency gap and Voting Rights Act compliance. It reproduces the real district counts for Alabama, California, and Texas, and he's exhibiting it at the SF Exploratorium in December." },
       { w: 4, re: [/\b(projects?|portfolio|built|build|made|cool (stuff|things)|side project|favou?rite|best (project|work)|show me)\b/], kw: ['project', 'build', 'portfolio', 'made', 'favorite'], a: "Highlights: ORCA (award-winning sheet-music to audio AI), AIDE (an intent-based zero-touch IDE), AgentSpace (two-way expert agents over MCP + A2A), BioVeritas (checks scientific rigor with retrieval), and Spay.LA (a fundraising platform that raised $75K). Plus a skin-lesion detector, a virtual trial room, and a housing platform. Ask about any of them." },
       { re: [/\borca\b|sheet music|score.{0,8}audio|audio.{0,8}score/], kw: ['orca', 'music', 'sheet', 'audio', 'song'], a: "ORCA (Orchestration and Recognition for Composition and Arrangement) turns sheet music into audio and audio back into a score: OpenCV reads the page, neural nets split the instruments, and a CNN writes the score, at 98% accuracy verified four ways including by real musicians. It won Best Project at the SD Undergrad Tech Conference (1 of 30 from 200+) and was shown at SAIRS 2025." },
       { re: [/\baide\b|zero.?touch|intent.?based ide|integrated developer/], kw: ['aide', 'ide'], a: "AIDE (AI Integrated Developer Environment) is an intent-based, zero-touch IDE that turns what you describe into working code: multi-layer intent classification, slot-filling, code injection, and runtime correctness loops for CI/CD. It's one of his Innovate Research Group projects." },
       { re: [/\bagent ?space\b|two.?way (marketplace|agent|graphrag)|\ba2a\b|hireable agent/], kw: ['agentspace', 'a2a', 'marketplace'], a: "AgentSpace is a two-way marketplace where professionals pour their personality and toolset into a hireable virtual agent that others can use. It runs on two-way GraphRAG over skill and personality embeddings (think Gemini Gems and Claude Skills), exposed over MCP + A2A for multi-agent context-sharing and delegation." },
       { re: [/\bbio ?veritas\b|scientific rigor|research integrity|biology research/], kw: ['bioveritas', 'rigor'], a: "BioVeritas checks how sound and honest a piece of biology research is, using retrieval to back up everything it flags. It's his take on AI for scientific rigor." },
       { re: [/\bspay\b|fundrais|advocacy|75k|nonprofit|non-profit/], kw: ['spay', 'fundraising', 'nonprofit'], a: "Spay.LA is a fundraising and advocacy platform he led for a real client as engineering manager of a team of 11. He owned everything from scoping with the client to shipping, and it raised $75K." },
-      { re: [/\b(union station|housing|listing platform|skin lesion|lesion|dermatolog|trial room|fitting room|virtual try|try.?on)\b/], kw: ['housing', 'lesion', 'trial', 'fitting'], a: "A few more: Union Station Housing (a listing platform for greater LA's main housing provider, with media upload and bulk exports), a Skin Lesion Detector (an on-device image classifier), and a Virtual Trial Room (a 3D fitting room using deep learning and computer vision). Most are from his Innovate Research Group." },
+      { re: [/\b(union station|housing|listing platform|skin lesion|lesion|dermatolog|trial room|fitting room|virtual try|try.?on)\b/], kw: ['housing', 'lesion', 'trial', 'fitting'], a: "A few more: Union Station Housing (a listing platform for one of greater LA's largest housing providers, with media upload and bulk exports), a Skin Lesion Detector (an on-device image classifier), and a Virtual Trial Room (a 3D fitting room using deep learning and computer vision). Most are from his Innovate Research Group." },
       { w: 4, re: [/\b(skills?|tech ?stack|technolog|languages?|tools?|frameworks?|proficient|expertise|\bstack\b|what.{0,10}(know|use))\b/], kw: ['skill', 'tech', 'stack', 'language', 'tool', 'expertise'], a: "Python and ML at the core: agentic frameworks, MCP, RAG/GraphRAG, fine-tuning (LoRA/SFT/RLHF), multimodal LLMs, OpenCV, CNNs, XGBoost. Plus the ship-it stack: React, FastAPI/Flask, Docker, PostgreSQL, MongoDB, and AWS (Lambda, Lex). He's product-minded, not just a model-tinkerer." },
       { re: [/\b(machine learning|deep learning|\bml\b|\bai\b|fine.?tun|lora|rlhf|\bsft\b|\brag\b|graphrag|\bllm\b|neural net|train(ing|ed)? (a )?model|embeddings?)\b/], kw: ['ml', 'ai', 'machine', 'learning', 'finetuning', 'rag', 'llm', 'training'], a: "On the ML side he does fine-tuning (LoRA, SFT, RLHF), RAG and GraphRAG, multimodal LLMs (Qwen), agentic systems over MCP, plus classic vision (CNNs, OpenCV) and ML (XGBoost). He's trained models on the San Diego Supercomputer Center and shipped them into production tools people actually use." },
       { re: [/\b(education|degree|gpa|grades?|major|school|college|university|ucsd|uc san diego|master'?s|bachelor|undergrad|graduat|cum laude|4\.0)\b/], kw: ['education', 'degree', 'gpa', 'ucsd', 'school', 'masters'], a: "He's finishing his CS master's at UC San Diego with a 4.00 GPA, after a B.S. in Computer Science there, cum laude with CSE Department Honors and Provost Honors every quarter. He moves fast: undergrad in two years, master's in a year and a quarter." },
       { re: [/\b(honou?rs?|awards?|recognition|achievement|accolade|proud|won|win|prize|\byc\b|y combinator|national merit|usaco|olympiad)\b/], kw: ['honors', 'award', 'recognition', 'won', 'achievement'], a: "A few: picked for Y Combinator's Startup School 2026; the ServiceNow Technical Skills Award as top intern of 800+; Best Project at the SD Undergrad Tech Conference for ORCA; cum laude plus CSE Department Honors at UCSD; National Merit Finalist and AP Scholar with Distinction; and USACO Silver." },
-      { re: [/\b(leadership|communit|clubs?|organization|founded|co.?found|president|started|\brain\b|university ai alliance|cse society|alliance|innovate research)\b/], kw: ['leadership', 'community', 'founded', 'president', 'club'], a: "He tends to start things. He co-founded RAIN (Real World AI Network), a 7,000+ student group across UCSD's engineering, data science, and business schools; sits on the founding board of the University AI Alliance (the nation's largest student-led AI initiative, with MIT, Stanford, Caltech, Cornell) as VP of external affairs; is president of UCSD's CSE Society (100+ members); and founded the Innovate Research Group (30+ people across UCLA, UCSB, UCSC)." },
+      { re: [/\b(leadership|communit|clubs?|organization|founded|co.?found|president|started|\brain\b|university ai alliance|cse society|alliance|innovate research)\b/], kw: ['leadership', 'community', 'founded', 'president', 'club'], a: "He tends to start things. He co-founded RAIN (Real World AI Network), a 7,000+ student group across UCSD's engineering, data science, and business schools; sits on the founding board of the University AI Alliance (the nation's largest student-led AI initiative, with MIT, Stanford, Caltech, Cornell) as VP of external affairs; is president of UCSD's CSE Society (200+ members across 21+ projects); and founded the Innovate Research Group (30+ people across UCLA, UCSB, UCSC)." },
       { re: [/\b(contact|e?mail|reach|connect|get in touch|linked ?in|git ?hub|message|\bdm\b|talk to)\b/], kw: ['contact', 'email', 'reach', 'linkedin', 'github'], a: "Easiest is email: <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>. His <a href=\"https://www.linkedin.com/in/pranav-kumar-soma/\" target=\"_blank\" rel=\"noopener\">LinkedIn</a>, <a href=\"https://github.com/soma-p\" target=\"_blank\" rel=\"noopener\">GitHub</a>, and résumé are all at the bottom of the page, and he reads everything." },
-      { re: [/\b(hir(e|ing)|looking for|seeking|open to|availab|opportunit|roles?|positions?|recruit|relocat|locat(ion|ed)|based|bay area|san francisco|sf\b|start date|when can he start)\b/], kw: ['hire', 'looking', 'available', 'relocate', 'location', 'role'], a: "He's after roles at top AI companies, software, ML, or forward-deployed engineering, ideally where the models are biggest and the stakes are real. He's based in San Diego and happy to relocate anywhere in the SF Bay Area." },
+      { re: [/\b(hir(e|ing)|looking for|seeking|open to|availab\w*|opportunit\w*|roles?|positions?|recruit\w*|relocat\w*|locat(ion|ed)|based|bay area|san francisco|sf\b|start date|when can he start)\b/], kw: ['hire', 'looking', 'available', 'relocate', 'location', 'role'], a: "He finishes his CS master's at UC San Diego in December 2026, and in September 2026 he starts as founding software engineer at a stealth startup building autonomy software. He's after roles at top AI companies, software, ML, or forward-deployed engineering, ideally where the models are biggest and the stakes are real. He's based in San Diego and happy to relocate anywhere in the SF Bay Area. Email is fastest for specifics: <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>." },
       { re: [/\b(r[eé]sum[eé]|\bcv\b|curriculum vitae)\b/], kw: ['resume', 'cv'], a: "His résumé is linked at the bottom of the page, with targeted versions for Software, Machine Learning, and Forward-Deployed roles. Or just email him: <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>." },
       { re: [/\b(from|grew up|cupertino|hometown|personal|hobb(y|ies)|outside.{0,12}work|robotics|robots?|debate|as a person|life story)\b/], kw: ['from', 'cupertino', 'hobbies', 'robotics', 'debate', 'personal'], a: "He's from Cupertino, grew up building robots, and came up through competitive robotics and speech and debate (and a USACO Silver), where you only get credit for the thing that works on the day. He runs wide on purpose: systems, ML, theory, full-stack, robotics. Outside the research he builds communities: RAIN, the University AI Alliance, CSE Society." },
       { re: [/\b(golem|crystal|mascot|robots?|animation|\bdog\b|baymax|svg|canvas|cute|creature|who are you|what are you)\b/], kw: ['golem', 'crystal', 'mascot', 'animation', 'site'], a: "Ha, every creature here is hand-built SVG and canvas. The green guy is his copper-golem guide; I'm the end-crystal that orbits it, and each project has its own little animation. It's his way of showing, not telling." },
       { re: [/\bhow.{0,16}(site|website|page|this).{0,16}(built|made|work)|built this|made this|tech behind|vanilla|no framework/], kw: ['website', 'built'], a: "The whole site is hand-built: vanilla HTML, CSS, and JavaScript, with SVG and canvas for every animation, no framework. Even this chatbot runs on pattern-matching right here in your browser." },
       { re: [/\b(are you (an? )?(ai|bot|robot|real|human|chat ?gpt|llm|gpt)|is this (an? )?(ai|bot)|you'?re (a )?bot)\b/], kw: ['bot', 'real'], a: "I'm a little pattern-matching bot Pranav built, not an LLM, running entirely in your browser. So I keep to what I actually know about him: work, research, projects, skills, what he's after, and how to reach him." },
-      { re: [/\b(fun fact|something interesting|surprise me|tell me something|interesting about|cool fact)\b/], kw: ['fun', 'interesting', 'random'], a: "Fun one: he finished undergrad in two years and his master's in a year and a quarter, at a 4.00 GPA the whole way. He was also the top intern of 800+ at ServiceNow, and his sheet-music AI ORCA was verified by real musicians." },
+      { re: [/\b(fun fact|something interesting|surprise me|tell me something|interesting about|cool fact)\b/], kw: ['fun', 'interesting', 'random'], a: "Fun one: he finished undergrad in two years and his master's in a year and a quarter, at a 4.00 in the master's. He was also the top intern of 800+ at UCSD's summer internship symposium, and his sheet-music AI ORCA was verified by real musicians." },
       { re: [/\b(thanks|thank you|thx|\bty\b|nice|awesome|great|love it|amazing|appreciate|helpful)\b/], kw: ['thanks', 'thank', 'awesome', 'great'], a: "Anytime! If you like what you see, his résumé and email are at the bottom of the page, and he reads everything." },
     ];
     const FALLBACK = "Good question. I stick to the highlights: his work and experience, research, projects, skills, education, honors, leadership, what he's looking for, and how to reach him. Try one of those, or email him at <a href=\"mailto:prsoma@ucsd.edu\">prsoma@ucsd.edu</a>.";
@@ -982,7 +1156,7 @@
     const respond = (q) => { const t = addBot('<span class="ask-typing"><i></i><i></i><i></i></span>'); setTimeout(() => { t.innerHTML = reply(q); log.scrollTop = log.scrollHeight; }, 360 + Math.random() * 360); };
     const send = (q) => { q = (q || '').trim(); if (!q) return; addMe(q); input.value = ''; respond(q); };
     form.addEventListener('submit', (e) => { e.preventDefault(); send(input.value); });
-    ['What does he work on?', 'Best projects?', "What's he looking for?", 'How do I reach him?'].forEach((c) => {
+    ['Why hire him?', "What's he doing next?", 'What does he work on?', 'How do I reach him?'].forEach((c) => {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'ask-chip'; b.textContent = c;
       b.addEventListener('click', () => send(c)); chipsBox.appendChild(b);
     });

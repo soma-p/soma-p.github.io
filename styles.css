@@ -42,6 +42,11 @@ a{color:inherit;text-decoration:none}
 .chip:focus-visible,.im-trigger:focus-visible{outline-offset:2px}
 .container{width:var(--container);margin-inline:auto}
 .accent{color:var(--accent)}
+/* first tab stop: jump past the nav straight into the content */
+.skip-link{position:fixed;top:8px;left:8px;z-index:200;transform:translateY(-160%);
+  background:var(--accent);color:#fff;padding:11px 18px;border-radius:9px;font-weight:600;
+  font-size:.92rem;transition:transform .2s}
+.skip-link:focus{transform:none}
 
 /* labels */
 .eyebrow{font-family:var(--ff-m);font-size:.72rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
@@ -146,10 +151,61 @@ a{color:inherit;text-decoration:none}
 .s-head p{color:var(--ink-2);max-width:42ch}
 
 /* ---------- WORK ---------- */
-.work-row{display:grid;grid-template-columns:.5fr 2fr;gap:30px;padding:34px 0;border-top:1px solid var(--line);transition:background .25s}
+.work-row{display:grid;grid-template-columns:.72fr 2fr;gap:30px;padding:34px 0;border-top:1px solid var(--line);transition:background .25s}
 .work-row:last-child{border-bottom:1px solid var(--line)}
 .work-row:hover{background:linear-gradient(90deg,rgba(14,122,83,.04),transparent)}
 .work-when{font-family:var(--ff-m);font-weight:500;color:var(--ink-3);font-size:.82rem;letter-spacing:.02em}
+
+/* one small instrument plate per job: what the work actually was, drawn.
+   Six custom properties carry the whole palette so dark mode is one override,
+   and the canvas reads the same properties back out via getComputedStyle. */
+.work-art{
+  --wa-line:rgba(14,122,83,.22); --wa-dim:rgba(14,122,83,.5); --wa-mid:#0E7A53;
+  --wa-hot:#34D399; --wa-glow:rgba(52,211,153,.55); --wa-plate:linear-gradient(158deg,#F7FBF9,#EBF3EF);
+  position:relative;margin-top:18px;width:100%;max-width:240px;aspect-ratio:5/4;
+  border:1px solid var(--line);border-radius:11px;background:var(--wa-plate);overflow:hidden
+}
+.work-art canvas,.work-art .wa-svg{display:block;width:100%;height:100%}
+.wa-cap{position:absolute;left:9px;bottom:7px;font-family:var(--ff-m);font-size:.55rem;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);pointer-events:none}
+
+/* the plates keep 28 CSS animations alive; park them while #work is off screen,
+   the same deal the canvas modules get from visLoop. Opt-out rather than opt-in,
+   so with no JS the plates animate instead of freezing on an empty first frame. */
+#work.wa-parked .wa-svg *{animation-play-state:paused!important}
+
+/* shared vocabulary across the four SVG plates */
+.wa-svg .wa-wire,.wa-svg .wa-wire-out{fill:none;stroke:var(--wa-line);stroke-width:1.4}
+.wa-svg .wa-wire path{fill:none;stroke:var(--wa-line);stroke-width:1.4}
+/* a bright dash travelling the same path as the faint wire under it */
+.wa-svg .wa-flow path{fill:none;stroke:var(--wa-hot);stroke-width:2;stroke-linecap:round;
+  stroke-dasharray:16 260;stroke-dashoffset:276;animation:waFlow 3.6s linear infinite}
+@keyframes waFlow{to{stroke-dashoffset:0}}
+.wa-svg .wa-hub{fill:none;stroke:var(--wa-mid);stroke-width:1.8}
+.wa-svg .wa-core-dot{fill:var(--wa-hot)}
+.wa-svg .wa-node rect{fill:none;stroke:var(--wa-mid);stroke-width:1.6}
+.wa-svg .wa-leaf circle{fill:var(--wa-dim)}
+
+/* ServiceNow: the old latency bar in ghost, the new one on top */
+.wa-intents .wa-bar-ghost{fill:var(--wa-line)}
+.wa-intents .wa-bar{fill:var(--wa-hot);transform-box:fill-box;transform-origin:left center;animation:waBar 3.6s ease-in-out infinite}
+.wa-intents .wa-bar-2{animation-delay:-1.8s}
+@keyframes waBar{0%,100%{transform:scaleX(1.85);opacity:.45}22%,78%{transform:scaleX(1);opacity:1}}
+
+/* Qualcomm: three sensor tracks folding into one grounded answer */
+.wa-fusion .wa-audio{fill:none;stroke:var(--wa-dim);stroke-width:1.8;stroke-linecap:round}
+.wa-fusion .wa-dots circle{fill:var(--wa-dim)}
+.wa-fusion .wa-frame rect,.wa-fusion .wa-frame path{fill:none;stroke:var(--wa-dim);stroke-width:1.6}
+.wa-fusion .wa-ring{fill:none;stroke:var(--wa-hot);stroke-width:1.6;transform-box:fill-box;transform-origin:center;
+  animation:waRing 2.4s ease-out infinite}
+@keyframes waRing{0%{transform:scale(.55);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+
+/* Work4Flow: prompts under a scanner, scores coming out the other side */
+.wa-score .wa-cell rect{fill:var(--wa-line)}
+.wa-score .wa-grade rect{fill:var(--wa-hot);transform-box:fill-box;transform-origin:left center;animation:waGrade 3.6s ease-in-out infinite}
+@keyframes waGrade{0%,12%{transform:scaleX(0);opacity:0}30%,88%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+.wa-score .wa-scan{stroke:var(--wa-mid);stroke-width:1.6;stroke-dasharray:3 5;opacity:.7;animation:waScan 3.6s ease-in-out infinite}
+@keyframes waScan{0%,100%{transform:translateX(-72px)}50%{transform:translateX(84px)}}
 .work-tag{display:inline-block;margin-top:10px;font-family:var(--ff-m);font-size:.68rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:rgba(14,122,83,.08);padding:5px 10px;border-radius:6px}
 .work-main h3{font-family:var(--ff-d);font-weight:600;font-size:var(--sm);letter-spacing:-.02em;line-height:1.12}
 .work-main h3 .at{color:var(--accent)}
@@ -610,6 +666,8 @@ a{color:inherit;text-decoration:none}
   .life-grid{grid-template-columns:34px 1fr auto;gap:22px}
   .baymax svg{width:106px;height:auto}
   .s-head{gap:18px}
+  .work-row{grid-template-columns:.85fr 2fr;gap:24px}
+  .work-art{max-width:200px}
 }
 /* ===== phone ===== */
 @media(max-width:680px){
@@ -627,6 +685,7 @@ a{color:inherit;text-decoration:none}
   .tk{padding:0}.tk + .tk{border-left:0}
   .hero-kicker{font-size:.68rem}
   .work-row{grid-template-columns:1fr;gap:8px}
+  .work-art{max-width:190px;margin-top:14px;margin-bottom:4px}
   .paper{grid-template-columns:1fr;gap:8px}
   .life-grid{grid-template-columns:1fr;gap:12px}
   .baymax{justify-content:flex-start;margin-top:2px}.baymax svg{width:92px;height:auto}
@@ -659,6 +718,9 @@ body.chat-open .ask-orb{opacity:0!important;pointer-events:none}
 .ask-fab:active{transform:scale(.93)}
 @keyframes fabPulse{0%,100%{box-shadow:0 8px 22px -6px rgba(123,44,191,.7)}50%{box-shadow:0 8px 30px -4px rgba(123,44,191,.95)}}
 @media(max-width:900px){.ask-fab{display:flex}}
+/* the orbiting crystal is the desktop way in, and it does not run under
+   reduced motion, so the FAB has to be the way in there too */
+@media(prefers-reduced-motion:reduce){.ask-fab{display:flex}}
 body.chat-open .ask-fab{display:none}
 .o-bob{transform-box:fill-box;transform-origin:50% 50%;animation:oBob 3.4s ease-in-out infinite}
 @keyframes oBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
@@ -729,6 +791,18 @@ html[data-theme="dark"] .buddy-bubble{background:#0b1310;color:#E9EFEC}
 html[data-theme="dark"] .buddy-bubble::after{border-top-color:#0b1310}
 html[data-theme="dark"] .contact{background:#0E6A49}
 html[data-theme="dark"] img{filter:brightness(.92)}
+/* the work plates: one override, and the swarm canvas picks these up too */
+html[data-theme="dark"] .work-art{
+  --wa-line:rgba(52,211,153,.2); --wa-dim:rgba(52,211,153,.46); --wa-mid:#2FA37D;
+  --wa-hot:#5FD89B; --wa-glow:rgba(95,216,155,.5); --wa-plate:linear-gradient(158deg,#111A16,#18241F);
+}
+html[data-theme="dark"] .work-row:hover{background:linear-gradient(90deg,rgba(34,176,116,.07),transparent)}
+/* surfaces that were hardcoded light and had no dark counterpart */
+html[data-theme="dark"] .marquee{background:var(--bg-soft)}
+html[data-theme="dark"] .gal figure{background:#16211C;box-shadow:0 18px 36px -18px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.07)}
+html[data-theme="dark"] .nav-cta:hover{background:var(--ink);color:var(--bg)}
+/* the phone breakpoint paints the slide-out menu #fff; dark mode needs its own */
+@media(max-width:680px){html[data-theme="dark"] .nav-links{background:#0F1613}}
 
 /* Minecraft lever: flip it to turn the site's lights off */
 .lever-toggle{position:fixed;left:14px;bottom:14px;z-index:120;width:46px;height:74px;border:0;background:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
