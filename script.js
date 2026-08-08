@@ -47,10 +47,19 @@
   };
   onProg(); addEventListener('scroll', onProg, { passive: true });
 
-  /* reveal on scroll */
+  /* reveal on scroll. Anything with [data-stagger] hands its children a
+     ramped delay so groups arrive as a run rather than all at once. */
   const io = new IntersectionObserver((es) => {
     es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
   }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
+  $$('[data-stagger]').forEach(group => {
+    const step = Number.parseInt(group.dataset.stagger, 10) || 70;
+    $$(':scope > *', group).forEach((el, i) => {
+      el.classList.add('reveal');
+      if (!el.dataset.rv) el.dataset.rv = 'rise';
+      el.style.setProperty('--d', Math.min(i * step, 520) + 'ms');
+    });
+  });
   $$('.reveal').forEach(el => io.observe(el));
   setTimeout(() => $$('.reveal:not(.in), .reveal-img:not(.in)').forEach(el => el.classList.add('in')), 2000);
 
@@ -145,6 +154,7 @@
   const shot = document.documentElement.classList.contains('shotmode');
   if (!reduce && !shot && window.Lenis) {
     const lenis = new window.Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true });
+    window.__lenis = lenis;                                       // so other modules can scroll through it
     const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); };
     requestAnimationFrame(raf);
     document.documentElement.style.scrollBehavior = 'auto';
@@ -162,6 +172,104 @@
       }
     }));
   }
+
+  /* hero parallax: the headline, portrait and data strip leave at different
+     rates, so the first scroll gesture has depth instead of a flat push. */
+  (() => {
+    if (reduce) return;
+    const head = $('.hero-headline'), plate = $('.hero-plate'), tick = $('.hero-ticker');
+    if (!head) return;
+    let queued = false;
+    const place = () => {
+      queued = false;
+      const y = scrollY;
+      if (y > innerHeight * 1.1) return;                        // nothing to do once it's gone
+      const k = Math.min(1, y / (innerHeight * 0.9));
+      head.style.transform = `translate3d(0,${(y * 0.16).toFixed(1)}px,0)`;
+      head.style.opacity = (1 - k * 0.85).toFixed(3);
+      if (plate) plate.style.transform = `translate3d(0,${(y * -0.06).toFixed(1)}px,0)`;
+      if (tick) tick.style.transform = `translate3d(0,${(y * 0.06).toFixed(1)}px,0)`;
+    };
+    place();
+    addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(place); } }, { passive: true });
+  })();
+
+  /* work dossier: the sticky rail tracks which entry you're reading, and the
+     numerals/fill follow the scroll. The rail is also a real jump-nav. */
+  (() => {
+    const stage = $('.work-stage'); if (!stage) return;
+    const entries = $$('.work-entry', stage), items = $$('#wpToc li'), num = $('#wpNum'), fill = $('#wpFill');
+    if (!entries.length) return;
+    const flow = $('.work-flow', stage);
+    flow?.classList.add('tracking');
+    let cur = -1, queued = false;
+
+    const paint = () => {
+      queued = false;
+      const line = scrollY + innerHeight * 0.42;                  // the "you are reading here" line
+      let i = 0;
+      entries.forEach((el, k) => { if (el.getBoundingClientRect().top + scrollY <= line) i = k; });
+      const box = stage.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (line - (box.top + scrollY)) / (box.height || 1)));
+      if (fill) fill.style.width = (p * 100).toFixed(1) + '%';
+      if (i === cur) return;
+      cur = i;
+      entries.forEach((el, k) => el.classList.toggle('live', k === i));
+      items.forEach((el, k) => el.classList.toggle('on', k === i));
+      if (num) {                                                  // brief fade so the numeral reads as a swap
+        num.classList.add('swap');
+        setTimeout(() => { num.textContent = String(i + 1).padStart(2, '0'); num.classList.remove('swap'); }, reduce ? 0 : 150);
+      }
+    };
+    const onScroll = () => { if (!queued) { queued = true; requestAnimationFrame(paint); } };
+    paint(); addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll, { passive: true });
+
+    items.forEach((li, k) => li.querySelector('button')?.addEventListener('click', () => {
+      const t = entries[k]; if (!t) return;
+      const y = t.getBoundingClientRect().top + scrollY - 132;
+      if (window.__lenis) window.__lenis.scrollTo(y); else scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+    }));
+  })();
+
+  /* projects rail: vertical scroll through a tall spacer drives the horizontal
+     scroll of the pinned track. Falls back to the plain grid on narrow screens
+     and under reduced motion, where hijacking the scroll direction is hostile. */
+  (() => {
+    const rail = $('#projRail'), track = $('#projTrack');
+    if (!rail || !track) return;
+    const pin = rail.querySelector('.rail-pin'), fill = $('#railFill');
+    const counter = rail.querySelector('.rail-prog span'), cards = $$('.card', track);
+    let span = 0, queued = false;
+
+    const measure = () => {
+      const on = !reduce && innerWidth >= 900 && matchMedia('(pointer:fine)').matches;
+      rail.classList.toggle('rail-off', !on);
+      if (!on) { rail.style.height = ''; pin.scrollLeft = 0; span = 0; return; }
+      span = Math.max(0, track.scrollWidth - pin.clientWidth);
+      rail.style.height = (innerHeight + span) + 'px';       // exactly enough scroll to cross the track
+      place();
+    };
+    const place = () => {
+      queued = false;
+      if (!span) return;
+      const top = rail.getBoundingClientRect().top;
+      const p = Math.min(1, Math.max(0, -top / span));
+      pin.scrollLeft = p * span;
+      if (fill) fill.style.width = (p * 100).toFixed(1) + '%';
+      if (counter && cards.length) {                          // which card is centred right now
+        const mid = pin.scrollLeft + pin.clientWidth / 2;
+        let i = 0;
+        cards.forEach((c, k) => { if (c.offsetLeft <= mid) i = k; });
+        counter.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(cards.length).padStart(2, '0');
+      }
+    };
+    const onScroll = () => { if (!queued) { queued = true; requestAnimationFrame(place); } };
+    measure();
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', measure, { passive: true });
+    // a card growing (the ORCA canvas sizing itself) changes the track width
+    if (window.ResizeObserver) new ResizeObserver(measure).observe(track);
+  })();
 
   /* ===== centerpieces ===== */
   const onView = (node, cb) => { new IntersectionObserver(es => cb(es[0].isIntersecting), { threshold: 0 }).observe(node); };
@@ -220,151 +328,6 @@
     };
     const frame = () => { if (run) { t += 16; if (Math.random() < 0.04) spawn(); draw(); } };
     if (reduce) { init(); draw(); } else { visLoop(cv, frame); }
-  })();
-
-  /* 1b) Dyson swarm on the incoming-role plate: collectors on three inclined
-     orbits, each beaming harvested power back down to the core.
-
-     Each shell is a real 3D circle: pick a unit normal n from a tilt/azimuth
-     pair, build an orthonormal basis (u, v) spanning the plane perpendicular
-     to it, and a drone at angle th sits at a*(cos th * u + sin th * v). The
-     z component of that is the depth, which drives draw order (behind the
-     core first), scale and alpha, so collectors visibly pass behind the star
-     and come back around in front of it. */
-  (() => {
-    const cv = $('#waSwarm'); if (!cv) return;
-    const c = cv.getContext('2d'); const dpr = Math.min(2, devicePixelRatio || 1);
-    let W = 0, H = 0, cx = 0, cy = 0, U = 0, core = null, speed = 0.6, hover = 0;
-
-    // three orbital shells: [radius x U, tilt, azimuth, angular speed, drones]
-    const SHELLS = [[0.40, 1.08, 0.31, 0.62, 6], [0.56, 1.24, 1.82, -0.44, 7], [0.72, 1.01, -0.91, 0.33, 8]];
-    // canvas blends gradient stops non-premultiplied, so fading a colour to
-    // "transparent" runs it through grey. Fade to the same hue at alpha 0.
-    const toRGBA = (col, a) => {
-      const h = (col || '').trim();
-      if (h[0] === '#') {
-        const p = h.length === 4 ? [h[1] + h[1], h[2] + h[2], h[3] + h[3]] : [h.slice(1, 3), h.slice(3, 5), h.slice(5, 7)];
-        return `rgba(${parseInt(p[0], 16)},${parseInt(p[1], 16)},${parseInt(p[2], 16)},${a})`;
-      }
-      const m = h.match(/[\d.]+/g);
-      return m ? `rgba(${m[0]},${m[1]},${m[2]},${a})` : h;
-    };
-    const pal = { line: '', dim: '', mid: '', hot: '', glow: '' };
-    const readPal = () => {
-      const s = getComputedStyle(cv.parentElement);
-      pal.line = s.getPropertyValue('--wa-line').trim(); pal.dim = s.getPropertyValue('--wa-dim').trim();
-      pal.mid = s.getPropertyValue('--wa-mid').trim(); pal.hot = s.getPropertyValue('--wa-hot').trim();
-      pal.glow = s.getPropertyValue('--wa-glow').trim();
-    };
-
-    const drones = [];
-    const build = () => {
-      drones.length = 0;
-      SHELLS.forEach(([k, tilt, az, w, n], si) => {
-        // plane normal, then any two unit vectors perpendicular to it
-        const nx = Math.sin(tilt) * Math.cos(az), ny = Math.sin(tilt) * Math.sin(az), nz = Math.cos(tilt);
-        let ux = -ny, uy = nx, uz = 0, ul = Math.hypot(ux, uy, uz);
-        if (ul < 1e-4) { ux = 1; uy = 0; uz = 0; ul = 1; }
-        ux /= ul; uy /= ul; uz /= ul;
-        const vx = ny * uz - nz * uy, vy = nz * ux - nx * uz, vz = nx * uy - ny * ux;
-        for (let i = 0; i < n; i++) {
-          drones.push({ si, k, w, u: [ux, uy, uz], v: [vx, vy, vz], th: (i / n) * Math.PI * 2 + si * 0.7, p: (i / n + si * 0.31) % 1 });
-        }
-      });
-    };
-
-    const size = () => {
-      const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
-      if (!W || !H) return;
-      cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0);
-      cx = W / 2; cy = H / 2; U = Math.min(W, H) / 2;
-      core = c.createRadialGradient(cx, cy, 0, cx, cy, U * 0.34);
-      core.addColorStop(0, '#FFFFFF'); core.addColorStop(0.22, pal.hot);
-      core.addColorStop(0.55, pal.mid); core.addColorStop(1, toRGBA(pal.mid, 0));
-    };
-    readPal(); size();
-    build();
-    addEventListener('resize', () => { readPal(); size(); }, { passive: true });
-    // the lever swaps the CSS custom properties out from under us
-    new MutationObserver(() => { readPal(); size(); })
-      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-
-    const host = cv.closest('.work-row');
-    host?.addEventListener('mouseenter', () => { hover = 1; });
-    host?.addEventListener('mouseleave', () => { hover = 0; });
-
-    const at = (d, th) => {                                   // orbital angle -> 3D point
-      const ct = Math.cos(th) * d.k * U, st = Math.sin(th) * d.k * U;
-      return [d.u[0] * ct + d.v[0] * st, d.u[1] * ct + d.v[1] * st, d.u[2] * ct + d.v[2] * st];
-    };
-    const orbit = (d, back) => {                              // one half of a shell's guide ellipse
-      c.beginPath();
-      for (let i = 0; i <= 44; i++) {
-        const th = (i / 44) * Math.PI * 2, p = at(d, th);
-        if (back ? p[2] > 0 : p[2] <= 0) { c.moveTo(cx + p[0], cy + p[1]); continue; }
-        c.lineTo(cx + p[0], cy + p[1]);
-      }
-      c.stroke();
-    };
-
-    const paint = (d, t) => {
-      const p = at(d, d.th), sx = cx + p[0], sy = cy + p[1];
-      const z = p[2] / (d.k * U);                             // -1 behind, +1 in front
-      const sc = 0.66 + 0.44 * (z + 1) / 2, al = 0.42 + 0.58 * (z + 1) / 2;
-      // harvest beam, brightest while this collector is charging
-      const chg = 0.5 + 0.5 * Math.sin(t * 0.0016 + d.th * 2 + d.si);
-      c.globalAlpha = Math.min(1, (0.1 + 0.3 * chg) * al);
-      c.strokeStyle = pal.hot; c.lineWidth = 1;
-      c.beginPath(); c.moveTo(cx, cy); c.lineTo(sx, sy); c.stroke();
-      // a packet of power running the beam back down to the core
-      const px = sx + (cx - sx) * d.p, py = sy + (cy - sy) * d.p;
-      c.globalAlpha = Math.min(1, 0.85 * al);
-      c.fillStyle = pal.hot;
-      c.beginPath(); c.arc(px, py, 1.5 * sc, 0, 7); c.fill();
-      // the collector itself: a panel held square to its own orbit
-      const ah = at(d, d.th + 0.05), ang = Math.atan2(ah[1] - p[1], ah[0] - p[0]);
-      c.save(); c.translate(sx, sy); c.rotate(ang);
-      c.globalAlpha = Math.min(1, al);
-      c.fillStyle = pal.mid; c.fillRect(-3.1 * sc, -2.1 * sc, 6.2 * sc, 4.2 * sc);
-      c.fillStyle = pal.hot; c.fillRect(-3.1 * sc, -2.1 * sc, 6.2 * sc, 1.1 * sc);
-      c.restore();
-      c.globalAlpha = 1;
-    };
-
-    const draw = (t) => {
-      if (!W || !H) return;
-      c.clearRect(0, 0, W, H);
-      c.lineWidth = 1; c.strokeStyle = pal.line;
-      const first = [0, 6, 13].map(i => drones[i]).filter(Boolean);
-      first.forEach(d => orbit(d, true));                     // guide arcs behind the core
-      drones.filter(d => at(d, d.th)[2] <= 0).forEach(d => paint(d, t));
-      const g = 1 + 0.06 * Math.sin(t * 0.0021);              // the star, breathing
-      c.fillStyle = core;
-      c.beginPath(); c.arc(cx, cy, U * 0.34 * g, 0, 7); c.fill();
-      c.strokeStyle = pal.glow; c.lineWidth = 1.2;
-      c.beginPath(); c.arc(cx, cy, U * 0.15 * g, 0, 7); c.stroke();
-      c.lineWidth = 1; c.strokeStyle = pal.line;
-      first.forEach(d => orbit(d, false));                    // guide arcs in front
-      drones.filter(d => at(d, d.th)[2] > 0).forEach(d => paint(d, t));
-    };
-
-    // park the sibling SVG plates' CSS animations while the section is off screen
-    const sec = cv.closest('.section');
-    if (sec) new IntersectionObserver(es => sec.classList.toggle('wa-parked', !es[0].isIntersecting), { threshold: 0 }).observe(sec);
-
-    let last = 0;
-    const frame = (t) => {
-      if (!W || !H) size();                                   // first measure can land before layout
-      const dt = last ? Math.min(64, t - last) : 16; last = t;
-      speed += ((hover ? 1.7 : 0.6) - speed) * 0.05;
-      drones.forEach(d => {
-        d.th += d.w * speed * dt * 0.0016;
-        d.p += (0.24 + 0.1 * d.si) * speed * dt * 0.001;
-        if (d.p >= 1) d.p -= 1;
-      });
-      draw(t);
-    };
-    if (reduce) { draw(1200); } else { visLoop(cv, frame); }
   })();
 
   /* 2) ORCA waveform (mirrored audio panel) */

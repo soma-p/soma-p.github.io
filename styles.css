@@ -25,12 +25,15 @@
   --sm:clamp(1.3rem,1.1rem + 1vw,1.9rem);
   --container:min(1240px,100% - 36px);
 }
-html{overflow-x:hidden}
+/* clip, not hidden: overflow-x:hidden makes these scroll containers, which
+   silently breaks every position:sticky descendant (the work rail, the
+   projects rail). clip contains the same overflow without that side effect. */
+html{overflow-x:clip}
 
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:88px;-webkit-text-size-adjust:100%}
 body{font-family:var(--ff);background:var(--bg);color:var(--ink);line-height:1.55;
-  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:clip}
 img{max-width:100%;display:block}
 h1,h2,h3,h4{overflow-wrap:break-word}   /* never let a long heading push past a narrow viewport */
 a{color:inherit;text-decoration:none}
@@ -150,70 +153,52 @@ a{color:inherit;text-decoration:none}
 .s-head .eyebrow{margin-bottom:14px;display:block}
 .s-head p{color:var(--ink-2);max-width:42ch}
 
-/* ---------- WORK ---------- */
-.work-row{display:grid;grid-template-columns:.72fr 2fr;gap:30px;padding:34px 0;border-top:1px solid var(--line);transition:background .25s}
-.work-row:last-child{border-bottom:1px solid var(--line)}
-.work-row:hover{background:linear-gradient(90deg,rgba(14,122,83,.04),transparent)}
-.work-when{font-family:var(--ff-m);font-weight:500;color:var(--ink-3);font-size:.82rem;letter-spacing:.02em}
+/* ---------- WORK: a sticky dossier ----------
+   The left rail pins and tracks you through the section; the entries scroll
+   past it. The rail is a real jump-nav, not decoration. */
+.work-stage{display:grid;grid-template-columns:minmax(200px,.62fr) 2fr;gap:clamp(30px,4vw,68px);align-items:start}
+.work-pin{position:sticky;top:112px;padding-top:6px}
 
-/* one small instrument plate per job: what the work actually was, drawn.
-   Six custom properties carry the whole palette so dark mode is one override,
-   and the canvas reads the same properties back out via getComputedStyle. */
-.work-art{
-  --wa-line:rgba(14,122,83,.22); --wa-dim:rgba(14,122,83,.5); --wa-mid:#0E7A53;
-  --wa-hot:#34D399; --wa-glow:rgba(52,211,153,.55); --wa-plate:linear-gradient(158deg,#F7FBF9,#EBF3EF);
-  position:relative;margin-top:18px;width:100%;max-width:240px;aspect-ratio:5/4;
-  border:1px solid var(--line);border-radius:11px;background:var(--wa-plate);overflow:hidden
-}
-.work-art canvas,.work-art .wa-svg{display:block;width:100%;height:100%}
-.wa-cap{position:absolute;left:9px;bottom:7px;font-family:var(--ff-m);font-size:.55rem;font-weight:500;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);pointer-events:none}
+.wp-count{display:flex;align-items:baseline;gap:9px;padding-bottom:16px;border-bottom:1.5px solid var(--ink)}
+.wp-n{font-family:var(--ff-d);font-weight:700;font-size:clamp(2.6rem,1.6rem + 3vw,4.4rem);line-height:.82;
+  letter-spacing:-.045em;font-variant-numeric:tabular-nums;color:var(--ink);transition:opacity .3s}
+.wp-n.swap{opacity:0}
+.wp-of{font-family:var(--ff-m);font-size:.66rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
 
-/* the plates keep 28 CSS animations alive; park them while #work is off screen,
-   the same deal the canvas modules get from visLoop. Opt-out rather than opt-in,
-   so with no JS the plates animate instead of freezing on an empty first frame. */
-#work.wa-parked .wa-svg *{animation-play-state:paused!important}
+.wp-toc{list-style:none;margin:18px 0 0;display:grid;gap:2px}
+.wp-toc button{display:grid;grid-template-columns:26px 1fr;align-items:baseline;gap:8px;width:100%;
+  font:inherit;text-align:left;background:none;border:0;padding:8px 10px 8px 0;cursor:pointer;
+  color:var(--ink-3);border-radius:7px;transition:color .25s,transform .25s,padding-left .25s}
+.wp-toc button i{font-family:var(--ff-m);font-style:normal;font-size:.6rem;font-weight:500;letter-spacing:.06em;opacity:.65}
+.wp-toc button span{font-size:.9rem;font-weight:500;line-height:1.25}
+.wp-toc button:hover{color:var(--ink-2)}
+.wp-toc li.on button{color:var(--ink);padding-left:10px}
+.wp-toc li.on button i{color:var(--accent);opacity:1}
+.wp-toc li.on button span{font-weight:600}
 
-/* shared vocabulary across the four SVG plates */
-.wa-svg .wa-wire,.wa-svg .wa-wire-out{fill:none;stroke:var(--wa-line);stroke-width:1.4}
-.wa-svg .wa-wire path{fill:none;stroke:var(--wa-line);stroke-width:1.4}
-/* a bright dash travelling the same path as the faint wire under it */
-.wa-svg .wa-flow path{fill:none;stroke:var(--wa-hot);stroke-width:2;stroke-linecap:round;
-  stroke-dasharray:16 260;stroke-dashoffset:276;animation:waFlow 3.6s linear infinite}
-@keyframes waFlow{to{stroke-dashoffset:0}}
-.wa-svg .wa-hub{fill:none;stroke:var(--wa-mid);stroke-width:1.8}
-.wa-svg .wa-core-dot{fill:var(--wa-hot)}
-.wa-svg .wa-node rect{fill:none;stroke:var(--wa-mid);stroke-width:1.6}
-.wa-svg .wa-leaf circle{fill:var(--wa-dim)}
+/* the fill tracks how far through the section you are */
+.wp-bar{margin-top:20px;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+.wp-bar span{display:block;height:100%;width:0;background:var(--accent);transform-origin:left;transition:width .18s linear}
 
-/* ServiceNow: the old latency bar in ghost, the new one on top */
-.wa-intents .wa-bar-ghost{fill:var(--wa-line)}
-.wa-intents .wa-bar{fill:var(--wa-hot);transform-box:fill-box;transform-origin:left center;animation:waBar 3.6s ease-in-out infinite}
-.wa-intents .wa-bar-2{animation-delay:-1.8s}
-@keyframes waBar{0%,100%{transform:scaleX(1.85);opacity:.45}22%,78%{transform:scaleX(1);opacity:1}}
-
-/* Qualcomm: three sensor tracks folding into one grounded answer */
-.wa-fusion .wa-audio{fill:none;stroke:var(--wa-dim);stroke-width:1.8;stroke-linecap:round}
-.wa-fusion .wa-dots circle{fill:var(--wa-dim)}
-.wa-fusion .wa-frame rect,.wa-fusion .wa-frame path{fill:none;stroke:var(--wa-dim);stroke-width:1.6}
-.wa-fusion .wa-ring{fill:none;stroke:var(--wa-hot);stroke-width:1.6;transform-box:fill-box;transform-origin:center;
-  animation:waRing 2.4s ease-out infinite}
-@keyframes waRing{0%{transform:scale(.55);opacity:.9}100%{transform:scale(1.5);opacity:0}}
-
-/* Work4Flow: prompts under a scanner, scores coming out the other side */
-.wa-score .wa-cell rect{fill:var(--wa-line)}
-.wa-score .wa-grade rect{fill:var(--wa-hot);transform-box:fill-box;transform-origin:left center;animation:waGrade 3.6s ease-in-out infinite}
-@keyframes waGrade{0%,12%{transform:scaleX(0);opacity:0}30%,88%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
-.wa-score .wa-scan{stroke:var(--wa-mid);stroke-width:1.6;stroke-dasharray:3 5;opacity:.7;animation:waScan 3.6s ease-in-out infinite}
-@keyframes waScan{0%,100%{transform:translateX(-72px)}50%{transform:translateX(84px)}}
-.work-tag{display:inline-block;margin-top:10px;font-family:var(--ff-m);font-size:.68rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:rgba(14,122,83,.08);padding:5px 10px;border-radius:6px}
-.work-main h3{font-family:var(--ff-d);font-weight:600;font-size:var(--sm);letter-spacing:-.02em;line-height:1.12}
-.work-main h3 .at{color:var(--accent)}
-.work-main p{margin-top:12px;color:var(--ink-2);max-width:64ch}
-.work-main p b{color:var(--ink);font-weight:600}
+.work-flow{display:grid}
+.work-entry{padding:38px 0;border-top:1px solid var(--line)}
+.work-entry:first-child{padding-top:0;border-top:0}
+.work-entry:last-child{border-bottom:1px solid var(--line)}
+.we-top{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:13px}
+.we-when{font-family:var(--ff-m);font-weight:500;color:var(--ink-3);font-size:.8rem;letter-spacing:.02em}
+.work-tag{display:inline-block;font-family:var(--ff-m);font-size:.66rem;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--accent);background:rgba(14,122,83,.08);padding:5px 10px;border-radius:6px}
 .chips{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
-.chip{font-family:var(--ff-m);font-size:.72rem;font-weight:500;color:var(--ink-2);background:var(--bg-soft);border:1px solid var(--line);padding:5px 10px;border-radius:6px}
+.chip{font-family:var(--ff-m);font-size:.72rem;font-weight:500;color:var(--ink-2);background:var(--bg-soft);
+  border:1px solid var(--line);padding:5px 10px;border-radius:6px}
 .section.alt .chip{background:#fff}
+.work-entry h3{font-family:var(--ff-d);font-weight:600;font-size:var(--sm);letter-spacing:-.02em;line-height:1.12}
+.work-entry h3 .at{color:var(--accent)}
+.work-entry p{margin-top:12px;color:var(--ink-2);max-width:64ch}
+.work-entry p b{color:var(--ink);font-weight:600}
+/* the entry you are reading sits at full strength, the rest step back */
+.work-flow.tracking .work-entry{transition:opacity .45s,filter .45s}
+.work-flow.tracking .work-entry:not(.live){opacity:.42}
 
 /* ---------- RESEARCH (dark block) ---------- */
 .dark{background:var(--black);color:#fff}
@@ -231,6 +216,39 @@ a{color:inherit;text-decoration:none}
 .dark .chip{background:#1B1C22;border-color:rgba(255,255,255,.16);color:#D7DAE1}
 
 /* ---------- PROJECTS ---------- */
+/* ---------- PROJECTS: the sideways rail ----------
+   .rail is a tall spacer; .rail-pin sticks to the viewport inside it and its
+   scrollLeft is driven by how far you are through the spacer. It is a real
+   scroll container, not a transform, so tabbing to an off-screen card still
+   brings it into view and a trackpad can nudge it directly. */
+.rail{position:relative}
+.rail-pin{position:sticky;top:0;height:100vh;display:flex;align-items:center;
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}
+.rail-pin::-webkit-scrollbar{display:none}
+.rail-track{display:flex;align-items:stretch;gap:26px;padding-inline:max(24px,calc(50vw - 620px));
+  padding-block:10px;will-change:transform}
+.rail .card{width:min(390px,74vw);flex:0 0 auto}
+.rail .card.feature{width:min(760px,88vw)}
+.rail .card{min-height:min(60vh,500px)}
+/* sticks near the bottom of the viewport for as long as the rail is on screen */
+.rail-prog{position:sticky;top:calc(100vh - 62px);z-index:2;width:min(560px,84vw);margin:0 auto;
+  display:flex;align-items:center;gap:14px;font-family:var(--ff-m);font-size:.6rem;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);pointer-events:none}
+.rail-prog i{flex:1;display:block;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+.rail-prog b{display:block;height:100%;width:0;background:var(--accent);border-radius:2px}
+.rail-prog span{white-space:nowrap;font-variant-numeric:tabular-nums}
+/* narrow screens and reduced motion get the plain grid back */
+.rail.rail-off{height:auto!important}
+.rail.rail-off .rail-pin{position:static;height:auto;display:block;overflow:visible}
+.rail.rail-off .rail-track{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;
+  width:var(--container);margin-inline:auto;padding:0}
+.rail.rail-off .card{width:auto}
+.rail.rail-off .card.feature{width:auto;grid-column:span 2}
+.rail.rail-off .rail-prog{display:none}
+@media(max-width:1024px){.rail.rail-off .rail-track{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.rail.rail-off .rail-track{grid-template-columns:1fr}
+  .rail.rail-off .card.feature{grid-column:span 1;flex-direction:column}}
+
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
 .card{border:1px solid var(--line);border-radius:12px;padding:28px;background:#fff;transition:transform .25s,box-shadow .25s,border-color .25s;display:flex;flex-direction:column}
 .card:hover{transform:translateY(-6px);box-shadow:0 30px 60px -30px rgba(10,10,11,.3);border-color:transparent}
@@ -640,16 +658,26 @@ a{color:inherit;text-decoration:none}
 @media(max-width:900px){.buddy{display:none}}
 
 /* ---------- reveal ---------- */
-.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+/* reveal choreography. data-rv picks the gesture, --d staggers siblings.
+   Everything lands on the same easing so the page reads as one hand. */
+.reveal{--d:0ms;opacity:0;transform:translateY(26px);
+  transition:opacity .7s cubic-bezier(.16,1,.3,1) var(--d),transform .7s cubic-bezier(.16,1,.3,1) var(--d),clip-path .9s cubic-bezier(.16,1,.3,1) var(--d)}
 .reveal.in{opacity:1;transform:none}
+.reveal[data-rv="left"]{transform:translateX(-34px)}
+.reveal[data-rv="right"]{transform:translateX(34px)}
+.reveal[data-rv="rise"]{transform:translateY(46px) scale(.985)}
+/* headings wipe up from behind their own baseline instead of just fading */
+.reveal[data-rv="clip"]{clip-path:inset(0 0 100% 0);transform:translateY(14px)}
+.reveal[data-rv="clip"].in{clip-path:inset(-30% 0 -12% 0)}
+.shotmode .reveal[data-rv="clip"]{clip-path:none!important}
 .shotmode .reveal{opacity:1!important;transform:none!important}
 .shotmode .ask-orb{opacity:1!important}
 .shotmode .hero{padding-top:120px}
 
 /* ---------- responsive ---------- */
 /* overflow guards: let flex/grid text children shrink instead of pushing width */
-.s-head>div,.s-head p,.work-main,.work-row,.ftext,.paper,.paper>div,.life-grid,.life-grid>div,.card,.lead,.lead-body,.cards,.papers{min-width:0}
-.work-main p,.paper p,.card p,.lead p,.hero-sub{overflow-wrap:break-word}
+.s-head>div,.s-head p,.work-entry,.work-flow,.work-stage,.work-pin,.wp-toc,.ftext,.paper,.paper>div,.life-grid,.life-grid>div,.card,.lead,.lead-body,.cards,.papers{min-width:0}
+.work-entry p,.paper p,.card p,.lead p,.hero-sub{overflow-wrap:break-word}
 
 /* ===== tablet ===== */
 @media(max-width:1024px){
@@ -666,8 +694,6 @@ a{color:inherit;text-decoration:none}
   .life-grid{grid-template-columns:34px 1fr auto;gap:22px}
   .baymax svg{width:106px;height:auto}
   .s-head{gap:18px}
-  .work-row{grid-template-columns:.85fr 2fr;gap:24px}
-  .work-art{max-width:200px}
 }
 /* ===== phone ===== */
 @media(max-width:680px){
@@ -684,8 +710,16 @@ a{color:inherit;text-decoration:none}
   .hero-ticker{grid-template-columns:1fr 1fr;gap:22px 18px;padding-top:18px}
   .tk{padding:0}.tk + .tk{border-left:0}
   .hero-kicker{font-size:.68rem}
-  .work-row{grid-template-columns:1fr;gap:8px}
-  .work-art{max-width:190px;margin-top:14px;margin-bottom:4px}
+  .work-stage{grid-template-columns:1fr;gap:0}
+  .work-pin{position:static;margin-bottom:26px}
+  .wp-toc{grid-auto-flow:column;grid-auto-columns:max-content;gap:0 6px;overflow-x:auto;scrollbar-width:none;
+    min-width:0;padding-bottom:2px}
+  .wp-toc::-webkit-scrollbar{display:none}
+  .wp-toc button{grid-template-columns:1fr;padding:7px 12px;border:1px solid var(--line);border-radius:100px}
+  .wp-toc button span{white-space:nowrap;font-size:.8rem}
+  .wp-toc button i{display:none}
+  .wp-toc li.on button{padding-left:12px;border-color:var(--accent);color:var(--accent)}
+  .work-flow.tracking .work-entry:not(.live){opacity:1}
   .paper{grid-template-columns:1fr;gap:8px}
   .life-grid{grid-template-columns:1fr;gap:12px}
   .baymax{justify-content:flex-start;margin-top:2px}.baymax svg{width:92px;height:auto}
@@ -792,11 +826,6 @@ html[data-theme="dark"] .buddy-bubble::after{border-top-color:#0b1310}
 html[data-theme="dark"] .contact{background:#0E6A49}
 html[data-theme="dark"] img{filter:brightness(.92)}
 /* the work plates: one override, and the swarm canvas picks these up too */
-html[data-theme="dark"] .work-art{
-  --wa-line:rgba(52,211,153,.2); --wa-dim:rgba(52,211,153,.46); --wa-mid:#2FA37D;
-  --wa-hot:#5FD89B; --wa-glow:rgba(95,216,155,.5); --wa-plate:linear-gradient(158deg,#111A16,#18241F);
-}
-html[data-theme="dark"] .work-row:hover{background:linear-gradient(90deg,rgba(34,176,116,.07),transparent)}
 /* surfaces that were hardcoded light and had no dark counterpart */
 html[data-theme="dark"] .marquee{background:var(--bg-soft)}
 html[data-theme="dark"] .gal figure{background:#16211C;box-shadow:0 18px 36px -18px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.07)}

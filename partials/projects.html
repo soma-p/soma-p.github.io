@@ -2,11 +2,17 @@
 <!-- PROJECTS -->
 <section class="section" id="projects">
   <div class="container">
-    <div class="s-head reveal">
+    <div class="s-head reveal" data-rv="clip">
       <div><span class="eyebrow">Projects</span><h2>Stuff I've built</h2></div>
-      <p>The things I build when nobody's grading them.</p>
+      <p>The things I build when nobody's grading them. Keep scrolling, this one goes sideways.</p>
     </div>
-    <div class="cards">
+  </div>
+
+  <!-- the rail pins to the viewport and scrolls sideways as you scroll down.
+       Below 900px, and under reduced motion, it is just a normal stack again. -->
+  <div class="rail" id="projRail">
+    <div class="rail-pin">
+      <div class="rail-track" id="projTrack">
       <div class="card feature reveal">
         <div class="fmedia orca-media">
           <canvas class="orca-wave" id="orcaWave"></canvas>
@@ -197,6 +203,8 @@
           </g></svg>
         </div>
       </div>
+      </div>
     </div>
+    <div class="rail-prog" aria-hidden="true"><span>01 / 08</span><i><b id="railFill"></b></i><span>keep scrolling</span></div>
   </div>
 </section>
