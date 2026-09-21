@@ -902,3 +902,79 @@ html[data-theme="dark"] .nav-cta:hover{background:var(--ink);color:var(--bg)}
 
 
 
+
+/* ============================================================
+   PRINT
+   Turns the site into a readable PDF (Cmd+P, or Chrome
+   --print-to-pdf). Three classes of problem to undo:
+   1. fixed/sticky chrome, which either repeats on every sheet or
+      floats over the content
+   2. the pinned horizontal projects rail, which is a real
+      overflow-x container and would print as one clipped frame
+   3. interactive-only furniture (chat, orb, lever, mascots) that
+      means nothing on paper
+   Animation state is NOT handled here: script.js already short
+   circuits the scramble, rotator and counters under
+   prefers-reduced-motion, so print with that emulated and the
+   text lands on its final value instead of mid-tween.
+   ============================================================ */
+@media print{
+  /* always print the light palette; a dark-mode print is unreadable and
+     drinks toner, so the dark tokens are overridden wholesale */
+  :root,:root[data-theme="dark"]{
+    --bg:#fff; --ink:#0d1b14; --muted:#4a5a52; --card:#fff; --line:#d8e2dc;
+  }
+  html,body{
+    background:#fff!important; color:#0d1b14!important;
+    overflow:visible!important; scroll-behavior:auto!important;
+  }
+  /* keep brand greens and photos rather than letting the browser
+     wash them out */
+  *{-webkit-print-color-adjust:exact!important; print-color-adjust:exact!important}
+
+  /* 1. interactive furniture: nothing to click on paper */
+  .skip-link,#themeToggle,#askPanel,#askFab,#askOrb,#buddy,
+  #heroBg,.robot-fleet,.lying-dog,.marquee,.nav-cta,
+  .rail-hint,.wp-bar,#wpToc{display:none!important}
+
+  /* 2. unpin everything. a fixed nav repeats on all 16 sheets; a sticky
+        work dossier collapses to an empty column */
+  .nav,.nav-links,.work-pin,.rail-pin{
+    position:static!important; height:auto!important; top:auto!important;
+  }
+  .rail{height:auto!important}
+  .rail-pin{padding:0!important; display:block!important}
+  .rail-scroll{overflow:visible!important; display:block!important}
+  .rail-scroll>*{width:auto!important; max-width:100%!important}
+  .work-stage{display:block!important}
+
+  /* 3. reveal animations: show everything, since there is no scrolling */
+  .reveal,[data-rv]{opacity:1!important; transform:none!important; clip-path:none!important}
+
+  /* 4. pagination. keep a heading with its content and never split a card */
+  section{break-inside:auto; page-break-inside:auto}
+  h1,h2,h3,h4{break-after:avoid; page-break-after:avoid}
+  .card,.work-entry,.lead,.res-item,figure,.tk{
+    break-inside:avoid; page-break-inside:avoid;
+  }
+  section#work,section#research,section#projects,
+  section#leadership,section#about,section#contact{
+    break-before:page; page-break-before:page;
+  }
+
+  /* 5. trim viewport-sized whitespace that only made sense on screen, and hold the
+        hero headline and portrait side by side so the opening fits one sheet */
+  .hero{min-height:0!important; padding-top:24px!important}
+  .hero-main{display:grid!important; grid-template-columns:1.45fr .85fr!important;
+             gap:26px!important; align-items:start!important; break-inside:avoid}
+  .hero-plate{margin:0!important}
+  .hero-plate img{max-height:250px!important; width:auto!important}
+  .hero-ticker{break-inside:avoid}
+  section{padding-top:28px!important; padding-bottom:28px!important}
+
+  /* 6. spell out link targets so a printed copy is still actionable */
+  .clinks a[href^="http"]::after,.rv a[href^="http"]::after{
+    content:" (" attr(href) ")"; font-size:.72em; color:#4a5a52; word-break:break-all;
+  }
+  @page{margin:14mm 12mm}
+}

@@ -99,7 +99,17 @@
   const cio = new IntersectionObserver((es) => {
     es.forEach(e => { if (e.isIntersecting) { run(e.target); cio.unobserve(e.target); } });
   }, { threshold: 0.6 });
-  $$('.n[data-count]').forEach(el => cio.observe(el));
+  // Under reduced motion there is nothing to animate, so finalize immediately
+  // rather than waiting to scroll into view. This is also what makes the numbers
+  // appear in print: the IntersectionObserver never fires for off-screen elements
+  // during a print render, which left every counter showing its literal "0".
+  $$('.n[data-count]').forEach(el => { if (reduce) run(el); else cio.observe(el); });
+
+  // Cmd+P from a normal browser still has motion enabled, so settle any counter
+  // that has not run yet before the print snapshot is taken.
+  window.addEventListener('beforeprint', () => {
+    $$('.n[data-count]').forEach(el => { cio.unobserve(el); run(el); });
+  });
 
   /* text scramble on the name */
   const scramble = (el) => {
